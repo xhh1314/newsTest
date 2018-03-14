@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta charset="utf-8" />
+		<title>敏感词列表页</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+		<script type="text/javascript">
+		/**页面全局url**/
+		//加载敏感词列表
+		var loadSenstivewordsListUrl = "${rc.contextPath}/sns/senstive/senstiveword_list.do?wordType=0";
+		//保存敏感词
+		var saveSenstivewordUrl = "${rc.contextPath}/sns/senstive/save.do";
+		//编辑敏感词
+		var toeditSenstivewordUrl = "${rc.contextPath}/sns/senstive/toeditSenstiveword.do";
+		//删除敏感词
+		var deleteSenstivewordUrl = "${rc.contextPath}/sns/senstive/delete.do";
+		//批量删除敏感词
+		var batchdeleteSenstivewordUrl = "${rc.contextPath}/sns/senstive/batchdelete.do";
+		</script>
+	</head>
+
+	<body class="page-content">
+		<!-- 区块：主内容区域 begin-->
+		<div class="senstivewords-main">
+			<form name="searchform" id="searchform" class="form-inline hk-search">
+				<div class="row">
+					<div class="col-sm-2 col-xs-6">
+			  			<input type="text" name="word" value="<#if searchVo.word??>${searchVo.word}</#if>" class="form-control input-sm" placeholder="敏感词名称">
+					</div>
+					<div class="col-sm-2  col-xs-6">
+			  			<button type="button" class="btn btn-info btn-sm" onclick="tosearch()">
+				  			<span class="glyphicon glyphicon-search"></span> 
+				  			<span>搜索</span>
+				  		</button>
+					</div>
+				</div>
+			</form>
+			<div class="hk-toolbar">
+				<div class="btn-group btn-group-sm">
+				  	<button type="button" class="btn btn-default">
+				  		<span class="glyphicon glyphicon-th-list"></span> 
+				  		操作
+				  	</button>
+				  	<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				    	<span class="caret"></span>
+				 	</button>
+				  	<ul class="dropdown-menu">
+				    	<li>
+				    		<a id="linkAddItem" href="javascript:void(0)">
+				    			<span class="glyphicon glyphicon-plus"></span> 
+				    			添加
+				    		</a>
+				    	</li>
+				    	<li>
+				    		<@shiro.hasPermission name="/sns/senstive/batchdelete.do">  
+	
+
+				    		<a id="linkDelItems" href="#">
+				    			<span class="glyphicon glyphicon-remove"></span> 
+					    		批量删除
+					    	</a>
+
+					    	</@shiro.hasPermission>
+					    </li>
+				  	</ul>
+				</div>
+			</div>
+			<table class="table table-hover table-bordered">
+			    <thead>
+			        <tr>
+			            <th><input type="checkbox" id="checkall" onclick="selectAll()"></th>
+			            <th data-field='index'>序号</th>
+			            <th>ID</th>
+			            <th style="width:35%;">敏感词名称</th>
+			            <th>录入时间</th>
+			            <th>录入人</th>
+			            <th>操作</th>
+			        </tr>
+			    </thead>
+			    <tbody>
+			    <#list page.list as senstivewords>
+			        <tr>
+			            <td><input type="checkbox" name="senstivewordsCheckbox" value="${senstivewords.senstiveId}"></td>
+			            <td data-field='index'>1</td>
+			            <td>${senstivewords.senstiveId}</td>
+			            <td><#if senstivewords.word??>${senstivewords.word}</#if></td>
+			            <td><#if senstivewords.createTime??>${senstivewords.createTime?string('yyyy-MM-dd HH:mm:ss')}</#if></td>
+			            <td><#if senstivewords.creator??>${senstivewords.creator}</#if></td>
+			            <td>
+							<a class="btn btn-info btn-xs" href="javascript:editItems('${senstivewords.senstiveId}')">编辑</a>
+			            	<a class="btn btn-danger btn-xs" href="javascript:deleteItems('${senstivewords.senstiveId}')">删除</a>
+			            </td>
+			        </tr>
+			    </#list>
+			    </tbody>
+			</table>
+			<#include "../common/page.html" />
+		  	<!-- Modal -->
+			<div class="modal fade" id="modalInfos" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+			  <#include "sensitiveword_add.html" />
+			</div>
+		</div>
+		<!-- 区块：主内容区域 end -->
+
+		<script type="text/javascript">
+		//信息表单模态框
+		var $modalInfos = $('#modalInfos');//模态框
+		var $modalInfoTitle = $modalInfos.find('#modalTite');//模态框标题
+			//此页面
+			var page = {
+				//初始化
+				init:function(){
+					this.eventInit();
+				},
+				//事件绑定
+				eventInit:function(){
+					//bootstrap模态框实例
+					$modalInfos.modal({
+						backdrop:'static',//点击模态透明层不隐藏
+						keyboard:false,//键盘不控制模态框 如：esc按下模态框不消失
+						show:false//实例化后默认不显示
+					});
+					//添加一条数据
+					$('#linkAddItem').click(function(){
+						$modalInfoTitle.html('添加数据1');
+						$modalInfos.modal('show'); //显示模态框（$modalInfo.modal('hide')为js手动隐藏模态框）
+					});
+				}
+			}
+			
+			$(function(){
+				//设置序号
+				var length = $("tbody tr").length;
+				//var begin = (${page.pageNo}-1)*length+1;
+				for(var i = 0;i<length;i++){
+		            $("tbody tr:eq("+i+") td[data-field='index']").text(i+1);
+		        }
+				page.init();
+			});
+		
+		
+			function tosearch(){
+				var data = $("#searchform").serialize();
+				loadMain(loadSenstivewordsListUrl,data);
+				
+			}
+			//在当前行编辑
+			function editItems(senstiveId){
+				
+				var data = {"senstiveId":senstiveId};
+				//先加载页面
+				$modalInfos.load(toeditSenstivewordUrl,data);
+				$modalInfos.modal('show');
+			};
+			//删除一条数据
+			function deleteItems(senstiveId){
+				
+				var c = confirm("确定删除"+senstiveId+"么?");
+				
+				if(c==true){
+					
+					var url = deleteSenstivewordUrl+"?senstiveId="+senstiveId;
+					$.ajax({
+					    type:"POST",
+					    dataType:"text",
+					    url:url,
+					    success:function(data,status){
+					    	if(status='success'&&data=='success'){
+					    		$('.hk-main').load(loadSenstivewordsListUrl);
+					    	}
+					    }
+					});
+				}
+				
+			}
+			//批量删除
+			$('#linkDelItems').on('click',function(){
+				var ids= new Array();
+				var i=0;
+				$("input:checkbox[name='senstivewordsCheckbox']:checked").each(function() {
+					ids.push({"senstiveId":$(this).val()}); // 每一个被选中项的值
+				});
+				if(ids=="") {
+					alert("请至少选择一条记录");
+					return false;
+				}
+				var c = confirm("确定删除选中的分类么?");
+				if(c==true){
+					$.ajax({
+					    type:"POST",
+					    dataType:"text",
+					    contentType: "application/json; charset=utf-8",
+					    url:batchdeleteSenstivewordUrl,
+					    data:JSON.stringify(ids),
+					    success:function(data,status){
+					    	if(status='success'&&data=='success'){
+					    		$('.hk-main').load(loadSenstivewordsListUrl);
+					    	}
+					    },
+					    error:function(data){
+					    	alert(data);
+					    }
+					});
+				}
+			});
+			/** 分页普通跳转 **/
+			function jumpNormalPage(page){
+				var checkid = null;
+				$('.hk-main').load(loadSenstivewordsListUrl+"&pageNo="+page);
+			}	
+			
+			//全选全不选，列表所有选中复选框选中，否则不选中
+			function selectAll() {
+				if($("#checkall").is(":checked")){  
+					$("input[name='senstivewordsCheckbox']").each(function(){  
+			             $(this).prop("checked", true);  
+			         });  
+			    }else{  
+			    	$("input[name='senstivewordsCheckbox']").each(function(){  
+			             $(this).removeAttr("checked");  
+			         });  
+			    }  
+			}
+			
+		</script>
+	</body>
+</html>

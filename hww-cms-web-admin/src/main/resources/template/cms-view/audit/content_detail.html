@@ -1,0 +1,238 @@
+<div class="modal-dialog modal-lg" role="document">
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+				aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+			<h5 class="modal-title">
+				<span class="glyphicon glyphicon-file"></span> <span>新闻详情</span>
+			</h5>
+		</div>
+		<div class="modal-body">
+			
+			<form class="form-horizontal">
+				<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">新闻标题</label>
+					<div class="col-sm-10">
+						<p class="form-control-static">
+							<#if news??>${news.title!}</#if>
+						</p>
+					</div>
+				</div>
+					
+				<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">新闻类型</label>
+					<div class="col-sm-10">
+						<p class="form-control-static">
+							<#if news??><#if news.contentType??>${news.contentType.contentTypeName!}</#if></#if></p>
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">是否置顶</label>
+					<div class="col-sm-10">
+						<p class="form-control-static">
+							<#if (news.top)??><#if news.top==0>否</#if><#if news.top==1>是</#if><#else>否</#if>
+								</p>
+					</div>
+				</div>
+				
+				<div class="form-group form-group-sm" id="thumb_logos_div">
+					<label class="col-sm-2 control-label">封面组图</label>
+					<div class="col-sm-10">
+						<div class="hk-imgset">
+							<div class="imgs" id="thumb_logo" style="height:200px; overflow:auto">
+							<!-- js初始化 -->
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">新闻摘要</label>
+					<div class="col-sm-10">
+						<p class="form-control-static">
+							<#if news??>${news.summary!}</#if></p>
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">新闻内容</label>
+					<div class="col-sm-10">
+						<div class="hk-imgset">
+							<#if dataContent??>
+					      			<div class="form-control-static" style="width:100%;">${dataContent.content!}</div>
+					      	</#if>
+					      	<#if news??>
+						      	
+						      	<#if news.contentType.contentTypeId==5>
+						      		<div class="col-sm-10">
+						      			<div class="row" id="imgs_content" style="width:100%; height:300px; overflow:auto"></div>
+									</div>
+						      	</#if>
+						      	<#if news.contentType.contentTypeId==6>
+						      		<div class="col-sm-10">
+										<section id="player">
+										    <video id="media" width="100%" height="500px" controls>
+										        <source id="v1" src="">
+										    </video>
+										</section>
+									</div>
+						      	</#if>
+					      	</#if>
+					    </div>
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">新闻地址</label>
+					<div class="col-sm-10">
+						<div id="newslocation"
+							style="padding: 8px;width:100%; height: 200px; background-color: #ddd; border-radius: 2px;">
+
+						</div>
+					</div>
+				</div>
+				 <div class="form-group form-group-sm">
+					    <label class="col-sm-2 control-label">发布时间</label>
+					    <div class="col-sm-10">
+					      	<p class="form-control-static">
+					      	<#if dataContent??>
+					      		<#if dataContent.createTime??>
+					      			${dataContent.createTime?string('yyyy-MM-dd HH:mm:ss')}
+					      		</#if>
+					      	</#if>
+					      	</p>
+					    </div>
+					  </div>
+					  				
+				<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">发布人</label>
+					<div class="col-sm-10">
+						<p class="form-control-static">
+							<#if news??>${news.author!}</#if></p>
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">责任编辑</label>
+					<div class="col-sm-10">
+						<p class="form-control-static">
+							<#if news??>${news.editor!}</#if></p>
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-info btn-sm"
+				data-dismiss="modal">
+				<span class="glyphicon glyphicon-remove"></span> 关闭
+			</button>
+		</div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+var tuji_detail_page={
+		initMap:function(){
+			var map = new BMap.Map("newslocation");
+			var point = new BMap.Point(116.331398,39.897445);
+			map.centerAndZoom(point,11);
+			map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+			<#if news??>
+				<#if news.longitude?? && news.latitude??>
+					map.clearOverlays(); 
+					// 百度地图API功能
+					var new_point = new BMap.Point(${news.longitude},${news.latitude});
+					map.centerAndZoom(new_point,11);
+					var marker = new BMap.Marker(new_point);  // 创建标注
+					map.addOverlay(marker);              // 将标注添加到地图中
+					map.panTo(new_point);
+				</#if>
+			</#if>
+		}
+}
+
+$(function(){
+	var imgs = new Array();
+	 <#if news??>
+	 	<#if news.thumbUrl??>
+	 	imgs = "${news.thumbUrl!''}";
+	 	if(imgs){
+	 		imgs = imgs.split(",");
+	 	}
+	 	</#if>
+	</#if>
+	if(imgs&&imgs.length>0){
+		for(var i=0;i<imgs.length;i++){
+			/* var img=document.createElement("img");
+			img.src=file_upload_prefix+imgs[i]; */
+			
+			var div = "<div class='col-sm-6 col-md-4' style='height: 130px;width: 150px;'>"
+			+ "<div align='center' style='height: 130px;width: 150px;'>"
+			+"<div class='thumbnail' style='height:130px;width:130px;' >"
+			+ "<img src='"+file_upload_prefix+imgs[i]+"' style='width:100%;height:100%;'>"
+			+"</div>" + "</div>" + "</div>";
+			
+			$("#thumb_logo").append(div);
+		}
+	}
+	tuji_detail_page.initMap();
+	
+	<#if news??>
+		<#if news.contentType.contentTypeId==5>
+		 	$("#thumb_logos_div").hide();
+		 	var picdata;
+		 	<#if picJson??>
+		 		if(${picJson!}){
+		 			picdata=${picJson!};
+		 		}
+		 	</#if>
+		 	
+		 	
+		 	if(picdata){
+				for(var i in picdata){
+					var pic=picdata[i];
+					/* var div = "<div class='col-sm-6 col-md-4' id='"+pic.fileId+"_div' style='height: 250px;width: 130px;'>"
+					+ "<div class='thumbnail' style='height: 130px;width: 130px;'>"
+					+ "<img src='"+file_upload_prefix+pic.imgUrl+"'id='"+pic.fileId+"_img'>"
+					+ "<div class='caption'>"
+					+ "<p><a class='btn' role='text'>描述:"+pic.fileDesc+"</a></p>"
+					+ "</div>" + "</div>" + "</div>"; */
+					
+					var printDesc=pic.fileDesc;
+					if(printDesc){
+						if(printDesc.length>3){
+							printDesc=printDesc.substring(0,3)+"...";
+						}
+					}
+					var div = "<div id='"+pic.fileId+"_div' class='col-sm-6 col-md-4' style='height: 180px;width: 150px;'>"
+					+ "<div align='center' style='height:180px;width: 150px;'>"
+					+"<div class='' style='height:130px;width:130px;' >"
+					+ "<img src='"+file_upload_prefix+pic.imgUrl+"' style='width:100%;height:100%;'>"
+					+"</div>"
+					+"<div>描述</div>"
+					+ "<p><a class='btn' role='text' title='描述："+pic.fileDesc+"'>描述:"+printDesc+"</a></p>"
+					
+					+ "</div>" + "</div>";
+					$("#imgs_content").append(div);
+				}
+		 	}
+		 	
+		</#if>
+	</#if>
+	//视频
+	var videos="";
+	<#if vidUrls??>
+		videos="${vidUrls!''}";
+	</#if>
+	
+	if(videos){
+		document.getElementById("v1").src=file_upload_prefix+videos;
+        document.getElementById("media").load();
+	}
+	
+});
+
+function desc_print(event){
+}
+
+</script>

@@ -1,0 +1,207 @@
+<div class="modal-dialog modal-lg" role="document">
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+				aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+			<h5 class="modal-title" id="myModalLabel">
+				<span class="glyphicon glyphicon-file"></span> <span id="modalTite">选择关联的新闻：</span>
+			</h5>
+		</div>
+		<form id="submitFormHotNews" method="post">
+			<div class="modal-body">
+				<div class="timeline-container timeline-style2">
+					<div class="timeline-items">
+						<input type="hidden" id="topicIds" name="topicId">
+						</p>
+						<p>
+							关键词:<input type="text" id="keywords"><input type="button"
+								value="搜索" id="searchNews" class="btn btn-info"/>
+						</p>
+					</div>
+				</div>
+			</div>
+		</form>
+		<div class="form-group">
+			<div style="overflow-y: auto; width: 96%; height: 400px; margin: 2%">
+				<table class="table table-hover table-bordered">
+					<thead>
+						<tr>
+							<th><input type="radio" onclick="selectAll()"></th>
+							<th style="width: 35%;">标题</th>
+							<th style="width: 35%;">摘要</th>
+							<th style="width: 10%;">关键词</th>
+							<th style="width: 15%;">创建时间</th>
+						</tr>
+					</thead>
+					<tbody id="table_news">
+					</tbody>
+				</table>
+
+			</div>
+
+		</div>
+		<div class="form-group" align="right" style="margin: 5%" >
+			<button id="jumpNews">上一页</button>
+			<button id="jumpNext">下一页</button>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-info btn-sm"
+				data-dismiss="modal">
+				<span class="glyphicon glyphicon-remove"></span> 关闭
+			</button>
+			<button class="btn btn-info" type="button" id="submitbutton_hotnews">
+				<i class="ace-icon fa fa-check bigger-110">提交</i>
+			</button>
+		</div>
+	</div>
+
+</div>
+<script>
+	var curPage = 1;
+	function initPage() {
+		$
+				.ajax({
+					url : "${rc.contextPath}/sns/topic/newsList.do",
+					type : 'psot',
+					dataType : 'json',
+					success : function(data) {
+						for (var i = 0; i < data.length; i++) {
+							var $tr = "<tr><td><input type='radio'name='relatednewsId' value='"+data[i].id+"'></td><td>"
+									+ data[i].title
+									+ "</td><td>"
+									+ data[i].summary
+									+ "</td><td>"
+									+ data[i].keyWords
+									+ "</td><td>"
+									+ data[i].createTime + "</td></tr>";
+							$("#table_news").append($tr);
+						}
+
+					}
+				})
+
+	};
+
+	//${rc.contextPath}/sns/topic/newsList.do?pageNo='"+index+
+	$(function() {
+		initPage();
+		$("#jumpNews").css("disabled", "disabled");
+	});
+	$("#submitbutton_hotnews").click(
+			function() {
+				var relatednewsId = $(
+						'input:radio[name="relatednewsId"]:checked').val();
+				doTopicTohot($("#topicIds").val(), relatednewsId);
+			})
+
+	$("#jumpNews")
+			.click(
+					function() {
+						if (curPage == 1) {
+							return;
+						}
+						$
+								.ajax({
+									url : "${rc.contextPath}/sns/topic/newsList.do?pageNo="
+											+ (curPage - 1),
+									type : "post",
+									dataType : "json",
+									success : function(data) {
+										curPage = curPage - 1;
+										$("#table_news").empty();
+										for (var i = 0; i < data.length; i++) {
+											var $tr = "<tr><td><input type='radio'name='relatednewsId' value='"+data[i].id+"'></td><td>"
+													+ data[i].title
+													+ "</td><td>"
+													+ data[i].summary
+													+ "</td><td>"
+													+ data[i].keyWords
+													+ "</td><td>"
+													+ data[i].createTime
+													+ "</td></tr>";
+											$("#table_news").append($tr);
+										}
+									}
+
+								})
+
+					})
+
+	$("#jumpNext")
+			.click(
+					function() {
+						$
+								.ajax({
+									url : "${rc.contextPath}/sns/topic/newsList.do?pageNo="
+											+ (curPage + 1),
+									type : "post",
+									dataType : "json",
+									success : function(data) {
+										console.log(data);
+										if (data != null && data.length > 0) {
+											curPage = curPage + 1;
+											$("#table_news").empty();
+											for (var i = 0; i < data.length; i++) {
+												var $tr = "<tr><td><input type='radio'name='relatednewsId' value='"+data[i].id+"'></td><td>"
+														+ data[i].title
+														+ "</td><td>"
+														+ data[i].summary
+														+ "</td><td>"
+														+ data[i].keyWords
+														+ "</td><td>"
+														+ data[i].createTime
+														+ "</td></tr>";
+												$("#table_news").append($tr);
+											}
+										} else {
+											alert("已经是最后一页");
+										}
+									}
+
+								})
+
+					})
+
+	$("#searchNews")
+			.click(
+					function() {
+						console.log($("#keywords").val());
+						$("#table_news").empty();
+						$
+								.ajax({
+									url : "${rc.contextPath}/sns/topic/newsList.do?keywords="
+											+ $("#keywords").val(),
+									type : 'psot',
+									dataType : 'json',
+									success : function(data) {
+										console.log(data);
+										for (var i = 0; i < data.length; i++) {
+											var $tr = "<tr><td><input type='radio'name='relatednewsId'value='"+data[i].id+"'></td><td>"
+													+ data[i].title
+													+ "</td><td>"
+													+ data[i].summary
+													+ "</td><td>"
+													+ data[i].keyWords
+													+ "</td><td>"
+													+ data[i].createTime
+													+ "</td></tr>";
+											$("#table_news").append($tr);
+										}
+									}
+								})
+
+					})
+</script>
+
+
+
+
+
+
+
+
+
+
+

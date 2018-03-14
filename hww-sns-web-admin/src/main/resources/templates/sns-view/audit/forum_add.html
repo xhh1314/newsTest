@@ -1,0 +1,140 @@
+<script type="text/javascript">
+	var listCategorytreeUrl = "${rc.contextPath}/sns/category/list_tree.do";
+	var saveForumUrl= "${rc.contextPath}/sns/forum/save.do";
+</script>
+<div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h5 class="modal-title" id="myModalLabel">
+		        	<span class="glyphicon glyphicon-file"></span> 
+		        	<span id="modalTite"></span>
+		        </h5>
+		      </div>
+		      <div class="modal-body">
+		        <form id="forumform" method="post" class="form-horizontal">
+		        	<input type="hidden" name="forumId" value="<#if forum??>${forum.forumId}</#if>">
+		        	<input type="hidden" id="categoryId" name="categoryId" value="<#if forum??>${forum.categoryId!''}</#if>">
+				  <div class="form-group form-group-sm">
+				    <label for="inputEmail3" class="col-sm-2 control-label">板块名称</label>
+				    <div class="col-sm-10">
+				      <input type="text" id="forumName" name="forumName" value="<#if forum??>${forum.forumName}</#if>" class="form-control" placeholder="板块名称">
+				    </div>
+				  </div>
+				  <div class="form-group form-group-sm">
+				    <label for="inputEmail3" class="col-sm-2 control-label">板块分类</label>
+				    <div class="col-sm-10">
+				      	<input type="text" id="forum_tree" name="categoryName" class="form-control" value="<#if forum??>${forum.categoryName!''}</#if>" onclick="$('#treeview').show()" placeholder="分类名称">  
+                        <div id="treeview" style="display: none;"></div>
+				  	</div>
+				  </div>
+				</form>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-info btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 关闭</button>
+		        <button type="button" id="forumSave" data-action=""  class="btn btn-info btn-sm"><span class="glyphicon glyphicon-saved"></span> 保存</button>
+		      </div>
+		    </div>
+		  </div>
+		  
+<script type="text/javascript">	
+	//信息表单模态框
+	var $modalInfo = $('#modalInfo');
+	var $modalInfoTitle = $modalInfo.find('#modalTite');
+	
+	$modalInfo.modal({
+		backdrop:'static',
+		keyboard:false,
+		show:false
+	});
+	//模态框完全关闭后重新load
+	$modalInfo.on('hidden.bs.modal', function () {
+		loadMain(loadForumUrl);
+	});
+	var dataArray = [];
+    function loadCategoryTree() {  
+    	$.ajax({  
+            type : "POST", 
+            async :false,  //同步
+            url : listCategorytreeUrl,
+            success : function(data, status) {
+                if (status == "success") {  
+                	dataArray = eval(data);//json字符串或者js对象都可以显示
+                	return dataArray;
+                }  
+            },  
+            error : function() {
+                return dataArray;
+            },  
+        }); 
+    }
+ 	 //页面初始化
+	$(function(){
+		//载入页面加载分类树
+		//loadCategoryTree();
+		var treeObj = $.fn.zTree.getZTreeObj("treeview"); 
+		treeObj.expandAll(true); 
+	});
+    
+    function buildDomTree() {
+    	/* var data = [{
+            text: "板块分类",//根节点
+            nodes: [{ text: "p1-1", id: '00001', nodeId: '00001' }, { text: "p1-2", id: '00002' }, { text: "p1-3", id: '00003' }, { text: "p1-4", id: '00004', nodes: [{ text: 'p1-1-1', id: '00005'}]}]
+
+        }] */
+    }  
+  
+    $("#forum_tree").click(function() {
+    	if(dataArray.length>0){
+    		var options = {  
+                    bootstrap2 : false,  
+                    showTags : true,  
+                    levels : 5,  
+                    showCheckbox : true,
+                    multiSelect : false, //默认只能选一个
+                    checkedIcon : "glyphicon glyphicon-check",  
+                    data : dataArray,  
+                    onNodeSelected : function(event, data) {  
+                        $("#forum_tree").val(data.text);  
+                        $("#categoryId").val(data.id);  //
+                        $("#treeview").hide();  
+                    }  
+                };  
+          
+           $('#treeview').treeview(options); 
+    	}
+    });  
+    
+    function formValidate(){
+    	var forumName = $("#forumName").val()||'';
+    	if(forumName===''){
+    		alert("版块名称不能为空!");
+    		return false;
+    	}
+    	return true;
+    }
+    $("#forumSave").on('click',function(){
+    	//设置选中的分类id
+    	var validated = formValidate();
+    	if(validated==false){
+    		return false;
+    	}
+		//ajax提交
+		$.ajax({
+		    type:"POST",
+		    data:$("#forumform").serialize(),
+		    dataType:"text",
+		    url:saveForumUrl,
+		    success:function(data,status){
+		    	if(status=='success'&&data=='success'){
+		    		$modalInfo.modal('hide');//手动关闭模态框
+		    	}else{
+		    		alert(data);
+		    	}
+		    },
+		    error:function(){
+		    	alert("保存失败!");
+		    }
+		});
+	});
+  </script>

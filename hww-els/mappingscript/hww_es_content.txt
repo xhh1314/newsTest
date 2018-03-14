@@ -1,0 +1,92 @@
+PUT  /es_hww/_mapping/hww_es_content
+{
+  
+"properties": {
+      "id": {
+        "type": "text"
+      },
+      "title": {
+        "type": "text",
+        "analyzer": "ik_max_word",
+        "search_analyzer": "ik_max_word"
+      },
+      "shortTitle": {
+        "type": "text",
+        "analyzer": "ik_max_word",
+        "search_analyzer": "ik_max_word"
+      },
+      "summary": {
+        "type": "text",
+        "analyzer": "ik_max_word",
+        "search_analyzer": "ik_max_word"
+      },
+      "content": {
+        "type": "text",
+        "analyzer": "ik_max_word",
+        "search_analyzer": "ik_max_word"
+        
+      },
+       "keywords": {
+        "type": "text",
+        "analyzer": "ik_max_word",
+        "search_analyzer": "ik_max_word"
+      },
+       "priority": {
+        "type": "integer"
+      },
+       "auditStatus": {
+        "type": "integer"
+      },
+       "longitude": {
+        "type": "double"
+      },
+       "latitude": {
+        "type": "double"
+      },
+      "geolocation": {
+        "type": "geo_point"
+      },
+      "address":{
+        "type":"text"
+      },
+      "top":{
+        "type":"integer"
+      },
+      "createTime":{
+        "type":"date",
+        "format": "yyyy-MM-dd HH:mm:ss"
+      },
+      "releaseTime":{
+        "type":"date",
+        "format": "yyyy-MM-dd HH:mm:ss"
+      },
+      "status":{
+        "type":"integer"
+      },
+      "memberId":{
+        "type": "long"
+      },
+      "relatednewsId":{
+        "type":"long"
+      },
+       "contentType":{
+        "type": "integer"
+      },
+       "topicType":{
+        "type": "integer"
+      },
+       "plateType":{
+        "type": "integer"
+      },
+       "anonymous":{
+        "type": "integer"
+      },
+       "publi":{
+        "type": "integer"
+      },
+       "showStatus":{
+        "type": "integer"
+      }
+    }
+  
+}

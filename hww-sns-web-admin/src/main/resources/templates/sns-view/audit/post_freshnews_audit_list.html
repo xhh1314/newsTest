@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta charset="utf-8" />
+<title>海客用户中心管理后台</title>
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<script type="text/javascript">
+			/* 页面全局url */
+			//保存审核请求url
+			var toAuditUrl = "${rc.contextPath}/sns/audit/save.do";
+			//批量审核请求url
+			var batchAuditUrl = "${rc.contextPath}/sns/audit/batch_save.do";
+			//该页面列表
+			var loadNewsfreshPostUrl = "${rc.contextPath}/sns/post/freshnews_post_audit_list.do?pageNo="+${page.pageNo};
+			var auditDetailUrl = "${rc.contextPath}/sns/audit/audit_detail.do";
+			//评论审核
+			var topicType = 1;
+		</script>
+<script src="${rc.contextPath}/resources/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript">
+$("._table_container").height(window.screen.availHeight-(90+60+70)-180);
+</script>
+<#setting number_format="#">
+</head>
+
+<body class="page-content">
+	<!-- 区块：主内容区域 begin-->
+	<div class="post-freshnews-audit-main">
+		<form id="searchform" name="searchform" class="form-inline hk-search">
+			<div class="row">
+				<div class="col-sm-2 col-xs-6">
+					<div class="input-group input-group-sm">
+						<span class="input-group-addon" id="basic-addon3">审核状态</span> <select
+							id="auditStatus" name="auditStatus" class="form-control">
+							<option value=''>全部</option>
+							<option value='0'>待审核</option>
+							<option value='1'>已审核</option>
+						</select>
+					</div>
+				</div>
+				<div class="col-sm-2 col-xs-6">
+					<input type="text" name="content"
+						value="<#if searchvo.content??>${searchvo.content}</#if>"
+						class="form-control input-sm" placeholder="评论内容">
+				</div>
+				<div class="col-sm-2 col-xs-6">
+					<input type="text" name="beginTime" id="beginTime"
+						class="form-control input-sm"
+						onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss', readOnly: true ,maxDate:'#F{$dp.$D(\'endTime\')}'});"
+						format="yyyy-MM-dd HH:mm:ss" placeholder="评论时间开始">
+				</div>
+				<div class="col-sm-2 col-xs-6">
+					<input type="text" name="endTime" id="endTime"
+						class="form-control input-sm"
+						onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss', readOnly: true ,minDate:'#F{$dp.$D(\'beginTime\')}'});"
+						format="yyyy-MM-dd HH:mm:ss" placeholder="评论时间结束">
+				</div>
+				<div class="col-sm-2 col-xs-6">
+					<button type="button" class="btn btn-info btn-sm"
+						onclick="tosearch()">
+						<span class="glyphicon glyphicon-search"></span> <span>搜索</span>
+					</button>
+				</div>
+			</div>
+		</form>
+		<div class="hk-toolbar">
+			<div class="btn-group btn-group-sm">
+				<button type="button" class="btn btn-default">
+					<span class="glyphicon glyphicon-th-list"></span> 操作
+				</button>
+				<button type="button" class="btn btn-default dropdown-toggle"
+					data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<span class="caret"></span>
+				</button>
+				 <@shiro.hasPermission name="/sns/audit/batch_save.do">
+				<ul class="dropdown-menu">
+					<li><a id="linkYesItems" href="javascript:void(0)"> <span
+							class="glyphicon glyphicon-edit"></span> 审核通过
+					</a></li>
+					<li><a id="linkYesItemsAndMark" href="javascript:void(0)">
+							<span class="glyphicon glyphicon-edit"></span> 审核通过并加备注
+					</a></li>
+					<li><a id="linkNoItems" href="#"> <span
+							class="glyphicon glyphicon-remove"></span> 审核不通过
+					</a></li>
+					</@shiro.hasPermission> 
+					<!-- <li>
+				  		<a id="linkNoItemCms" href="#">
+				  			<span class="glyphicon glyphicon-remove"></span> 
+					  		传到cms系统
+					  	</a>
+					  </li> -->
+				</ul>
+			</div>
+		</div>
+		<div class="_table_container"  style="overflow-y: auto;width:100%; " >
+		<table class="table table-hover table-bordered">
+			<thead>
+				<tr>
+					<th><input type="checkbox" id="checkall" onclick="selectAll()"></th>
+					<th>序号</th>
+					<!-- <th>ID</th> -->
+					<th style="width: 30%;">评论内容</th>
+					 <th>会员账号</th>
+					<th>评论时间</th>
+					<th>审核状态</th>
+					<th>可见状态</th>
+					<th>发布时间</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<#list page.list as comment>
+				<tr>
+					<td><input name="postFreshnewsAuditCheckbox"
+						value="${comment.postId}" type="checkbox"></td>
+					<td data-field='index'></td>
+					<!-- <td>${comment.postId}</td> -->
+					<td><#if comment.content??>${comment.content}</#if></td>
+					
+					<td><#if comment.memberName??>${comment.memberName}</#if></td>
+					 <#--
+					<td><#if comment.memberId??>${comment.memberId}</#if></td>
+					-->
+					<td><#if comment.createTime??>${comment.createTime?string('yyyy-MM-dd
+						HH:mm:ss')}</#if></td>
+					<td><#if comment.auditStatus??> <#if 
+							comment.auditStatus==0> 审核未通过 <#elseif
+							comment.auditStatus==1> 审核通过 <#elseif
+							comment.auditStatus==2>新提交 <#else> 已删除 </#if> </#if></td>
+					<td>
+						<!-- <a class="btn btn-info btn-xs linkTimeLine" href="javascript:toauditdetail(${comment.postId})">详情</a> -->
+						<#if comment.showStatus??> <#if 
+							comment.showStatus==0> 不可见 <#elseif comment.showStatus==1>
+			      			可见
+			      			<#else>
+			      			
+								</#if>
+						</#if>
+					</td>
+					<td><#if comment.lastModifyTime??>${comment.lastModifyTime?string('yyyy-MM-dd
+						HH:mm:ss')}</#if></td>
+					<td>
+					 <@shiro.hasPermission name="/sns/audit/batch_save.do">
+					<#if comment.auditStatus??> <#if 
+							comment.auditStatus==0> <a class="btn btn-info btn-xs"
+							href="javascript:freshnewsPostauditPassOrDeny('${comment.postId}',1,1)">审核通过</a>
+						<#elseif comment.auditStatus==1>
+			      			<a class="btn btn-info btn-xs" href="javascript:freshnewsPostauditPassOrDeny('${comment.postId}',0,1)">审核不通过</a>
+			      			<#else>
+			      			<a class="btn btn-info btn-xs" href="javascript:freshnewsPostauditPassOrDeny('${comment.postId}',1,1)">审核通过</a>
+									<a class="btn btn-info btn-xs" href="javascript:freshnewsPostauditPassOrDeny('${comment.postId}',0,1)">审核不通过</a>
+								</#if> </#if>
+								</@shiro.hasPermission> 
+								 <@shiro.hasPermission name="/sns/post/disabledUser.do">
+								 <#if comment.disabled??>
+								  <#if comment.disabled==0>
+								<a class="btn btn-info btn-xs linkDetail" href="javascript:disabledUser(<#if comment.memberId??>'${comment.memberId}'<#else>null</#if>,1)">禁言</a>
+								  <#else>
+								  <a class="btn btn-info btn-xs linkDetail" href="javascript:disabledUser(<#if comment.memberId??>'${comment.memberId}'<#else>null</#if>,0)">解禁</a>
+								</#if></#if>
+								</@shiro.hasPermission> 
+								</td>
+				</tr>
+				</#list>
+			</tbody>
+		</table>
+		</div>
+		<#include "../common/page.html" />
+		<!-- Modal 审核备注 -->
+		<div class="modal fade" id="modalMark" tabindex="-1" role="dialog">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h5 class="modal-title" id="myModalLabel">
+							<span class="glyphicon glyphicon-file"></span> <span>审核备注</span>
+						</h5>
+					</div>
+					<div class="modal-body">
+						<form id="audit" name="audit" class="form-horizontal">
+							<input type="hidden" id="curentstatus" name="curentstatus"
+								value="1" />
+							<!-- 默认为1审核通过 -->
+							<input type="hidden" id="topicType" name="topicType" value="1" />
+							<!-- 默认为1表示评论 -->
+							<div class="form-group form-group-sm">
+								<label class="col-sm-2 control-label">备注</label>
+								<div class="col-sm-10">
+									<textarea id="auditopinion" name="auditopinion"
+										class="form-control" rows="5"></textarea>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-info btn-sm"
+							data-dismiss="modal">
+							<span class="glyphicon glyphicon-remove"></span> 关闭
+						</button>
+						<button type="button" class="btn btn-info btn-sm"
+							data-dismiss="modal"
+							onclick="batchAudit($('#curentstatus').val(),$('#auditopinion').val())">
+							<span class="glyphicon glyphicon-ok"></span> 确定
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Modal审核详情 -->
+		<div class="modal fade" id="modalTimeLine" tabindex="-1" role="dialog">
+			<#include "../common/audit_detail.html" />
+		</div>
+	</div>
+	<!-- 区块：主内容区域 end -->
+
+	<script type="text/javascript">
+		//信息表单模态框
+		var $modalInfo = $('#modalInfo');//模态框
+		var $modalInfoTitle = $modalInfo.find('#modalTite');//模态框标题	
+		//审核详情模态框
+		var $modalTimeLine = $('#modalTimeLine');
+		//审核备注模态框
+		var $modalMark = $('#modalMark');
+		//模态框完全关闭后重新load
+		$modalMark.on('hidden.bs.modal', function () {
+			loadMain(loadNewsfreshPostUrl);
+		});
+		
+		//此页面
+		var page = {
+				//初始化
+				init:function(){
+					this.eventInit();
+				},
+				//事件绑定
+				eventInit:function(){
+					
+					//bootstrap模态框实例
+					$modalInfo.modal({
+						backdrop:'static',//点击模态透明层不隐藏
+						keyboard:false,//键盘不控制模态框 如：esc按下模态框不消失
+						show:false//实例化后默认不显示
+					});
+					$modalTimeLine.modal({
+						backdrop:'static',
+						keyboard:false,
+						show:false
+					});
+
+					$modalMark.modal({
+						backdrop:'static',
+						keyboard:false,
+						show:false
+					});
+				}
+			}
+			
+			$(function(){
+				//设置序号
+				var length = $("tbody tr").length;
+				//var begin = (${page.pageNo}-1)*length+1;
+				for(var i = 0;i<length;i++){
+		      $("tbody tr:eq("+i+") td[data-field='index']").text(i+1);
+		    }
+				//设置搜素框审核状态下拉选中
+	  		<#if searchvo.auditStatus??>
+	  			$("#auditStatus").val(${searchvo.auditStatus});
+	  		</#if>
+				page.init();
+			});
+			
+			//查看审核详情
+			function toauditdetail(postId){
+				$.ajax({
+				  type:"POST",
+				  dataType:"html",
+				  contentType: "application/json; charset=utf-8",
+				  url:auditDetailUrl,
+				  data:JSON.stringify({"topicId":postId}),
+				  success:function(data,status){
+				  	if(status='success'){
+				  		$modalTimeLine.html(data);
+							$modalTimeLine.modal('show');
+				  	}
+				  },
+				  error:function(data){
+				  	alert("获取审核详情失败!");
+				  }
+				});
+			}
+			
+			/**搜素**/
+			function tosearch(){
+				var data = $("#searchform").serialize();
+				loadMain(loadNewsfreshPostUrl,data);
+			}
+			function getCheckedTopicId(){
+				var ids= new Array();
+				var i=0;
+				$("input:checkbox[name='postFreshnewsAuditCheckbox']:checked").each(function() {
+					var data = {"topicId":$(this).val()};
+					ids.push(data); // 每一个被选中项的值
+				});
+				if(ids=="") {
+					alert("请至少选择一条记录");
+					return false;
+				}
+				return ids;
+			}
+			
+			//审核通过并加备注
+			$('#linkYesItemsAndMark').click(function(){
+				var ids = getCheckedTopicId();
+				if(ids){
+					$modalMark.modal('show');
+					$("#curentstatus").val(1);
+				}
+			});
+			
+			//审核不通过并加备注
+			$('#linkNoItems').click(function(){
+				var ids = getCheckedTopicId();
+				if(ids){
+					$modalMark.modal('show');
+					$("#curentstatus").val(0);
+				}
+			});
+			//传递评论
+			$("#linkNoItemCms").click(function(){
+				var ids = getCheckedTopicId();
+			})
+			
+			//批量审核
+			function batchAudit(curentstatus,auditopinion){
+				var ids = getCheckedTopicId();
+				if(ids&&ids.length>0){
+					//添加确认提示
+					var msg = "确定将选择的"+ids.length+"条信息批量"; 
+					if(curentstatus==0){
+						msg = msg+"审核不通过吗？";
+					}else if(curentstatus==1){
+						msg = msg+"审核通过吗？";
+					}
+					if (confirm(msg)==true){
+						for(var i=0;i<ids.length;i++){
+							var data = ids[i];
+							data['curentstatus'] = curentstatus;
+							data['topicType'] = topicType;
+							data['auditOpinion'] = auditopinion;
+						}
+						$.ajax({
+						  type:"POST",
+						  dataType:"text",
+						  contentType: "application/json; charset=utf-8",
+						  url:batchAuditUrl,
+						  data:JSON.stringify(ids),
+						  success:function(data,status){
+						  	if(status='success'&&data=='success'){
+						  		//关闭模态框触发模态框关闭事件重新加载页面
+						  	}
+						  },
+						  error:function(data){
+						  	alert(data);
+						  }
+						});
+					}
+				}
+			}
+			//批量审核通过
+			$('#linkYesItems').on('click',function(){
+				var ids= new Array();
+				var i=0;
+				$("input:checkbox[name='postFreshnewsAuditCheckbox']:checked").each(function() {
+					//topicType=1为评论
+					var data = {"topicId":$(this).val(),"curentstatus":1,"topicType":topicType};
+					ids.push(data); // 每一个被选中项的值
+				});
+				if(ids=="") {
+					alert("请至少选择一条记录");
+					return false;
+				}
+				//添加确认提示
+				var msg = "确定将选择的"+ids.length+"条信息批量审核通过吗？";
+				if (confirm(msg)==true){
+					$.ajax({
+					  type:"POST",
+					  dataType:"text",
+					  contentType: "application/json; charset=utf-8",
+					  url:batchAuditUrl,
+					  data:JSON.stringify(ids),
+					  success:function(data,status){
+					  	if(status='success'&&data=='success'){
+					  		loadMain(loadNewsfreshPostUrl);
+					  	}
+					  },
+					  error:function(data){
+					  	alert(data);
+					  }
+					});
+				}
+			});
+			
+			//单条审核通过或不通过
+			function freshnewsPostauditPassOrDeny(topicId,curentstatus){
+				var data = JSON.stringify({"topicId":topicId,"curentstatus":curentstatus,"topicType":topicType});
+				$.ajax({
+				  type:"POST",
+				  dataType:"text",
+				  contentType: "application/json; charset=utf-8",
+				  url:toAuditUrl,
+				  data:data,
+				  success:function(data,status){
+				  	if(status='success'){
+				  		if(data=='success'){
+				  			alert('审核成功!');
+				  			loadMain(loadNewsfreshPostUrl);
+				  		}else{
+				  			alert('审核操作失败:'+data);
+				  		}
+				  	}
+				  },
+				  error:function(data){
+				  	alert("审核操作失败!");
+				  }
+				});
+			}
+			
+			/** 分页普通跳转 **/
+			function jumpNormalPage(page){
+				var checkid = null;
+				var data = $("#searchform").serialize();
+				var domain = loadNewsfreshPostUrl.substring(0,loadNewsfreshPostUrl.lastIndexOf("?"));
+				loadMain(domain+"?pageNo="+page,data);
+			}	
+			//全选全不选，列表所有选中复选框选中，否则不选中
+			function selectAll() {
+				if($("#checkall").is(":checked")){ 
+					$("input[name='postFreshnewsAuditCheckbox']").each(function(){ 
+			       $(this).prop("checked", true); 
+			     }); 
+			  }else{ 
+			  	$("input[name='postFreshnewsAuditCheckbox']").each(function(){ 
+			       $(this).removeAttr("checked"); 
+			     }); 
+			  } 
+			}
+			function disabledUser(memberId,disabled){
+				$.ajax({
+					url:"${rc.contextPath}/sns/post/disabledUser.do",
+					data:{"memberId":memberId,"disabled":disabled},
+					type:"post",
+					dataType:"json",
+					success:function(data){
+						if(data!=null){
+							alert("操作成功！");
+							loadMain(loadNewsfreshPostUrl);
+						}else{
+							alert("操作失败");
+						}		
+					}
+				})
+			}
+		</script>
+</body>
+</html>

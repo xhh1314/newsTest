@@ -1,0 +1,200 @@
+DELETE es_hww
+GET es_hww
+PUT es_hww
+{
+   "settings": {
+    "refresh_interval": "1s",
+    "number_of_shards": 10,
+    "number_of_replicas": 2
+  }
+}
+
+POST es_hww/hww_es_recomm_his/_delete_by_query?conflicts=proceed
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+GET es_hww/hww_es_member_loc/_search/
+{
+  "query":{
+    "match": {
+      "memberId": "3"
+    }
+  }
+}
+
+GET es_hww/hww_es_recomm_his/_search/
+{
+  "query":{
+    "term": {
+      "hisid": "123"
+    }
+  }
+}
+GET _cluster/health?pretty=true
+
+PUT  /es_hww/_mapping/hww_es_recomm_his
+{
+"properties": {
+      "hisid": {
+        "type": "text"
+      },
+      "memberId":{
+        "type": "long"
+      },
+        "type":{
+        "type": "text"
+      },
+      
+    "imei":{
+        "type": "text"
+      },
+      "contentId":{
+        "type":"long"
+      },
+       "plateType":{
+        "type": "integer"
+      },
+      "createTime":{
+        "type":"date",
+        "format": "yyyy-MM-dd HH:mm:ss"
+      },
+       "recommTimeStamp":{
+        "type":"long"
+      }
+}
+}
+
+PUT  /es_hww/_mapping/hww_es_member_loc
+{
+"properties": {
+     
+      "memberId":{
+        "type": "long"
+      },
+      "imei":{
+        "type": "text"
+      },
+      "longitude": {
+        "type": "double"
+      },
+       "latitude": {
+        "type": "double"
+      },
+      "geolocation": {
+        "type": "geo_point"
+      },
+      "address":{
+        "type":"text"
+      },
+       "locationType":{
+        "type": "integer"
+      },
+      "locTime":{
+        "type":"date",
+        "format": "yyyy-MM-dd HH:mm:ss"
+      },
+       "locTimeStamp":{
+        "type":"long"
+      }
+}
+}
+
+
+PUT  /es_hww/_mapping/hww_es_content
+{
+  
+"properties": {
+      "id": {
+        "type": "text"
+      },
+      "title": {
+        "type": "text",
+        "analyzer": "ik_max_word",
+        "search_analyzer": "ik_max_word"
+      },
+      "shortTitle": {
+        "type": "text",
+        "analyzer": "ik_max_word",
+        "search_analyzer": "ik_max_word"
+      },
+      "summary": {
+        "type": "text",
+        "analyzer": "ik_max_word",
+        "search_analyzer": "ik_max_word"
+      },
+      "content": {
+        "type": "text",
+        "analyzer": "ik_max_word",
+        "search_analyzer": "ik_max_word"
+        
+      },
+       "keywords": {
+        "type": "text",
+        "analyzer": "ik_max_word",
+        "search_analyzer": "ik_max_word"
+      },
+       "priority": {
+        "type": "integer"
+      },
+       "auditStatus": {
+        "type": "integer"
+      },
+       "longitude": {
+        "type": "double"
+      },
+       "latitude": {
+        "type": "double"
+      },
+      "geolocation": {
+        "type": "geo_point"
+      },
+      "address":{
+        "type":"text"
+      },
+      "top":{
+        "type":"integer"
+      },
+      "createTime":{
+        "type":"date",
+        "format": "yyyy-MM-dd HH:mm:ss"
+      },
+      "releaseTime":{
+        "type":"date",
+        "format": "yyyy-MM-dd HH:mm:ss"
+      },
+      "status":{
+        "type":"integer"
+      },
+      "memberId":{
+        "type": "long"
+      },
+      "relatednewsId":{
+        "type":"long"
+      },
+       "contentType":{
+        "type": "integer"
+      },
+       "topicType":{
+        "type": "integer"
+      },
+       "plateType":{
+        "type": "integer"
+      },
+       "anonymous":{
+        "type": "integer"
+      },
+       "publi":{
+        "type": "integer"
+      },
+       "showStatus":{
+        "type": "integer"
+      }
+    }
+  
+}
+
+
+

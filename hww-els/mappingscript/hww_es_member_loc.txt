@@ -1,0 +1,34 @@
+PUT  /es_hww/_mapping/hww_es_member_loc
+{
+"properties": {
+     
+      "memberId":{
+        "type": "long"
+      },
+      "imei":{
+        "type": "text"
+      },
+      "longitude": {
+        "type": "double"
+      },
+       "latitude": {
+        "type": "double"
+      },
+      "geolocation": {
+        "type": "geo_point"
+      },
+      "address":{
+        "type":"text"
+      },
+       "locationType":{
+        "type": "integer"
+      },
+      "locTime":{
+        "type":"date",
+        "format": "yyyy-MM-dd HH:mm:ss"
+      },
+       "locTimeStamp":{
+        "type":"long"
+      }
+}
+}

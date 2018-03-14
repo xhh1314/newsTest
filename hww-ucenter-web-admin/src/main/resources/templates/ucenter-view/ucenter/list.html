@@ -1,0 +1,695 @@
+
+<script type="text/javascript">
+    //本页面url
+    var loadSysListUrl ="${rc.contextPath}/ucenter/query.do";
+</script>
+   <@shiro.hasPermission name="/ucenter/query.do"> 
+					<form class="form-inline hk-search" id="searchForm" method="post">
+						<div class="row">
+							<div class="col-sm-2 col-xs-6" style="width: 125px;">
+								<#if (form.memberId)??>
+									<input id="sMemberId" name="memberId" type="text" value="${form.memberId?c}" class="form-control input-sm" placeholder="用户ID">
+									<#else>
+										<input id="sMemberId" name="memberId" type="text" class="form-control input-sm" placeholder="用户ID">
+								</#if>
+							</div>
+							<div class="col-sm-2  col-xs-6" style="width: 125px;">
+								<#if (form.phoneNo)??>
+									<input id="sPhone" name="phoneNo" type="text" value="${form.phoneNo}" class="form-control input-sm" placeholder="手机号">
+									<#else>
+										<input id="sPhone" name="phoneNo" type="text" class="form-control input-sm" placeholder="手机号">
+								</#if>
+							</div>
+						<!-- 	<div class="col-sm-2  col-xs-6" style="width: 125px;">
+								<#if (form.weChatNo)??>
+									<input id="sWeChatNo" name="weChatNo" value="${form.weChatNo}" type="text" class="form-control input-sm" placeholder="微信号">
+									<#else>
+										<input id="sWeChatNo" name="weChatNo" type="text" class="form-control input-sm" placeholder="微信号">
+								</#if>
+							</div>
+							<div class="col-sm-2  col-xs-6" style="width: 125px;">
+								<#if (form.qqNo)??>
+									<input id="sQqNo" name="qqNo" type="text" value="${form.qqNo}" class="form-control input-sm" placeholder="QQ号">
+									<#else>
+										<input id="sQqNo" name="qqNo" type="text" class="form-control input-sm" placeholder="QQ号">
+								</#if>
+							</div>
+							<div class="col-sm-2  col-xs-6" style="width: 125px;">
+								<#if (form.weiBoNo)??>
+									<input id="sWeiBoNo" name="weiBoNo" type="text" value="${form.weiBoNo}" class="form-control input-sm" placeholder="微博号">
+									<#else>
+										<input id="sWeiBoNo" name="weiBoNo" type="text" class="form-control input-sm" placeholder="微博号">
+								</#if>
+							</div> -->
+							<div class="col-sm-2  col-xs-6" style="width: 125px;">
+								<#if (form.pseudonym)??>
+									<input id="sPseudonym" name="pseudonym" value="${form.pseudonym}" type="text" class="form-control input-sm" placeholder="昵称">
+									<#else>
+										<input id="sPseudonym" name="pseudonym" type="text" class="form-control input-sm" placeholder="昵称">
+								</#if>
+							</div>
+							<div class="col-sm-2  col-xs-6" style="width: 125px;">
+								<div class="input-group input-group-sm">
+									<span class="input-group-addon" id="basic-addon3">状态</span>
+									<#if (form.status)??>
+										<#if form.status==0>
+											<select class="form-control" id="sstatus" name="status">
+												<option value="">全部</option>
+												<option value="1">正常</option>
+												<option value="0" selected="selected">冻结</option>
+											</select>
+										</#if>
+										<#if form.status==1>
+											<select class="form-control" id="sstatus" name="status">
+												<option value="">全部</option>
+												<option value="1" selected="selected">正常</option>
+												<option value="0">冻结</option>
+											</select>
+										</#if>
+										<#else>
+											<select class="form-control" id="sstatus" name="status">
+												<option value="" selected="selected">全部</option>
+												<option value="1">正常</option>
+												<option value="0">冻结</option>
+											</select>
+									</#if>
+								</div>
+							</div>
+							<div class="col-sm-2  col-xs-6">
+								<button id="btnSearch" type="button" class="btn btn-info btn-sm" onclick="serach()">
+									<span class="glyphicon glyphicon-search"></span>
+									<span>搜索</span>
+								</button>
+							</div>
+						</div>
+					</form>
+					</@shiro.hasPermission>  
+					<div class="hk-toolbar">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+						<div class="btn-group btn-group-sm">
+							<button type="button" class="btn btn-default">
+								<span class="glyphicon glyphicon-th-list"></span>
+								操作
+							</button>
+							<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								<span class="caret"></span>
+							</button>
+							<ul class="dropdown-menu">
+								<li>
+									<a id="linkAddItem" href="javascript:toAdd()">
+										<span class="glyphicon glyphicon-floppy-remove"></span>
+										添加
+									</a>
+								</li>
+								<@shiro.hasPermission name="/ucenter/handleStatu.do">  
+								<li>
+									<a id="linkFreezeItem" href="javascript:someHandleStatu(0)">
+										<span class="glyphicon glyphicon-floppy-saved"></span>
+										冻结
+									</a>
+								</li>
+								<li>
+									<a id="linkUnfreezeItem" href="javascript:someHandleStatu(1)">
+										<span class="glyphicon glyphicon-floppy-saved"></span>
+										解冻
+									</a>
+								</li>
+								</@shiro.hasPermission>
+								<@shiro.hasPermission name="/ucenter/resetPassword.do">  
+								<li>
+									<a id="linkResetPwdItem" href="javascript:resetPassword()">
+										<span class="glyphicon glyphicon-lock"></span>
+										重置密码
+									</a>
+								</li>
+								</@shiro.hasPermission>
+								<@shiro.hasPermission name="/ucenter/delete.do"> 
+								<li>
+									<a id="linkDelItems" href="javascript:deleteItem()">
+										<span class="glyphicon glyphicon-remove"></span>
+										删除
+									</a>
+								</li>
+								</@shiro.hasPermission>
+							</ul>
+						</div>
+					</div>
+					<div style="overflow-x: auto; overflow-y: auto; height:300px; width:auto;">
+					<table class="table table-hover table-bordered">
+						<thead>
+						<tr>
+							<th class="center detail-col">
+								<label class="pos-rel">
+									<input type="checkbox" class="ace" id="all" onclick="selectAll()"/>
+									<span class="lbl"></span>
+								</label>
+							</th>
+							<th>用户ID</th>
+							<th>手机号</th>
+							<th>性别</th>
+							<th>微信号</th>
+							<th>QQ号</th>
+							<th>微博</th>
+							<th>所在地</th>
+							<th>昵称</th>
+							<th>账号状态</th>
+							<th><i class="ace-icon fa fa-clock-o bigger-110 hidden-300"></i>操作</th>
+						</tr>
+						</thead>
+						<#if page?? && page?size gt 0>  
+						<tbody id="tblBody">
+						<#list page.list as entity>
+							<tr>
+								<td class="center detail-col">
+									<label class="pos-rel">
+										<input name="IDCheck" id="code" value="${entity.memberId?c}" type="checkbox" class="ace" />
+										<span class="lbl"></span>
+									</label>
+								</td>
+								<td><#if (entity.memberId)??>${entity.memberId?c}<#else></#if></td>
+								<td><#if (entity.phoneNo)??>${entity.phoneNo}<#else></#if></td>
+								<td><#if (entity.sex)??>${entity.sex}<#else></#if></td>
+								<td><#if (entity.weChatNo)??>${entity.weChatNo}<#else></#if></td>
+								<td><#if (entity.qqNo)??>${entity.qqNo}<#else></#if></td>
+								<td><#if (entity.weiBoNo)??>${entity.weiBoNo}<#else></#if></td>
+								<td><#if (entity.provinceName)??>${entity.provinceName}<#else></#if></td>
+								<td><#if (entity.nickName)??>${entity.nickName}<#else></#if></td>
+								<td><#if (entity.status==0)>冻结<#else>正常</#if></td>
+								<td>
+								
+								<@shiro.hasPermission name="/ucenter/handleStatu.do">
+									<button type="button" class="btn btn-xs btn-warning" onclick="handleStatu(0,'${entity.memberId?c}')">冻结</button>
+									<button type="button" class="btn btn-xs btn-warning" onclick="handleStatu(1,'${entity.memberId?c}')">解冻</button>
+									</@shiro.hasPermission>
+									<!-- <@shiro.hasPermission name="/ucenter/edit.do">
+									<button type="button" class="btn-eidt btn btn-xs btn-info" onclick="toEdit('${entity.memberId?c}')">编辑</button>
+									</@shiro.hasPermission> -->
+									<!-- <@shiro.hasPermission name="/ucenter/delete.do">
+									<button type="button" class="btn btn-xs btn-danger" onclick="removeUser('${entity.memberId?c}')">删除</button>
+								     </@shiro.hasPermission> -->
+								<!--  <button type="button" class="btn btn-xs btn-danger" onclick="disabledUser('${entity.memberId?c}',1)">启用</button> -->
+								</td>
+							</tr>
+						</#list>
+						</tbody>
+						</#if>
+					</table>
+					</div>
+					 <form id="submitForm" name="submitForm" action="query.do" method="post">
+						<#if (form.memberId)??>
+							<input type="hidden" name="memberId" id="memberIds" value="${form.memberId?c}"/>
+							<#else>
+								<input type="hidden" name="memberId" id="memberIds"/>
+						</#if>
+						<#if (form.phoneNo)??>
+							<input type="hidden" name="phoneNo" id="phoneNos" value="${form.phoneNo}"/>
+							<#else>
+								<input type="hidden" name="phoneNo" id="phoneNos"/>
+						</#if>
+						<#if (form.weChatNo)??>
+							<input type="hidden" name="weChatNo" id="weChatNos" value="${form.weChatNo}"/>
+							<#else>
+								<input type="hidden" name="weChatNo" id="weChatNos"/>
+						</#if>
+						<#if (form.qqNo)??>
+							<input type="hidden" name="qqNo" id="qqNos" value="${form.qqNo}"/>
+							<#else>
+								<input type="hidden" name="qqNo" id="qqNos"/>
+						</#if>
+						<#if (form.weiBoNo)??>
+							<input type="hidden" name="weiBoNo" id="weiBoNos" value="${form.weiBoNo}"/>
+							<#else>
+								<input type="hidden" name="weiBoNo" id="weiBoNos"/>
+						</#if>
+						<#if (form.nickName)??>
+							<input type="hidden" name="nickName" id="nickNames" value="${form.nickName}"/>
+							<#else>
+								<input type="hidden" name="nickName" id="nickNames"/>
+						</#if>
+						<#if (form.status)??>
+							<input type="hidden" name="status" id="statuss" value="${form.status}"/>
+							<#else>
+								<input type="hidden" name="status" id="statuss"/>
+						</#if>
+						<#if page?? >  
+						<input type="hidden" name="pageNo" id="pageNo" value="${page.pageNo}"/>
+						</#if>
+					</form> 
+	
+					<#include "../page.html">
+						<div class="modal fade" id="modalInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+							<div class="modal-dialog" role="document">
+								<div class="modal-content">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+										<h5 class="modal-title" id="myModalLabel">
+											<span class="glyphicon glyphicon-file"></span>
+											<span id="modalTite"></span>
+										</h5>
+									</div>
+									<div class="modal-body">
+										<form id="sysForm" class="form-horizontal">
+											<input type="hidden" name="memberId" id="memberId"/>
+											<!--<div class="form-group form-group-sm">
+												<label for="inputEmail3" class="col-sm-2 control-label">站点编号</label>
+												<div class="col-sm-10">
+													<input type="text" name="siteId" id="siteId" class="form-control" placeholder="站点编号">
+												</div>
+											</div>-->
+											<div class="form-group form-group-sm">
+												<label for="memberName" class="col-sm-2 control-label">用户名</label>
+												<div class="col-sm-10">
+													<input type="text" name="memberName" id="memberName" class="form-control" placeholder="用户名">
+												</div>
+											</div>
+											<div class="form-group form-group-sm">
+												<label for="phoneNo" class="col-sm-2 control-label">手机号</label>
+												<div class="col-sm-10">
+													<input type="text" name="phoneNo" id="phoneNo" class="form-control" placeholder="手机号">
+												</div>
+											</div>
+											<div class="form-group form-group-sm" id="pwdDiv">
+												<label for="password" class="col-sm-2 control-label">密码</label>
+												<div class="col-sm-10">
+													<input type="text" name="password" id="password" class="form-control" placeholder="密码">
+												</div>
+											</div>
+											<div class="form-group form-group-sm">
+												<label for="sex" class="col-sm-2 control-label">性别</label>
+												<div class="col-sm-10">
+													<select name="sex" id="sex">
+														<option value="女" selected="selected">女</option>
+														<option value="男">男</option>
+													</select>
+												</div>
+											</div>
+											<div class="form-group form-group-sm">
+												<label for="weChatNo" class="col-sm-2 control-label">微信号</label>
+												<div class="col-sm-10">
+													<input type="text" name="weChatNo" id="weChatNo" class="form-control" placeholder="微信号">
+												</div>
+											</div>
+											<div class="form-group form-group-sm">
+												<label for="qqNo" class="col-sm-2 control-label">QQ号</label>
+												<div class="col-sm-10">
+													<input type="text" name="qqNo" id="qqNo" class="form-control" placeholder="QQ号">
+												</div>
+											</div>
+											<div class="form-group form-group-sm">
+												<label for="weiBoNo" class="col-sm-2 control-label">微博</label>
+												<div class="col-sm-10">
+													<input type="text" name="weiBoNo" id="weiBoNo" class="form-control" placeholder="微博">
+												</div>
+											</div>
+											<div class="form-group form-group-sm">
+												<label for="provinceName" class="col-sm-2 control-label">所在地</label>
+												<div class="col-sm-10">
+													<input type="text" name="provinceName" id="provinceName" class="form-control" placeholder="所在地">
+												</div>
+											</div>
+											
+											<div class="form-group form-group-sm">
+												<label for="email" class="col-sm-2 control-label">邮箱</label>
+												<div class="col-sm-10">
+													<input type="text" name="email" id="email" class="form-control" placeholder="邮箱">
+												</div>
+											</div>
+											<div class="form-group form-group-sm">
+												<label for="nickName" class="col-sm-2 control-label">昵称</label>
+												<div class="col-sm-10">
+													<input type="text" name="nickName" id="nickName" class="form-control" placeholder="昵称">
+												</div>
+											</div>
+											<div class="form-group form-group-sm">
+												<label for="status" class="col-sm-2 control-label">状态</label>
+												<div class="col-sm-10">
+													<input type="radio"  value="1"  name="status"  id="enable" checked="checked"/>正常
+													<input type="radio"  value="0"  name="status"  id="disable"/>冻结
+												</div>
+											</div>
+										</form>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-info btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 关闭</button>
+										<button id="btnSave" data-action="" type="button" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-saved"></span> 保存</button>
+										<button id="btnUpdate" data-action="" type="button" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-saved"></span> 修改</button>
+									</div>
+								</div>
+							</div>
+						</div>
+	<script type="text/javascript">
+        var page = {
+            init : function() {
+                this.eventInit();
+            },
+            eventInit : function() {
+                //信息表单模态框
+                var $modalInfo = $('#modalInfo');
+                var $modalInfoTitle = $modalInfo.find('#modalTite');
+                $modalInfo.modal({
+                    backdrop : 'static',
+                    keyboard : false,
+                    show : false
+                });
+                //添加一条数据
+                $('#linkAddItem').click(function() {
+                    resetForm();
+                    $modalInfoTitle.html('添加数据');
+                    $modalInfo.modal('show');
+                    $("#pwdDiv").show();
+                    $("#btnSave").show();
+                    $("#btnUpdate").hide();
+                });
+                //编辑一条数据
+                $('#linkEditItem').click(function() {
+                    $modalInfoTitle.html('编辑数据');
+                    $modalInfo.modal('show');
+                    $("#pwdDiv").hide();
+                    $("#btnSave").hide();
+                    $("#btnUpdate").show();
+                });
+            }
+        }
+        jQuery(function($) {
+            page.init();
+        });
+        //分页查询
+        function jumpNormalPage(pageNo) {
+            $("#pageNo").val(pageNo);
+            var data = $("#submitForm").serialize();
+            $('.hk-main').load(loadSysListUrl,data);
+        }
+        function toAdd() {
+            resetForm();
+            $modalInfoTitle.html('添加数据');
+            $modalInfo.modal('show');
+            $("#pwdDiv").show();
+            $("#btnSave").show();
+            $("#btnUpdate").hide();
+		}
+        //新增操作
+        $("#btnSave").click(function() {
+            if(validateForm(1)){
+                $.ajax({
+                    type: 'POST',
+                    url: "${rc.contextPath}/ucenter/save.do",
+                    data: $("#sysForm").serialize(),
+                    dataType:'json',
+                   // contentType:"application/json",
+                    success: function(data) {
+                        alert(data.message);
+                        $(".modal-backdrop").hide();
+                        $("#pageNo").val('<#if page??>${page.pageNo}<#else>1</#if>');
+                        var data = $("#submitForm").serialize();
+                        $('.hk-main').load(loadSysListUrl, data);
+                    }
+                   
+                });
+            }
+        });
+        //修改操作
+        $("#btnUpdate").click(function() {
+                if(validateForm(2)){
+                    $.ajax({
+                        type: 'POST',
+                        url: "${rc.contextPath}/ucenter/update.do",
+                        data: $("#sysForm").serialize(),
+                        dataType:'json',
+                        success: function(data) {
+                            alert(data.message);
+                            $(".modal-backdrop").hide();
+                            $("#pageNo").val('<#if page??>${page.pageNo}<#else>1</#if>');
+                            var data = $("#submitForm").serialize();
+                            $('.hk-main').load(loadSysListUrl, data);
+                        }
+                    });
+                }
+        });
+        //批量删除
+        function deleteItem() {
+            var memberIds="";
+            $("input[id^='code']:checked").each(function(){
+                memberIds+=$(this).val()+",";
+            });
+            if (!memberIds) {
+                alert("请勾选要删除的记录！");
+                return;
+            }
+            var flag = confirm("确定要删除吗？");
+            if (!flag) {
+                return;
+            }
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/ucenter/delete.do",
+                data: "allIDCheck="+memberIds,
+                dataType:'json',
+                success: function(data) {
+                    alert(data.message);
+                    $(".modal-backdrop").hide();
+                    $("#pageNo").val('<#if page??>${page.pageNo}<#else>1</#if>');
+                    var data = $("#submitForm").serialize();
+                    $('.hk-main').load(loadSysListUrl, data);
+                }
+            });
+        };
+        //批量解冻与冻结
+        function someHandleStatu(status) {
+            var memberIds="";
+            $("input[id^='code']:checked").each(function(){
+                memberIds+=$(this).val()+",";
+            });
+            if (!memberIds) {
+                alert("请勾选要冻结/解冻的记录！");
+                return;
+            }
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/ucenter/handleStatu.do",
+                data: "allIDCheck="+memberIds+"&status="+status,
+                dataType:'json',
+                success: function(data) {
+                    alert(data.message);
+                    $(".modal-backdrop").hide();
+                    $("#pageNo").val('<#if page??>${page.pageNo}<#else>1</#if>');
+                    var data = $("#submitForm").serialize();
+                    $('.hk-main').load(loadSysListUrl, data);
+                }
+            });
+        };
+        //单个解冻与冻结
+        function handleStatu(status, memberId) {
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/ucenter/handleStatu.do",
+                data: "memberId="+memberId + "&status="+status,
+                dataType:'json',
+                success: function(data) {
+                    alert(data.message);
+                    $(".modal-backdrop").hide();
+                    $("#pageNo").val('<#if page??>${page.pageNo}<#else>1</#if>');
+                    var data = $("#submitForm").serialize();
+                    $('.hk-main').load(loadSysListUrl, data);
+                }
+            });
+        }
+        //单个删除
+        function removeUser(memberId) {
+            var flag = confirm("确定要删除吗？");
+            if (!flag) {
+                return;
+            }
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/ucenter/delete.do",
+                data: "memberId="+memberId,
+                dataType:'json',
+                success: function(data) {
+                    alert(data.message);
+                    $(".modal-backdrop").hide();
+                    $("#pageNo").val('<#if page??>${page.pageNo}<#else>1</#if>');
+                    var data = $("#submitForm").serialize();
+                    $('.hk-main').load(loadSysListUrl, data);
+                }
+            });
+        }
+        //去修改查询单个操作
+        function toEdit(memberId) {
+            $("#pwdDiv").hide();
+            $("#btnSave").hide();
+            $("#btnUpdate").show();
+            var $modalInfo = $("#modalInfo");
+            var $modalInfoTitle = $modalInfo.find('#modalTite');
+            $modalInfo.modal({
+                backdrop : 'static',
+                keyboard : false,
+                show : false
+            });
+            $modalInfoTitle.html('编辑数据');
+            $modalInfo.modal('show');
+            resetForm();
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/ucenter/edit.do",
+                data: "memberId="+memberId,
+                dataType:'json',
+                success: function(data) {
+                	console.log(data)
+                    $("#memberId").val(""+data.memberId+"");
+                    $("#siteId").val(data.siteId);
+                    $("#memberName").val(data.memberName);
+                    $("#sex").val(data.sex);
+                    $("#weChatNo").val(data.weChatNo);
+                    $("#qqNo").val(data.qqNo);
+                    $("#weiBoNo").val(data.weiBoNo);
+                    $("#pseudonym").val(data.pseudonym);
+                    $("#phoneNo").val(data.phoneNo);
+                    $("#provinceName").val(data.provinceName);
+                    $("#email").val(data.email);
+                    $("#nickName").val(data.nickName); 
+                    if (data.status == 0) {
+                        $("#sysForm input[name='status']").get(1).checked=true;
+                    } else {
+                        $("#sysForm input[name='status']").get(0).checked=true;
+                    }
+                }
+            });
+        }
+        //批量重置密码
+        function resetPassword() {
+            var memberIds="";
+            $("input[id^='code']:checked").each(function(){
+                memberIds+=$(this).val()+",";
+            });
+            if (!memberIds) {
+                alert("请勾选要重置密码的记录！");
+                return;
+            }
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/ucenter/resetPassword.do",
+                data: "allIDCheck="+memberIds,
+                dataType:'json',
+                success: function(data) {
+                    alert(data.message);
+                    $(".modal-backdrop").hide();
+                    $("#pageNo").val('<#if page??>${page.pageNo}<#else>1</#if>');
+                    var data = $("#submitForm").serialize();
+                    $('.hk-main').load(loadSysListUrl, data);
+                }
+            });
+        };
+        //重置表单
+        function resetForm() {
+//            $("#siteId").val("");
+            $("#memberName").val("");
+            $("#phoneNo").val("");
+            $("#sex").val("女");
+            $("#weChatNo").val("");
+            $("#qqNo").val("");
+            $("#weiBoNo").val("");
+            $("#pseudonym").val("");
+            $("#provinceName").val("");
+            $("#email").val("");
+            $("#nickName").val(""); 
+            $("#sysForm input[name='status']").get(0).checked=true;
+        }
+        //验证表单
+        function validateForm(type) {
+//            var siteId = $("#siteId").val();
+            var memberName = $("#memberName").val();
+            var phoneNo = $("#phoneNo").val();
+            var weChatNo = $("#weChatNo").val();
+            var qqNo = $("#qqNo").val();
+            var weiBoNo = $("#weiBoNo").val();
+            var pseudonym = $("#pseudonym").val();
+            var provinceName = $("#provinceName").val();
+            var password = $("#password").val();
+//            if (!siteId) {
+//                alert("站点编号不能为空！");
+//                return false;
+//            }
+//            if(isNaN(parseInt(siteId))) {
+//                alert("站点编号必须是数字类型！");
+//                return false;
+//            }
+            if (!memberName) {
+                alert("用户名不能为空！");
+                return false;
+            }
+            if (!phoneNo) {
+                alert("手机号不能为空！");
+                return false;
+            }
+            if (!password && type==1) {
+                alert("密码不能为空！");
+                return false;
+            }
+            if (!weChatNo) {
+                alert("微信号不能为空！");
+                return false;
+            }
+            if (!qqNo) {
+                alert("qq号不能为空！");
+                return false;
+            }
+            if (!weiBoNo) {
+                alert("微博号不能为空！");
+                return false;
+            }
+            if (!provinceName) {
+                alert("所在地不能为空！");
+                return false;
+            }
+            if (!nickName) {
+                alert("昵称不能为空！");
+                return false;
+            }
+            return true;
+        }
+        //去系统管理
+        function toSys() {
+            location.href = "${rc.contextPath}/sys/query.do";
+        }
+        //去前端用户
+        function toUcenter() {
+            location.href = "${rc.contextPath}/ucenter/query.do";
+        }
+        //条件查询操作
+        function serach() {
+            var memberId = $("#sMemberId").val();
+            if(memberId != null && memberId !="") {
+                if( isNaN(parseInt(memberId))) {
+                    alert("用户ID必须是数字类型！");
+                    return false;
+                }
+            }
+            var data = $("#searchForm").serialize();
+            $('.hk-main').load(loadSysListUrl,data);
+        }
+        //全选全不选，列表所有选中复选框选中，否则不选中
+        function selectAll() {
+            if($("#all").is(":checked")){
+                $("input[id^='code']").each(function(){
+                    $(this).prop("checked", true);
+                });
+            }else{
+                $("input[id^='code']").each(function(){
+                    $(this).removeAttr("checked");
+                });
+            }
+        } 
+        $("input[id^='code']").click(function(){
+            var all = $("#tblBody tr").size();
+            var size =$("input[id^='code']:checked").length;
+            if (all == size) {
+                $("#all").prop("checked", true);
+            } else {
+                $("#all").removeAttr("checked");
+            }
+        });
+        
+        
+        
+	</script>
+</body>
+</html>

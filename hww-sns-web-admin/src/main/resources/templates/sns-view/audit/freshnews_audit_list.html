@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta charset="utf-8" />
+<title>新鲜事审核列表</title>
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<script type="text/javascript">
+			/* 页面全局url */
+			//保存审核请求url
+			var toAuditUrl = "${rc.contextPath}/sns/audit/save.do";
+			//批量审核请求url
+			var batchAuditUrl = "${rc.contextPath}/sns/audit/batch_save.do";
+			//新鲜事审核列表页
+			var newsfreshAuditUrl = "${rc.contextPath}/sns/topic/freshnews_audit_list.do?pageNo="+${page.pageNo};
+			//新鲜事详情页
+			var newsfreshDetailUrl = "${rc.contextPath}/sns/topic/newsfresh_detail.do";
+			//新鲜事审核详情页
+			var newsfreshAuditDetailUrl = "${rc.contextPath}/sns/audit/newsfresh_audit_detail.do";
+			//获取关联新闻列表
+			var getRelatedNewsUrl = "${rc.contextPath}/sns/news/list.do";
+			//新鲜事转爆料
+			var convertFreshToBrokeUrl = "${rc.contextPath}/sns/topic/convertfresh_to_broke.do";
+			//主题类型下拉列表(版块)
+			var loadAllTopicTypeUrl = "${rc.contextPath}/sns/forum/list_all.do";
+			//主题审核
+			var topicType = 0;
+			//
+			var newsSerchAuditUrl = "${rc.contextPath}/sns/topic/searchNewsList.do";
+		</script>
+<script src="${rc.contextPath}/My97DatePicker/WdatePicker.js"></script>
+
+<script type="text/javascript">
+$("._table_container").height(window.screen.availHeight-(90+60+70)-180);
+</script>
+<#setting number_format="#">
+</head>
+  <!-- <a href="${rc.contextPath}/sns/topic/trams.do">数据同步</a>  -->
+<body class="page-content">
+	<!-- 区块：主内容区域 begin-->
+	<div class="freshnews-audit-main">
+		<form name="searchform" id="searchform" class="form-inline hk-search">
+			<div class="row">
+
+				<div class="col-sm-2 col-xs-6">
+					<div class="input-group input-group-sm">
+						<span class="input-group-addon" id="basic-addon3">审核状态</span> <select
+							id="auditStatus" name="auditStatus" class="form-control">
+							<option value=''>全部</option>
+							<option value='0'>待审核</option>
+							<option value='1'>已审核</option>
+						</select>
+					</div>
+				</div> 
+				<div class="col-sm-2 col-xs-6">
+					<div class="input-group input-group-sm">
+						<span class="input-group-addon" id="basic-addon3">所属版块</span> <select
+							id="topicTypeSelect" name="topicType" class="form-control">
+							<!-- js初始化 -->
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+			
+				<div class="col-sm-2 col-xs-6">
+					<input type="text" name="content"
+						value="<#if searchvo??><#if searchvo.content??>${searchvo.content}</#if></#if>"
+						class="form-control input-sm" placeholder="新鲜事内容">
+				</div>
+				<div class="col-sm-2 col-xs-6">
+					<input type="text" name="beginTime" id="beginTime"
+						class="form-control input-sm"
+						onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss', readOnly: true ,maxDate:'#F{$dp.$D(\'endTime\')}'});"
+						format="yyyy-MM-dd HH:mm:ss" placeholder="创建时间开始">
+				</div>
+				<div class="col-sm-2 col-xs-6">
+					<input type="text" name="endTime" id="endTime"
+						class="form-control input-sm"
+						onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss', readOnly: true ,minDate:'#F{$dp.$D(\'beginTime\')}'});"
+						format="yyyy-MM-dd HH:mm:ss" placeholder="创建时间结束">
+				</div>
+				<div class="col-sm-2 col-xs-6">
+					<button type="button" class="btn btn-info btn-sm"
+						onclick="tosearch()">
+						<span class="glyphicon glyphicon-search"></span> <span>搜索</span>
+					</button>
+				</div>
+ 			<!-- 	<div class="col-sm-2 col-xs-6">
+					<input type="text" name="keyWords" 
+						value="<#if searchvo??><#if searchvo.keyWords??>${searchvo.keyWords}</#if></#if>"
+						class="form-control input-sm" placeholder="全文检索">
+				</div>
+				<div class="col-sm-2 col-xs-6">
+					<button type="button" class="btn btn-info btn-sm"
+						onclick="tosearchAll()">
+						<span class="glyphicon glyphicon-search"></span> <span>检索</span>
+					</button>
+				</div> -->
+				
+			</div>
+		</form>
+		<div class="hk-toolbar">
+			<div class="btn-group btn-group-sm">
+				<button type="button" class="btn btn-default">
+					<span class="glyphicon glyphicon-th-list"></span> 操作
+				</button>
+				<button type="button" class="btn btn-default dropdown-toggle"
+					data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu">
+					<!-- <li>
+				  		<a id="linkChooseNews" href="javascript:void(0)">
+				  			<span class="glyphicon glyphicon-link"></span> 
+				  			设为爆料
+				  		</a>
+				  	</li> -->
+				  	<li>
+				  		<a id="ceshi"  href="javascript:void(0)">
+				  			<span class="glyphicon glyphicon-link"></span> 
+				  			内容化
+				  		</a>
+				  	</li>
+				  	
+					<!-- <li>
+				  		<a id="convertToBroke" href="javascript:void(0)">
+				  			<span class="glyphicon glyphicon-link"></span> 
+				  			认证为爆料
+				  		</a>
+				  	</li> -->
+				  		<@shiro.hasPermission name="/sns/audit/batch_save.do">
+					<li><a id="linkYesItems" href="javascript:void(0)"> <span
+							class="glyphicon glyphicon-edit"></span> 批量审核通过
+					</a></li>
+					<li><a id="linkYesItemsAndMark" href="javascript:void(0)">
+							<span class="glyphicon glyphicon-edit"></span> 批量审核通过并加备注
+					</a></li>
+					
+					<li><a id="linkNoItems" href="#"> <span
+							class="glyphicon glyphicon-remove"></span> 批量审核不通过
+					</a></li>
+					</@shiro.hasPermission> 
+					<!-- <li>
+				  		<a id="linkNoItemCmsTopic" href="#">
+				  			<span class="glyphicon glyphicon-remove"></span> 
+					  		传输到cms
+					  	</a>
+					  </li> -->
+				</ul>
+			</div>
+		</div>
+		<div class="_table_container" style="overflow-y: auto;width:100%; " >
+		<table class="table table-hover table-bordered" style="table-layout:fixed;">
+			<thead>
+				<tr>
+					<th style="width:2%;"><input type="checkbox" id="checkall" onclick="selectAll()"></th>
+					<th style="width:3%;">序号</th>
+					<!-- <th>ID</th> -->
+					<th style="width:5%;">所属版块</th>
+					<th style="width:5%;">是否爆料</th>
+					<!-- <th style="width:18%;">主题图片</th>  -->
+					<th style="width:30%;word-wrap:break-word;word-break:break-all;width:200px; overflow:auto;table-layout:fixed">主题内容</th>
+					<th style="width:5%;">会员账号</th> 
+					<th style="width:7%;">创建时间</th>
+					<th style="width:5%;">审核状态</th>
+					<th style="width:5%;">可见状态</th>
+					<th style="width:7%;">发布时间</th>
+					<th style="width:25%;">操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<#list page.list as freshnews>
+				<tr>
+					<td><input type="checkbox" name="freshnewsCheckbox"
+						value="${freshnews.topicId}"></td>
+					<td data-field='index'></td>
+					<!-- <td>${freshnews.topicId}</td> -->
+					 <td><#if freshnews.forumName??>${freshnews.forumName}</#if></td>  
+					 <td><#if freshnews.topicType==1>是
+					    <#else>否
+					   </#if>
+					 </td> 
+					 
+					<!-- <td>
+						<div style="height: 100%;width: 100%">
+							<#if freshnews.fileId??>
+						     <#list freshnews.fileId?split(",") as imgUrl>  
+								<img src="${imgUrl}" style="height: 80%;width: 18%"/>
+						     </#list>  
+							</#if>
+						</div>
+					</td> -->
+					
+					<td><#if freshnews.content??>${freshnews.content}</#if></td>
+					  <td><#if freshnews.memberName??>${freshnews.memberName}</#if></td> 
+					<!-- <td><#if freshnews.memberId??>${freshnews.memberId}</#if></td> -->
+					<td><#if freshnews.createTime??>${freshnews.createTime?string('yyyy-MM-dd
+						HH:mm:ss')}</#if></td>
+					<td><#if freshnews.auditStatus??> <#if 
+							freshnews.auditStatus==0>审核未通过
+			      		<#elseif freshnews.auditStatus == 1>审核通过
+			      		<#elseif freshnews.auditStatus == 2>新提交
+			      		<#else>已删除
+								</#if> </#if></td>
+					<td>
+						<!-- <a class="btn btn-info btn-xs linkTimeLine" href="javascript:toauditdetail(${freshnews.topicId})">详情</a> -->
+						<#if freshnews.showStatus??> <#if 
+							freshnews.showStatus==0>
+									不可见
+			      			<#elseif freshnews.showStatus == 1>
+			      			可见
+			      			<#else>
+			      			
+								</#if> </#if>
+					</td>
+					<td><#if freshnews.lastModifyTime??>${freshnews.lastModifyTime}</#if></td>
+					<td>
+					<@shiro.hasPermission name="/sns/audit/batch_save.do">
+					<a class="btn btn-info btn-xs linkDetail"
+						href="javascript:todetail('${freshnews.topicId}')">详情</a> 
+						</@shiro.hasPermission> 
+						<@shiro.hasPermission name="/sns/audit/batch_save.do">
+						<#if freshnews.auditStatus??>
+						<#if freshnews.auditStatus==0>
+									<a class="btn btn-info btn-xs" href="javascript:freshnewsAuditPassOrDeny('${freshnews.topicId}',1)">审核通过</a>
+			      			<#elseif freshnews.auditStatus == 1>
+			      			<a class="btn btn-info btn-xs" href="javascript:freshnewsAuditPassOrDeny('${freshnews.topicId}',0)">审核不通过</a>
+			      			<#else>
+			      			<a class="btn btn-info btn-xs" href="javascript:freshnewsAuditPassOrDeny('${freshnews.topicId}',1)">审核通过</a>
+									<a class="btn btn-info btn-xs" href="javascript:freshnewsAuditPassOrDeny('${freshnews.topicId}',0)">审核不通过</a>
+								</#if> </#if>
+								</@shiro.hasPermission> 
+								<@shiro.hasPermission name="/sns/audit/batch_save.do">
+								<#if freshnews.topicType==1>
+								   <a class="btn btn-info btn-xs linkDetail" href="javascript:topicNotToHot('${freshnews.topicId}',<#if freshnews.relatednewsId??>'${freshnews.relatednewsId}'<#else>null</#if>)">取消爆料</a>
+								<#else>
+								 <a class="btn btn-info btn-xs linkDetail" href="javascript:topicToHot('${freshnews.topicId}',<#if freshnews.relatednewsId??>'${freshnews.relatednewsId}'<#else>null</#if>)">爆料</a>
+								
+								 </#if>
+								  </@shiro.hasPermission> 
+								  <@shiro.hasPermission name="/sns/audit/batch_save.do">
+								  <a class="btn btn-info btn-xs linkDetail" href="javascript:checkNews(<#if freshnews.relatednewsId??>'${freshnews.relatednewsId}'<#else>null</#if>)">所属新闻</a> 
+								  </@shiro.hasPermission> 
+								  <@shiro.hasPermission name="/sns/audit/batch_save.do">
+								  <#if freshnews.disabled??>
+								 <#if freshnews.disabled==0>
+								  <a class="btn btn-info btn-xs linkDetail" href="javascript:disabledUser(<#if freshnews.memberId??>'${freshnews.memberId}'<#else>null</#if>,1)">禁言</a>
+								 <#else>
+								  <a class="btn btn-info btn-xs linkDetail" href="javascript:disabledUser(<#if freshnews.memberId??>'${freshnews.memberId}'<#else>null</#if>,0)">解禁</a>
+									</#if></#if>
+									</@shiro.hasPermission> 
+								</td>
+				</tr>
+				</#list>
+			</tbody>
+			
+		</table>
+		</div>
+      <#include "../common/page.html"/>
+		
+		<!-- Modal 审核备注 -->
+		<div class="modal fade" id="modalMark" tabindex="-1" role="dialog">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h5 class="modal-title" id="myModalLabel">
+							<span class="glyphicon glyphicon-file"></span> <span>审核备注</span>
+						</h5>
+					</div>
+					<div class="modal-body">
+						<form id="audit" name="audit" class="form-horizontal">
+							<input type="hidden" id="curentstatus" name="curentstatus"
+								value="1" />
+							<!-- 默认为1审核通过 -->
+							<input type="hidden" id="topicType" name="topicType" value="0" />
+							<div class="form-group form-group-sm">
+								<label class="col-sm-2 control-label">备注</label>
+								<div class="col-sm-10">
+									<textarea id="auditopinion" name="auditopinion"
+										class="form-control" rows="5"></textarea>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-info btn-sm"
+							data-dismiss="modal">
+							<span class="glyphicon glyphicon-remove"></span> 关闭
+						</button>
+						<button type="button" class="btn btn-info btn-sm"
+							data-dismiss="modal"
+							onclick="batchAudit($('#curentstatus').val(),$('#auditopinion').val())">
+							<span class="glyphicon glyphicon-ok"></span> 确定
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Modal审核详情 -->
+		<div class="modal fade" id="modalTimeLine" tabindex="-1" role="dialog">
+			<#include "audit_detail.html"/>
+		</div>
+		<!-- Modal关联新闻 -->
+		<div class="modal fade" id="modalNewList" tabindex="-1" role="dialog">
+			<#include "relatedNews.html"/>
+		</div>
+		<!-- 新闻列表 -->
+		<div class="modal fade"  id="modalHotNewList_news" tabindex="-1" role="dialog">
+			 <#include "hotNews.html"/> 
+		</div>
+		
+		
+		<div class="modal fade" id="modalNews_Detail" tabindex="-1" role="dialog">
+			  <#include "newsDetail.html"/> 
+		</div>
+		
+		<div class="modal fade" id="toConent" tabindex="-1" role="dialog">
+			<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h5 class="modal-title">
+						<span class="glyphicon glyphicon-file"></span> <span>内容化</span>
+					</h5>
+				</div>
+				<div class="modal-body">
+						<div class="form-group">
+							<label class="col-sm-2 control-label no-padding-right">标题：</label>
+							<div class="col-sm-9">
+									<input id="title" name="title"  value="" class="col-sm-7" type="text" placeholder="请输入标题" required=""/>
+							</div>
+						</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-info btn-sm"
+						data-dismiss="modal">
+						<span class="glyphicon glyphicon-remove"></span> 关闭
+					</button>
+					<button type="button" class="btn btn-info btn-sm" id="toConents"
+						data-dismiss="modal">
+						<span class="glyphicon glyphicon-remove"></span> 保存
+					</button>
+				</div>
+			</div>
+		</div>
+		</div>
+	</div>
+	<!-- 区块：主内容区域 end -->
+	<script type="text/javascript">
+	var freshnewsauditlist_page = {
+			initTopicType:function(){
+				$.ajax({
+					type:"POST",
+				  dataType:"text",
+				  url:loadAllTopicTypeUrl,
+				  success:function(data,status){
+				  	if(status='success'&&data!=''){
+				  		var searchType;
+				  		<#if searchvo??>
+				  			<#if searchvo.topicType??>
+				  			searchType=${searchvo.topicType};
+				  			</#if>
+				  		</#if>
+				  		
+				  		$("#topicTypeSelect").html("<option value=''>全部</option>");
+				  		var array = JSON.parse(data);
+				  		if(array.length>0){
+				  			for(var i=0;i<array.length;i++){
+				  				var obj = array[i];
+				  				// selected="selected"
+				  				console.log("searchType="+searchType);
+				  				console.log("obj.forumId="+obj.forumId);
+				  				if(obj.forumName!='新闻'){
+				  					if(searchType!=null){
+				  						if(searchType==obj.forumId){
+						  					$("#topicTypeSelect").append("<option value='"+obj.forumId+"' selected='selected' >"+obj.forumName+"</option>");
+				  						}else{
+				  							$("#topicTypeSelect").append("<option value='"+obj.forumId+"'>"+obj.forumName+"</option>");
+				  						}
+				  					}else{
+				  						$("#topicTypeSelect").append("<option value='"+obj.forumId+"'>"+obj.forumName+"</option>");
+				  					}
+				  				}
+				  			}
+				  		}
+				  	}
+				  }
+				});
+			}
+	}
+		jQuery(function($){
+			//初始化主题类型下拉树
+			freshnewsauditlist_page.initTopicType();
+			//设置序号
+			var length = $("tbody tr").length;
+			//var begin = (${page.pageNo}-1)*length+1;
+			for(var i = 0;i<length;i++){
+	      $("tbody tr:eq("+i+") td[data-field='index']").text(i+1);
+	    }
+			//设置搜素框审核状态下拉选中
+  		<#if searchvo.auditStatus??>
+  			$("#auditStatus").val(${searchvo.auditStatus});
+  		</#if>
+	  }); 
+		
+		
+		function tosearch(){
+			var data = $("#searchform").serialize();
+			loadMain(newsfreshAuditUrl,data);
+		}
+		
+		/* //els 全文检索
+		function tosearchAll(){
+			var data = $("#searchform").serialize();
+			loadMain(newsfreshAuditUrl,data);
+		} */
+		
+		
+		//信息表单模态框
+		var $modalInfo = $('#modalInfo');//模态框
+		var $modalInfoTitle = $modalInfo.find('#modalTite');//模态框标题
+		//bootstrap模态框实例
+		$modalInfo.modal({
+			backdrop:'static',//点击模态透明层不隐藏
+			keyboard:false,//键盘不控制模态框 如：esc按下模态框不消失
+			show:false//实例化后默认不显示
+		});
+		
+		//审核详情模态框
+		var $modalTimeLine = $('#modalTimeLine');
+		$modalTimeLine.modal({
+			backdrop:'static',
+			keyboard:false,
+			show:false
+		});
+
+		//新闻列表模态框
+		var $modalNewList = $('#modalNewList');
+		$modalNewList.modal({
+			backdrop:'static',
+			keyboard:false,
+			show:false
+		});
+		
+		var $modalNews_Detail = $('#modalNews_Detail');
+		$modalNews_Detail.modal({
+			backdrop:'static',
+			keyboard:false,
+			show:false
+		});
+		
+		var $modalHotNewList_news = $('#modalHotNewList_news');
+		$modalHotNewList_news.modal({
+			backdrop:'static',
+			keyboard:false,
+			show:false
+		});
+		
+		var $modalNews = $('#modalNews');
+		$modalNews.modal({
+			backdrop:'static',
+			keyboard:false,
+			show:false
+		});
+		
+		
+		//模态框完全关闭后重新load
+		$modalNewList.on('hidden.bs.modal', function () {
+			loadMain(newsfreshAuditUrl);
+		});
+
+		//审核备注模态框
+		var $modalMark = $('#modalMark');
+		$modalMark.modal({
+			backdrop:'static',
+			keyboard:false,
+			show:false
+		});
+		//模态框完全关闭后重新load
+		$modalMark.on('hidden.bs.modal', function () {
+			loadMain(newsfreshAuditUrl);
+		});
+		
+		var $toConent = $('#toConent');
+		//内容化
+		$toConent.modal({
+			backdrop:'static',
+			keyboard:false,
+			show:false
+		}); 
+		$('#ceshi').click(function(){
+			
+			var ids = getCheckedTopicId();
+			if(ids.length > 1) {
+				alert("请选择一条记录");
+				return false;
+			}
+			if(ids){
+				$toConent.modal('show');
+				$("#curentstatus").val(1);
+			}
+
+		});
+		
+		$('#toConents').click(function(){
+			var ids = getCheckedTopicId();
+			var data = JSON.stringify({"topicId":topicId});
+			var topicId;
+			for(var i =0; i < ids.length ;i++){
+				topicId = ids[0].topicId;
+			}
+			var	title = $("#title").val();
+			var urls="${rc.contextPath}/sns/topic/tocontent/toCmsContent.do";
+			$.ajax({
+				  type:"POST",
+				  dataType:"json",
+				  url:urls,
+				  data:{title:title,
+					  topicId:topicId.toString()
+					  },
+				  success:function(data){
+					  if(data.status==200){
+						  alert("操作成功");
+							$toConent.modal('hide'); 
+					  }else{
+						  alert("操作失败");
+							$toConent.modal('hide');
+					  }
+				  },error(data){
+					  alert("操作失败");
+						$toConent.modal('hide');
+				  }
+			});
+		});
+		
+
+		
+		//查看审核详情
+		function toauditdetail(topicId){
+			var data = JSON.stringify({"topicId":topicId});
+			$.ajax({
+			  type:"POST",
+			  dataType:"html",
+			  contentType: "application/json; charset=utf-8",
+			  url:newsfreshAuditDetailUrl,
+			  data:data,
+			  success:function(data,status){
+			  	if(status='success'){
+			  		    $modalTimeLine.load(data);
+						$modalTimeLine.modal('show');
+			  	}
+			  },
+			  error:function(data){
+			  	alert("获取详情失败!");
+			  }
+			});
+			$modalTimeLine.load(newsfreshAuditDetailUrl,data);
+			$modalTimeLine.modal('show');
+		}
+
+		//查看新鲜事详细
+		function todetail(topicId){
+			var data = JSON.stringify({"topicId":topicId});
+			$.ajax({
+			  type:"POST",
+			  dataType:"html",
+			  contentType: "application/json; charset=utf-8",
+			  url:newsfreshDetailUrl,
+			  data:data,
+			  success:function(data,status){
+			  	if(status='success'){
+			  		$modalTimeLine.html(data);
+				  $modalTimeLine.modal('show');
+			  	}
+			  },
+			  error:function(data){
+			  	alert("获取详情失败!");
+			  }
+			});
+		}
+
+		//关联新闻
+		$('#linkChooseNews').click(function(){
+			//判断选中新鲜事
+			var ids = getCheckedTopicId();
+			if(ids&&ids.length>0){
+				//TODO 是否可多选
+				$.ajax({
+				  type:"POST",
+				  dataType:"html",
+				  contentType: "application/json; charset=utf-8",
+				  url:getRelatedNewsUrl,
+				  data:JSON.stringify({"pageSize":3}),
+				  success:function(data,status){
+				  	if(status='success'){
+				  		$modalNewList.html(data);
+				  		$modalNewList.modal('show');
+				  	}
+				  },
+				  error:function(data){
+				  	alert("获取新闻列表失败!");
+				  }
+				});
+			}
+			
+		});
+		
+
+		//新鲜事转爆料
+		$('#convertToBroke').click(function(){
+			var ids = getCheckedTopicId();
+			if(ids&&ids.length>0){
+				var msg = "确定将选择的新鲜事转爆料么?";
+				if(confirm(msg)==true){
+					$.ajax({
+					  type:"POST",
+					  dataType:"text",
+					  contentType: "application/json; charset=utf-8",
+					  url:convertFreshToBrokeUrl,
+					  data:JSON.stringify(ids),
+					  success:function(data,status){
+					  	if(data=='success'&&status=='success'){
+					  		loadMain(newsfreshAuditUrl);
+					  	}
+					  },
+					  error:function(data){
+					  	alert("新鲜事转爆料失败!");
+					  }
+					});
+				}
+			}
+		});
+		
+		function getCheckedTopicId(){
+			var ids= new Array();
+			var i=0;
+			$("input:checkbox[name='freshnewsCheckbox']:checked").each(function() {
+				var data = {"topicId":$(this).val()};
+				ids.push(data); // 每一个被选中项的值
+			});
+			if(ids=="") {
+				alert("请至少选择一条记录");
+				return false;
+			}
+			return ids;
+		}
+		//审核通过并加备注
+		$('#linkYesItemsAndMark').click(function(){
+			var ids = getCheckedTopicId();
+			if(ids){
+				$modalMark.modal('show');
+				$("#curentstatus").val(1);
+			}
+		});
+		
+		
+		//审核不通过并加备注
+		$('#linkNoItems').click(function(){
+			var ids = getCheckedTopicId();
+			if(ids){
+				$modalMark.modal('show');
+				$("#curentstatus").val(0);
+			}
+		});
+		
+		
+		//批量审核
+		function batchAudit(curentstatus,auditopinion){
+			if(curentstatus==null){
+				curentstatus = 1;
+			}
+			var ids = getCheckedTopicId();
+			if(ids&&ids.length>0){
+				//添加确认提示
+				var msg = "确定将选择的"+ids.length+"条信息批量"; 
+				if(curentstatus==0){
+					msg = msg+"审核不通过吗？";
+				}else if(curentstatus==1){
+					msg = msg+"审核通过吗？";
+				}
+ 				if (confirm(msg)==true){
+ 					for(var i=0;i<ids.length;i++){
+ 						var data = ids[i];
+ 						data['curentstatus'] = curentstatus;
+ 						data['topicType'] = topicType;
+ 						data['auditOpinion'] = auditopinion;
+ 					}
+ 					$.ajax({
+ 					  type:"POST",
+ 					  dataType:"text",
+ 					  contentType: "application/json; charset=utf-8",
+ 					  url:batchAuditUrl,
+ 					  data:JSON.stringify(ids),
+ 					  success:function(data,status){
+ 					  	if(status='success'&&data=='success'){
+ 					  		//关闭模态框,触发模态框关闭事件重新加载页面
+ 					  	}
+ 					  },
+ 					  error:function(data){
+ 					  	alert(data);
+ 					  }
+ 					});
+ 				}
+				
+			}
+		}
+		
+		//批量审核通过
+		$('#linkYesItems').on('click',function(){
+			var ids= new Array();
+			var i=0;
+			$("input:checkbox[name='freshnewsCheckbox']:checked").each(function() {
+				var data = {"topicId":$(this).val(),"curentstatus":1,"topicType":topicType};
+				ids.push(data); // 每一个被选中项的值
+			});
+			if(ids=="") {
+				alert("请至少选择一条记录");
+				return false;
+			}
+			//添加确认提示
+			var msg = "确定将选择的"+ids.length+"条信息批量审核通过吗？";
+			if (confirm(msg)==true){
+				$.ajax({
+				  type:"POST",
+				  dataType:"text",
+				  contentType: "application/json; charset=utf-8",
+				  url:batchAuditUrl,
+				  data:JSON.stringify(ids),
+				  success:function(data,status){
+				  	if(status='success'&&data=='success'){
+				  		loadMain(newsfreshAuditUrl);
+				  	}
+				  },
+				  error:function(data){
+				  	alert(data);
+				  }
+				});
+			}
+		});
+		
+		//单条审核通过或不通过
+		function freshnewsAuditPassOrDeny(topicId,curentstatus){
+			var data = JSON.stringify({"topicId":topicId,"curentstatus":curentstatus,"topicType":topicType});
+			$.ajax({
+			  type:"POST",
+			  dataType:"text",
+			  contentType: "application/json; charset=utf-8",
+			  url:toAuditUrl,
+			  data:data,
+			  success:function(data,status){
+			  	if(status='success'){
+			  		if(data=='success'){
+			  			alert('审核成功!');
+			  			loadMain(newsfreshAuditUrl);
+			  		}else{
+			  			alert('审核操作失败:'+data);
+			  		}
+			  	}
+			  },
+			  error:function(data){
+			  	alert("审核操作失败!");
+			  }
+			});
+		}
+		
+		/** 分页普通跳转 **/
+		function jumpNormalPage(page){
+			var checkid = null;
+			var data = $("#searchform").serialize();
+			var domain = newsfreshAuditUrl.substring(0,newsfreshAuditUrl.lastIndexOf("?"));
+			$('.hk-main').load(domain+"?pageNo="+page,data);
+		}	
+		
+		//全选全不选，列表所有选中复选框选中，否则不选中
+		function selectAll() {
+			if($("#checkall").is(":checked")){
+				$("input[name='freshnewsCheckbox']").each(function(){ 
+		       $(this).prop("checked", true); 
+		     }); 
+		  }else{ 
+		  	$("input[name='freshnewsCheckbox']").each(function(){ 
+		       $(this).removeAttr("checked"); 
+		     }); 
+		  } 
+		}
+		$.fn.serializeObject = function()  
+		{  
+		  var o = {};  
+		  var a = this.serializeArray();  
+		  $.each(a, function() {  
+		    if (o[this.name]) {  
+		      if (!o[this.name].push) {  
+		        o[this.name] = [o[this.name]];  
+		      }  
+		      o[this.name].push(this.value || '');  
+		    } else {  
+		      o[this.name] = this.value || '';  
+		    }  
+		  });  
+		  return o;  
+		}; 
+		
+		
+	/* 	$("#linkNoItemCmsTopic").click(function(){
+			var ids= new Array();
+			var i=0;
+			$("input:checkbox[name='freshnewsCheckbox']:checked").each(function() {
+				var data = {"topicId":$(this).val(),"curentstatus":1,"topicType":topicType};
+				ids.push(data); // 每一个被选中项的值
+			});
+			if(ids=="") {
+				alert("请至少选择一条记录");
+				return false;
+			}
+			//添加确认提示
+			var msg = "确定将选择的"+ids.length+"条信息批量传输吗？";
+			if (confirm(msg)==true){
+				$.ajax({
+				  type:"POST",
+				  dataType:"text",
+				  contentType: "application/json; charset=utf-8",
+				  url:"${rc.contextPath}/sns/audit/tramCms.do",
+				  data:JSON.stringify(ids),
+				  success:function(data,status){
+				  	if(status='success'&&data=='success'){
+				  		loadMain(newsfreshAuditUrl);
+				  	}
+				  },
+				  error:function(data){
+				  	alert(data);
+				  }
+				});
+			}
+		}); */
+		
+function topicToNews(topicId){
+			var data = JSON.stringify({"topicId":topicId});
+			$.ajax({
+			    type:"POST",
+			    dataType:"html",
+			    contentType: "application/json; charset=utf-8",
+			    url:"${rc.contextPath}/sns/topic/newsfresh_details.do",
+			    data:data,
+			    success:function(data,status){
+			    	if(status='success'){
+			    		$modalNewList.html(data);
+						$modalNewList.modal('show');
+			    	}
+			    },
+			    error:function(data){
+			    	alert("获取详情失败!");
+			    }
+			});
+}
+
+
+function topicToHot(topicId,relatednewsId){
+	if(relatednewsId!=null){
+		doTopicTohot(topicId,relatednewsId);
+		//doTopicTohot(topicId,"21304594835574784");
+	}else{
+	var data = JSON.stringify();
+		$.ajax({
+		    type:"POST",
+		    dataType:"json",
+		    url:"${rc.contextPath}/sns/topic/hot_detail.do",
+		    data:{"topicId":topicId},
+		    success:function(data){
+		    	console.log(data);
+		    	$("#topicIds").val(data.topicId);
+		    	 $("#titles").val(data.title);
+		         $("#contents").val(data.content);
+				 $modalHotNewList_news.modal('show'); 
+				     
+		    },
+		    error:function(data){
+		    	alert("网络请求失败!");
+		    }
+		});
+}
+}
+function doTopicTohot(topicId,relatednewsId){
+	$.ajax({
+	  type:"POST",
+	  dataType:"json",
+	  url:"${rc.contextPath}/sns/topic/topicToNews.do",
+	  data:{"topicId":topicId,"relatednewsId":relatednewsId},
+	  success:function(data,status){
+	  	if(status='success'){
+	  		alert("操作成功");
+	  		hideModal($modalHotNewList_news);
+	  		loadMain(newsfreshAuditUrl);
+	  	}else{
+	  		alert("操作失败!");
+	  	}
+	  },
+	  error:function(data){
+	  	alert("网络请求失败!");
+	  }
+	});
+}
+function hideModal(model) {
+	model.removeClass("in");
+	$(".modal-backdrop").remove();
+	$('body').removeClass('modal-open');
+	$('body').css('padding-right', '');
+	model.hide();
+}
+
+ 
+  function checkNews(relatednewsId){
+	if(relatednewsId==null){
+		alert("没有关联的新闻！");
+		return;
+	}
+	$("#title_news").children().remove();
+	$("#summary_news").children().remove();
+	$("#content_news").children().remove();
+	$("#keyWords_news").children().remove();
+	$("#createTime_news").children().remove();
+	$.ajax({
+		url:"${rc.contextPath}/sns/topic/findNewsById.do",
+		data:{"relatednewsId":relatednewsId},
+		type:"POST",
+		dataType:"json",
+		success:function(data){
+			
+			//$("#title_news").val(data.title);
+			$("#title_news").append("<div>"+data.title+"</div>");
+			//$("#summary_news").val(data.summary);
+			$("#summary_news").append("<div>"+data.summary+"</div>");
+			//$("#content_news").val(data.content);
+			$("#content_news").append("<div >"+data.content+"</div>");
+			//$("#keyWords_news").val(data.keyWords);
+			$("#keyWords_news").append("<label class='control-label' align='left'>"+data.keyWords+"</label>");
+			//$("#createTime_news").val(data.createTime);
+			$("#createTime_news").append("<div>"+data.createTime+"</div>");
+			$modalNews_Detail.modal('show');
+		}
+	})
+}  
+ 
+ 
+ function topicNotToHot(topicId,relatednewsId){
+	 if(relatednewsId!=null){
+		 $.ajax({
+				url:"${rc.contextPath}/sns/topic/topicNotToHot.do",
+				data:{"topicId":topicId},
+				type:"post",
+				dataType:"text",
+				success:function(data){
+					alert(data);
+					loadMain(newsfreshAuditUrl);
+				}
+			})
+	 }else{
+		 alert("该新鲜事不是爆料！")
+	 }
+ }
+
+
+function disabledUser(memberId,disabled){
+	$.ajax({
+		url:"${rc.contextPath}/sns/topic/disabledUser.do",
+		data:{"memberId":memberId,"disabled":disabled},
+		type:"post",
+		dataType:"json",
+		success:function(data){
+			if(data!=null){
+				alert("操作成功！");
+				loadMain(newsfreshAuditUrl);
+			}else{
+				alert("操作失败");
+				
+			}		
+		}
+	})
+}
+
+
+
+
+
+
+
+
+
+		</script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<script type="text/javascript">
+	/* 页面全局url */
+	var loadForumUrl = "${rc.contextPath}/sns/forum/list.do";
+	var toeditForumUrl = "${rc.contextPath}/sns/forum/toedit.do";
+	var deleteForumUrl = "${rc.contextPath}/sns/forum/delete.do";
+	var batchdeleteForumUrl = "${rc.contextPath}/sns/forum/batchdelete.do";
+</script>
+		<form name="searchform" id="searchform" class="form-inline hk-search">
+				<div class="row">
+					<div class="col-sm-2 col-xs-6">
+			  			<input type="text" name="forumName" value="<#if searchVo??>${searchVo.forumName!''}</#if>" 
+			  			class="form-control input-sm" placeholder="板块名称">
+					</div>
+					<div class="col-sm-2  col-xs-6">
+			  			<button type="button" class="btn btn-info btn-sm" onclick="tosearch()">
+				  			<span class="glyphicon glyphicon-search"></span> 
+				  			<span>搜索</span>
+				  		</button>
+					</div>
+				</div>
+			</form>
+			<div class="hk-toolbar">
+				<div class="btn-group btn-group-sm">
+				  	<button type="button" class="btn btn-default">
+				  		<span class="glyphicon glyphicon-th-list"></span> 
+				  		操作
+				  	</button>
+				  	<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				    	<span class="caret"></span>
+				 	</button>
+				  	<ul class="dropdown-menu">
+				    	<li>
+				    		<a id="linkAddItem" href="javascript:void(0)">
+				    			<span class="glyphicon glyphicon-plus"></span> 
+				    			添加
+				    		</a>
+				    	</li>
+				    	
+				  	</ul>
+				</div>
+			</div>
+			<table id="forumtable" class="table table-hover table-bordered">
+			    <thead>
+			        <tr>
+			            <th><input type="checkbox" id="checkall" onclick="selectAll()"></th>
+			            <th>序号</th>
+			            <th>ID</th>
+			            <th style="width:35%;">板块名称</th>
+			            <th>板块分类</th>
+			            <th>录入时间</th>
+			            <th>录入人</th>
+			            <th>操作</th>
+			        </tr>
+			    </thead>
+			    <tbody>
+			        <#list page.list as forum>
+					<tr>
+						<td><input type="checkbox" name="forumcheckbox" value="${forum.forumId}"></td>
+						            <td data-field="index" data-formatter="indexFormatter"></td>
+						            <td data-field="forumId" data-editable="true">${forum.forumId}</td>
+						            <td><#if forum.forumName??>${forum.forumName}</#if></td>
+						            <td><#if forum.categoryName??>${forum.categoryName}</#if></td>
+						            <td><#if forum.createTime??>${forum.createTime?string("yyyy-MM-dd HH:mm:ss")}</#if></td>
+						            <td><#if forum.creator??>${forum.creator}</#if></td>
+						            <td><#if forum.showStatus==0>不可见
+						            		<#else>可见       
+						                </#if>
+						            </td>
+						            <td>
+										 <a  class="btn btn-info btn-xs" href="javascript:editItem('${forum.forumId}')">编辑</a>
+						            	 <a class="btn btn-info btn-xs" href="javascript:deleteItem('${forum.forumId}')">删除</a> 
+						            	
+						            </td>
+						         </tr>        			    
+					</#list>
+			    </tbody>
+			</table>
+		  	<#include "../common/page.html">
+		  	
+			<!-- 表单模态框 -->
+			<div class="modal fade" id="modalInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+			  <#include "forum_add.html">
+			  
+			</div>
+		
+		<script type="text/javascript">
+			//设置序号
+			var length = $("tbody tr").length;
+			//var begin = (${page.pageNo}-1)*length+1;
+			for(var i = 0;i<length;i++){
+	            $("tbody tr:eq("+i+") td[data-field='index']").text(i+1);
+	        }
+			//var tableParam = $("#forumtable");
+			//添加一条数据
+			$('#linkAddItem').click(function(){
+				$modalInfoTitle.html('添加数据');
+				$modalInfo.modal('show');
+			});
+			//在当前行编辑
+			function editItem(forumId){
+				
+				var url= toeditForumUrl+"?forumId="+forumId;
+				//先加载页面
+				$modalInfo.load(url);
+				$modalInfoTitle.html('编辑数据');
+				$modalInfo.modal('show');
+				
+			};
+			//删除一条数据
+			function deleteItem(forumId){
+				var c = confirm("确定删除"+forumId+"么?");
+				if(c==true){
+					var url = deleteForumUrl+"?forumId="+forumId;
+					$.ajax({
+					    type:"POST",
+					    dataType:"text",
+					    url:url,
+					    success:function(data,status){
+					    	if(status='success'&&data=='success'){
+					    		$('.hk-main').load(loadForumUrl);
+					    	}
+					    }
+					});
+				}
+				
+			}
+			//批量删除
+			$('#linkDelItems').on('click',function(){
+				var ids= new Array();
+				var i=0;
+				$("input:checkbox[name='forumcheckbox']:checked").each(function() {
+					ids.push({"forumId":$(this).val()}); // 每一个被选中项的值
+				});
+				if(ids=="") {
+					alert("请至少选择一条记录");
+					return false;
+				}
+				var c = confirm("确定删除选中的分类么?");
+				if(c==true){
+					$.ajax({
+					    type:"POST",
+					    dataType:"text",
+					    contentType: "application/json; charset=utf-8",
+					    url:batchdeleteForumUrl,
+					    data:JSON.stringify(ids),
+					    success:function(data){
+					    	if(data=='success'){
+					    		$('.hk-main').load(loadForumUrl);
+					    	}
+					    },
+					    error:function(data){
+					    	alert(data);
+					    }
+					});
+				}
+			});
+			function indexFormatter(value, row, index) {
+				return index+1;  
+	         } 
+			
+			/**搜素**/
+			function tosearch(){
+				var data = $("#searchform").serialize();
+				$('.hk-main').load(loadForumUrl,data);
+				
+			}
+			/** 分页普通跳转 **/
+			function jumpNormalPage(page){
+				var checkid = null;
+				$('.hk-main').load(loadForumUrl+"?pageNo="+page);
+			}	
+			
+			//全选全不选，列表所有选中复选框选中，否则不选中
+			function selectAll() {
+				if($("#checkall").is(":checked")){  
+					$("input[name='forumcheckbox']").each(function(){  
+			             $(this).prop("checked", true);  
+			         });  
+			    }else{  
+			    	$("input[name='forumcheckbox']").each(function(){  
+			             $(this).removeAttr("checked");  
+			         });  
+			    }  
+			}
+		</script>

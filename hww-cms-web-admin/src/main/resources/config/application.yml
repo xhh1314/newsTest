@@ -1,0 +1,52 @@
+snowFlake: 
+ datacenter_id: 1 #主键生成所属datacenter_id，注意一定不要重复 【0-15】
+ cluster_id: 1 #主键生成所在  某应用下集群id， 所属应用的集群内 注意一定不要重复【0-31】
+jpush: 
+  appKey: d4ee2375846bc30fa51334f5
+  masterSecet: f3b222f7e0dde430b6d8fa5a
+ 
+server:
+  port: 7904
+  session:
+    timeout: 1800
+  tomcat:
+    uri-encoding: UTF-8
+    max-threads: 800
+    max-connections: 800
+  context-path: /cmsadmin
+spring:
+  profiles: 
+     active: dev
+  application:
+    name: hww-cms-web-admin
+  resources: 
+   cache-period: 10000
+
+         
+#模板配置
+  freemarker:
+    template-loader-path:
+    - classpath:/template
+    prefix: /cms-view/
+    suffix: .html
+    content-type: text/html
+    charset: UTF-8
+    request-context-attribute: rc
+    expose-request-attributes: false
+    expose-session-attributes: false
+    expose-spring-macro-helpers: true
+    
+    settings:
+      auto_import: /ftl/sys/index.ftl as p,/ftl/spring.ftl as s
+      number_format : 0.##########
+#  http:
+#    multipart:
+#      max-file-size: 1024000kb
+  #自定义配置
+custom:
+  picUploadLocation: /upload/tmp/img/
+
+logging:
+  file: logs/hww-cms-web-admin.log
+  level:
+    com.hww.cms: debug

@@ -1,0 +1,523 @@
+
+<script type="text/javascript">
+    //鏈〉闈rl
+    var loadSysListUrl ="${rc.contextPath}/searchHistory/list.do";
+</script>
+<form class="form-inline hk-search" id="searchForm" method="post">
+	<div class="row">
+		<div class="col-sm-2  col-xs-6" style="width: 125px;">
+			<#if form.searchContent??>
+				<input id="ssearchContent" name="searchContent" type="text" value="${form.searchContent}" class="form-control input-sm" placeholder="鎼滅储璇�">
+				<#else>
+					<input id="ssearchContent" name="searchContent" type="text" class="form-control input-sm" placeholder="鎼滅储璇�">
+			</#if>
+		</div>
+		<div class="col-sm-2  col-xs-6" style="width: 125px;">
+			<div class="input-group input-group-sm">
+				<span class="input-group-addon" id="basic-addon3">绫诲瀷</span>
+				<#if (form.type)??>
+					<#if form.type==1>
+						<select class="form-control" id="types" name="type">
+							<option value="">鍏ㄩ儴</option>
+							<option value="1" selected="selected">缁煎悎</option>
+							<option value="2">鐖嗘枡</option>
+							<option value="3">瑙嗛</option>
+							<option value="4">鏂伴矞浜�</option>
+							<option value="5">鐢ㄦ埛</option>
+							<option value="6">闄勮繎</option>
+						</select>
+					</#if>
+					<#if form.type==2>
+						<select class="form-control" id="types" name="type">
+							<option value="">鍏ㄩ儴</option>
+							<option value="1">缁煎悎</option>
+							<option value="2" selected="selected">鐖嗘枡</option>
+							<option value="3">瑙嗛</option>
+							<option value="4">鏂伴矞浜�</option>
+							<option value="5">鐢ㄦ埛</option>
+							<option value="6">闄勮繎</option>
+						</select>
+					</#if>
+					<#if form.type==3>
+						<select class="form-control" id="types" name="type">
+							<option value="">鍏ㄩ儴</option>
+							<option value="1">缁煎悎</option>
+							<option value="2">鐖嗘枡</option>
+							<option value="3" selected="selected">瑙嗛</option>
+							<option value="4">鏂伴矞浜�</option>
+							<option value="5">鐢ㄦ埛</option>
+							<option value="6">闄勮繎</option>
+						</select>
+					</#if>
+					<#if form.type==4>
+						<select class="form-control" id="types" name="type">
+							<option value="">鍏ㄩ儴</option>
+							<option value="1">缁煎悎</option>
+							<option value="2">鐖嗘枡</option>
+							<option value="3">瑙嗛</option>
+							<option value="4" selected="selected">鏂伴矞浜�</option>
+							<option value="5">鐢ㄦ埛</option>
+							<option value="6">闄勮繎</option>
+						</select>
+					</#if>
+					<#if form.type==5>
+						<select class="form-control" id="types" name="type">
+							<option value="">鍏ㄩ儴</option>
+							<option value="1">缁煎悎</option>
+							<option value="2">鐖嗘枡</option>
+							<option value="3">瑙嗛</option>
+							<option value="4">鏂伴矞浜�</option>
+							<option value="5" selected="selected">鐢ㄦ埛</option>
+							<option value="6">闄勮繎</option>
+						</select>
+					</#if>
+					<#if form.type==6>
+						<select class="form-control" id="types" name="type">
+							<option value="">鍏ㄩ儴</option>
+							<option value="1">缁煎悎</option>
+							<option value="2">鐖嗘枡</option>
+							<option value="3">瑙嗛</option>
+							<option value="4">鏂伴矞浜�</option>
+							<option value="5">鐢ㄦ埛</option>
+							<option value="6" selected="selected">闄勮繎</option>
+						</select>
+					</#if>
+					<#else>
+						<select class="form-control" id="types" name="type">
+							<option value="" selected="selected">鍏ㄩ儴</option>
+							<option value="1">缁煎悎</option>
+							<option value="2">鐖嗘枡</option>
+							<option value="3">瑙嗛</option>
+							<option value="4">鏂伴矞浜�</option>
+							<option value="5">鐢ㄦ埛</option>
+							<option value="6">闄勮繎</option>
+						</select>
+				</#if>
+			</div>
+		</div>
+		<div class="col-sm-2  col-xs-6">
+			<button id="btnSearch" type="button" class="btn btn-info btn-sm" onclick="search()">
+				<span class="glyphicon glyphicon-search"></span>
+				<span>鎼滅储</span>
+			</button>
+		</div>
+	</div>
+</form>
+<div style="overflow-x: hidden; overflow-y: auto; height:300px; width:auto;">
+	<table id="simple-table" class="table  table-bordered table-hover">
+		<thead>
+		<tr>
+			<th class="hidden-300"  style="text-align: center">鎼滅储娆℃暟</th>
+			<th class="hidden-300"  style="text-align: center">鎼滅储鍐呭</th>
+		</tr>
+		</thead>
+		<tbody id="tblBody">
+		<#list page.list as searchHistory>
+			<tr style="text-align: center;">
+				<td><#if (searchHistory.num)??>${searchHistory.num}<#else></#if></td>
+				<td><#if (searchHistory.searchContent)??>${searchHistory.searchContent}<#else></#if></td>
+			</tr>
+		</#list>
+		</tbody>
+	</table>
+</div>
+<form id="submitForm" name="submitForm" action="list.do" method="post">
+	<#if (form.searchContent)??>
+		<input type="hidden" name="searchContent" id="searchContent" value="${form.searchContent}"/>
+		<#else>
+			<input type="hidden" name="searchContent" id="searchContent"/>
+	</#if>
+	<input type="hidden" name="pageNo" id="pageNo" value="${page.pageNo}"/>
+</form>
+<#include "../common/page.html">
+	<!--<div class="modal fade" id="modalInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h5 class="modal-title" id="myModalLabel">
+						<span class="glyphicon glyphicon-file"></span>
+						<span id="modalTite"></span>
+					</h5>
+				</div>
+				<div class="modal-body">
+					<form id="sysForm" class="form-horizontal">
+						<input type="hidden" name="memberId" id="memberId"/>
+						&lt;!&ndash;<div class="form-group form-group-sm">&ndash;&gt;
+						&lt;!&ndash;<label for="inputEmail3" class="col-sm-2 control-label">绔欑偣缂栧彿</label>&ndash;&gt;
+						&lt;!&ndash;<div class="col-sm-10">&ndash;&gt;
+						&lt;!&ndash;<input type="text" name="siteId" id="siteId" class="form-control" placeholder="绔欑偣缂栧彿">&ndash;&gt;
+						&lt;!&ndash;</div>&ndash;&gt;
+						&lt;!&ndash;</div>&ndash;&gt;
+						&lt;!&ndash;<div class="form-group form-group-sm">
+							<label for="inputEmail3" class="col-sm-2 control-label">鐢ㄦ埛鍚�</label>
+							<div class="col-sm-10">
+								<input type="text" name="realName" id="realName" class="form-control" placeholder="鐢ㄦ埛鍚�">
+							</div>
+						</div>&ndash;&gt;
+						<div class="form-group form-group-sm">
+							<label for="inputEmail3" class="col-sm-2 control-label">璐﹀彿</label>
+							<div class="col-sm-10">
+								<input type="text" name="membername" id="membername" class="form-control" placeholder="璐﹀彿">
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label for="inputEmail3" class="col-sm-2 control-label">鏄电О</label>
+							<div class="col-sm-10">
+								<input type="text" name="pseudonym" id="pseudonym" class="form-control" placeholder="鏄电О">
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label for="inputEmail3" class="col-sm-2 control-label">鑱旂郴鐢佃瘽</label>
+							<div class="col-sm-10">
+								<input type="text" name="phoneNo" id="phoneNo" class="form-control" placeholder="鑱旂郴鐢佃瘽">
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label for="inputEmail3" class="col-sm-2 control-label">閭</label>
+							<div class="col-sm-10">
+								<input type="text" name="email" id="email" class="form-control" placeholder="閭">
+							</div>
+						</div>
+						<div class="form-group form-group-sm" id="pwdDiv">
+							<label for="inputEmail3" class="col-sm-2 control-label">瀵嗙爜</label>
+							<div class="col-sm-10">
+								<input type="text" name="password" id="password" class="form-control" placeholder="瀵嗙爜">
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label for="inputEmail3" class="col-sm-2 control-label">鐘舵��</label>
+							<div class="col-sm-10">
+								<input type="radio" value="1"  name="status" id="enable"/>姝ｅ父
+								<input type="radio" value="0" name="status" id="disable"/>鍐荤粨
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-info btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 鍏抽棴</button>
+					<button id="btnSave" data-action="" type="button" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-saved"></span> 淇濆瓨</button>
+					<button id="btnUpdate" data-action="" type="button" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-saved"></span> 淇敼</button>
+				</div>
+			</div>
+		</div>
+	</div>-->
+	<script type="text/javascript">
+        var page = {
+            init : function() {
+                this.eventInit();
+            },
+            eventInit : function() {
+                //淇℃伅琛ㄥ崟妯℃�佹
+                var $modalInfo = $('#modalInfo');
+                var $modalInfoTitle = $modalInfo.find('#modalTite');
+                $modalInfo.modal({
+                    backdrop : 'static',
+                    keyboard : false,
+                    show : false
+                });
+                //娣诲姞涓�鏉℃暟鎹�
+                $('#linkAddItem').click(function() {
+                    resetForm();
+                    $modalInfoTitle.html('娣诲姞鏁版嵁');
+                    $modalInfo.modal('show');
+                    $("#pwdDiv").show();
+                    $("#btnSave").show();
+                    $("#btnUpdate").hide();
+                });
+                //缂栬緫涓�鏉℃暟鎹�
+                $('#linkEditItem').click(function() {
+                    $modalInfoTitle.html('缂栬緫鏁版嵁');
+                    $modalInfo.modal('show');
+                    $("#pwdDiv").show();
+                    $("#btnSave").hide();
+                    $("#btnUpdate").show();
+                });
+            }
+        };
+
+        jQuery(function($) {
+            page.init();
+        });
+        function toAdd() {
+            resetForm();
+            $modalInfoTitle.html('娣诲姞鏁版嵁');
+            $modalInfo.modal('show');
+            $("#pwdDiv").show();
+            $("#btnSave").show();
+            $("#btnUpdate").hide();
+        }
+        //鏂板鎿嶄綔
+        $("#btnSave").click(function() {
+            if(validateForm()){
+                $.ajax({
+                    type: 'POST',
+                    url: "${rc.contextPath}/hotword/save.do",
+                    data: $("#sysForm").serialize(),
+                    dataType:'json',
+                    success: function(data) {
+                        alert(data);
+                        $(".modal-backdrop").hide();
+                        $("#pageNo").val('${page.pageNo}');
+                        var data = $("#submitForm").serialize();
+                        $('.hk-main').load(loadSysListUrl, data);
+                    }
+                });
+            }
+        });
+        //淇敼鎿嶄綔
+        $("#btnUpdate").click(function() {
+            if(validateForm()){
+                $.ajax({
+                    type: 'POST',
+                    url: "${rc.contextPath}/hotword/update.do",
+                    data: $("#sysForm").serialize(),
+                    dataType:'json',
+                    success: function(data) {
+                        alert(data);
+                        $(".modal-backdrop").hide();
+                        $("#pageNo").val('${page.pageNo}');
+                        var data = $("#submitForm").serialize();
+                        $('.hk-main').load(loadSysListUrl, data);
+                    }
+                });
+            }
+        });
+        //鍗曚釜瑙ｅ喕涓庡喕缁撴搷浣�
+        function handleStatus(status, memberId) {
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/hotword/handleStatu.do",
+                data: "memberId="+memberId + "&status="+status,
+                dataType:'json',
+                success: function(data) {
+                    alert(data);
+                    $(".modal-backdrop").hide();
+                    $("#pageNo").val('${page.pageNo}');
+                    var data = $("#submitForm").serialize();
+                    $('.hk-main').load(loadSysListUrl, data);
+                }
+            });
+        }
+        //鍗曚釜鍒犻櫎鎿嶄綔
+        function removeUser(memberId) {
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/hotword/delete.do",
+                data: "memberId="+memberId,
+                dataType:'json',
+                success: function(data) {
+                    alert(data);
+                    $(".modal-backdrop").hide();
+                    $("#pageNo").val('${page.pageNo}');
+                    var data = $("#submitForm").serialize();
+                    $('.hk-main').load(loadSysListUrl, data);
+                }
+            });
+        }
+        //鍘讳慨鏀规煡璇㈠崟涓搷浣�
+        function toEdit(memberId) {
+            $("#pwdDiv").hide();
+            $("#btnSave").hide();
+            $("#btnUpdate").show();
+            var $modalInfo = $("#modalInfo");
+            var $modalInfoTitle = $modalInfo.find('#modalTite');
+            $modalInfo.modal({
+                backdrop : 'static',
+                keyboard : false,
+                show : false
+            });
+            $modalInfoTitle.html('缂栬緫鏁版嵁');
+            $modalInfo.modal('show');
+            resetForm();
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/hotword/edit.do",
+                data: "memberId="+memberId,
+                dataType:'json',
+                success: function(data) {
+                    $("#memberId").val(data.memberId);
+                    $("#siteId").val(data.siteId);
+                    $("#realName").val(data.realName);
+                    $("#membername").val(data.membername);
+                    $("#pseudonym").val(data.pseudonym);
+                    $("#phoneNo").val(data.phoneNo);
+                    $("#email").val(data.email);
+                    $("#password").val(data.password);
+                    if (data.status == 0) {
+                        $("#sysForm input[name='status']").get(1).checked=true;
+                    } else {
+                        $("#sysForm input[name='status']").get(0).checked=true;
+                    }
+                }
+            });
+        }
+        //閲嶇疆琛ㄥ崟
+        function resetForm() {
+            $("#siteId").val("");
+            $("#realName").val("");
+            $("#membername").val("");
+            $("#pseudonym").val("");
+            $("#phoneNo").val("");
+            $("#email").val("");
+            $("#password").val("");
+            $("#sysForm input[name='status']").get(0).checked=true;
+        }
+        //楠岃瘉琛ㄥ崟
+        function validateForm() {
+//            var siteId = $("#siteId").val();
+//            var realName = $("#realName").val();
+            var membername = $("#membername").val();
+            var pseudonym = $("#pseudonym").val();
+            var phoneNo = $("#phoneNo").val();
+            var email = $("#email").val();
+            var password = $("#password").val();
+//            if (!siteId) {
+//                alert("绔欑偣缂栧彿涓嶈兘涓虹┖锛�");
+//                return false;
+//            }
+//            if(isNaN(parseInt(siteId))) {
+//                alert("绔欑偣缂栧彿蹇呴』鏄暟瀛楃被鍨嬶紒");
+//                return false;
+//            }
+//            if (!realName) {
+//                alert("鐢ㄦ埛鍚嶄笉鑳戒负绌猴紒");
+//                return false;
+//            }
+            if (!membername) {
+                alert("璐﹀彿涓嶈兘涓虹┖锛�");
+                return false;
+            }
+            if (!pseudonym) {
+                alert("鏄电О涓嶈兘涓虹┖锛�");
+                return false;
+            }
+            if (!phoneNo) {
+                alert("鑱旂郴鐢佃瘽涓嶈兘涓虹┖锛�");
+                return false;
+            }
+            if (!email) {
+                alert("閭涓嶈兘涓虹┖锛�");
+                return false;
+            }
+            if (!password) {
+                alert("瀵嗙爜涓嶈兘涓虹┖锛�");
+                return false;
+            }
+            return true;
+        }
+
+        //鎵归噺瑙ｅ喕涓庡喕缁撴搷浣�
+        function someHandleStatu(status) {
+            var memberIds="";
+            $("input[id^='code']:checked").each(function(){
+                memberIds+=$(this).val()+",";
+            });
+            if (!memberIds) {
+                alert("璇峰嬀閫夎鍐荤粨/瑙ｅ喕鐨勮褰曪紒");
+                return;
+            }
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/hotword/handleStatu.do",
+                data: "allIDCheck="+memberIds+"&status="+status,
+                dataType:'json',
+                success: function(data) {
+                    alert(data);
+                    $(".modal-backdrop").hide();
+                    $("#pageNo").val('${page.pageNo}');
+                    var data = $("#submitForm").serialize();
+                    $('.hk-main').load(loadSysListUrl, data);
+                }
+            });
+        }
+        //鎵归噺鍒犻櫎鎿嶄綔
+        function deleteItem() {
+            var memberIds="";
+            $("input[id^='code']:checked").each(function(){
+                memberIds+=$(this).val()+",";
+            });
+            if (!memberIds) {
+                alert("璇峰嬀閫夎鍒犻櫎鐨勮褰曪紒");
+                return;
+            }
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/hotword/delete.do",
+                data: "allIDCheck="+memberIds,
+                dataType:'json',
+                success: function(data) {
+                    alert(data);
+                    $(".modal-backdrop").hide();
+                    $("#pageNo").val('${page.pageNo}');
+                    var data = $("#submitForm").serialize();
+                    $('.hk-main').load(loadSysListUrl, data);
+                }
+            });
+        }
+        //鍒嗛〉鏌ヨ
+        function jumpNormalPage(pageNo) {
+            $("#pageNo").val(pageNo);
+            var data = $("#submitForm").serialize();
+            $('.hk-main').load(loadSysListUrl,data);
+        }
+        //鏉′欢鏌ヨ鎿嶄綔
+        function search() {
+            var memberId = $("#sMemberId").val();
+            if(memberId != null && memberId !="") {
+                if( isNaN(parseInt(memberId))) {
+                    alert("鐢ㄦ埛ID蹇呴』鏄暟瀛楃被鍨嬶紒");
+                    return false;
+                }
+            }
+            var data = $("#searchForm").serialize();
+            $('.hk-main').load(loadSysListUrl,data);
+        }
+        //鎵归噺閲嶇疆瀵嗙爜
+        $("#linkResetPwdItem").click(function(){
+            var memberIds="";
+            $("input[id^='code']:checked").each(function(){
+                memberIds+=$(this).val()+",";
+            });
+            if (!memberIds) {
+                alert("璇峰嬀閫夎閲嶇疆瀵嗙爜鐨勮褰曪紒");
+                return false;
+            }
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/hotword/resetPassword.do",
+                data: "allIDCheck="+memberIds,
+                dataType:'json',
+                success: function(data) {
+                    alert(data);
+                    $(".modal-backdrop").hide();
+                    $("#pageNo").val('${page.pageNo}');
+                    var data = $("#submitForm").serialize();
+                    $('.hk-main').load(loadSysListUrl, data);
+                }
+            });
+        });
+        //鍏ㄩ�夊叏涓嶉�夛紝鍒楄〃鎵�鏈夐�変腑澶嶉�夋閫変腑锛屽惁鍒欎笉閫変腑
+        function selectAll() {
+            if($("#all").is(":checked")){
+                $("input[id^='code']").each(function(){
+                    $(this).prop("checked", true);
+                });
+            }else{
+                $("input[id^='code']").each(function(){
+                    $(this).removeAttr("checked");
+                });
+            }
+        }
+        $("input[id^='code']").click(function(){
+            var all = $("#tblBody tr").size();
+            var size =$("input[id^='code']:checked").length;
+            if (all == size) {
+                $("#all").prop("checked", true);
+            } else {
+                $("#all").removeAttr("checked");
+            }
+        });
+	</script>

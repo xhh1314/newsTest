@@ -1,0 +1,46 @@
+snowFlake: 
+ datacenter_id: 1 #主键生成所属appid，注意一定不要重复 【0-31】
+ cluster_id: 1 #主键生成所在  某应用下集群id， 所属应用的集群内 注意一定不要重复【0-31】
+server:
+  port: 7980
+  session:
+    timeout: 1800
+  tomcat:
+    uri-encoding: UTF-8
+    
+  context-path: /snsadmin
+  
+spring:
+  profiles:
+    active: dev
+  application:
+    name: hww-sns-web-admin
+  data:
+    jpa:
+      repositories:
+        enabled: true
+
+        
+
+#模板配置
+  freemarker:
+    template-loader-path:
+    - classpath:/templates
+    prefix: /sns-view/
+    suffix: .html
+    content-type: text/html
+    charset: UTF-8
+    request-context-attribute: rc
+    expose-request-attributes: false
+    expose-session-attributes: false
+    expose-spring-macro-helpers: true
+    
+    settings:
+      auto_import: /ftl/sns/index.ftl as p,/ftl/spring.ftl as s
+      number_format : 0.##########
+
+#日志配置
+logging:
+  file: logs/hww-sns-web-admin.log
+  level:
+    com.hww.sns: debug

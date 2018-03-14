@@ -1,0 +1,15 @@
+spring: 
+  profiles:
+    active: dev
+  application:
+    name: hww-api-center
+
+server:
+  port: 8761
+  tomcat:
+    uri-encoding: UTF-8
+    max-threads: 800
+  
+logging:
+  file: logs/hww-api-center.log
+  

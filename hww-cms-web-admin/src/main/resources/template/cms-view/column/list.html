@@ -1,0 +1,199 @@
+
+<script type="text/javascript">
+	var editUrl = "${rc.contextPath}/column/v_edit.do";
+	var deleteUrl = "${rc.contextPath}/column/o_delete.do";
+	var indexUrl = "${rc.contextPath}/column/v_list.do"
+</script>
+
+<div class="row pd-8">
+				<div class="col-sm-3">
+					<div id="treeWrap" class="tree-wrap hk-scrollbar">
+			      		<ul id="treeDemo" class="ztree"></ul>
+			      	</div>
+				</div>
+				<div class="col-sm-9">
+					<div style="padding:8px; height:200px; border-radius:2px;" id="columnForm">
+			      	</div>
+				</div>
+			</div>
+
+<!-- 区块：主内容区域 end --> <script type="text/javascript">
+	//此页面
+
+	var length = $("tbody tr").length;
+	//var begin = (${page.pageNo}-1)*length+1;
+	for (var i = 0; i < length; i++) {
+		$("tbody tr:eq(" + i + ") td[data-field='index']").text(i + 1);
+	}
+
+	var page = {
+		//初始化
+		init : function() {
+			this.eventInit();
+		},
+		//事件绑定
+		eventInit : function() {
+			//信息表单模态框
+			var $modalInfo = $('#modalInfo');//模态框
+			var $modalInfoTitle = $modalInfo.find('#modalTite');//模态框标题
+			//bootstrap模态框实例
+			$modalInfo.modal({
+				backdrop : 'static',//点击模态透明层不隐藏
+				keyboard : false,//键盘不控制模态框 如：esc按下模态框不消失
+				show : false
+			//实例化后默认不显示
+			});
+			
+			//添加一条数据
+			$('#linkAddItem').click(function() {
+				$modalInfoTitle.html('添加数据');
+				$modalInfo.modal('show');//模态框显示
+			});
+			//编辑一条数据
+			$('#linkEditItem').click(function() {
+				$modalInfoTitle.html('编辑数据');
+				$modalInfo.modal('show');
+			});
+
+			//分页查询
+			function jumpNormalPage(pageNo) {
+				$("#pageNo").val(pageNo);
+				$("#submitForm").submit();
+			}
+		}
+    };
+
+	//在当前行编辑
+	function editItem(columnId) {
+
+		var url = editUrl + "?columnId=" + columnId;
+		//先加载页面
+		$modalInfo.load(url);
+		$modalInfoTitle.html('编辑数据');
+		$modalInfo.modal('show');
+    }
+
+    //删除一条数据
+	function deleteItem(columnId) {
+		var c = confirm("确定删除" + columnId + "么?");
+		if (c == true) {
+			var url = deleteUrl + "?columnId=" + columnId;
+			$.ajax({
+				type : "POST",
+				dataType : "text",
+				url : url,
+				success : function(data, status) {
+					if (status = 'success' && data == 'true') {
+						$('.hk-main').load(indexUrl);
+					}
+				}
+			});
+		}
+
+	}
+	
+	function search(){
+        var typeName = $("#contentNameSearch").val();
+		$('.hk-main').load(indexUrl + "?columnName=" + typeName);
+		
+	}
+	
+	var zTree;
+	IDMark_A = "_a";
+	function addHoverDom(treeId, treeNode) {
+		//if (treeNode.id==1) return;
+		var aObj = $("#" + treeNode.tId + IDMark_A);
+		
+		if ($("#diyAddBtn_"+treeNode.id).length>0||$("#diyEditBtn_"+treeNode.id).length>0) return;
+		
+		
+		var editStr ="<@shiro.hasPermission name='/column/v_add.do'>  "+"<span class='button add' id='diyAddBtn_" +treeNode.id+ "' title='添加子分类' onfocus='this.blur();'></span>"+"</@shiro.hasPermission>  ";
+		if(treeNode.pId==null || treeNode.pId==0){
+			editStr = editStr+"<span class='button edit' id='diyEditBtn_" +treeNode.id+ "' title='修改分类' onfocus='this.blur();'></span>";
+		}else{
+			editStr = "<@shiro.hasPermission name='/column/v_edit.do'>  "+"<span class='button edit' id='diyEditBtn_" +treeNode.id+ "' title='修改分类' onfocus='this.blur();'></span>"+"</@shiro.hasPermission>  ";
+		}
+		aObj.append(editStr);
+		var addbtn = $("#diyAddBtn_"+treeNode.id);
+		if (addbtn) addbtn.bind("click", function(){
+			target('#menuList',"${rc.contextPath}/column/v_add.do?inOrOut=true&parentId="+treeNode.id);
+		});
+		
+		var editbtn = $("#diyEditBtn_"+treeNode.id);
+		if (editbtn) editbtn.bind("click", function(){
+			target('#menuList',"${rc.contextPath}/column/v_edit.do?inOrOut=true&columnId="+treeNode.id);
+		});
+	}
+	function removeHoverDom(treeId, treeNode) {
+		//if (treeNode.parentTId && treeNode.getParentNode().id!=1) return;
+		
+		$("#diyAddBtn_"+treeNode.id).unbind().remove();
+		$("#diyEditBtn_" +treeNode.id).unbind().remove();
+	}
+
+	var setting = {
+			view : {
+				addHoverDom: addHoverDom,
+				removeHoverDom: removeHoverDom
+			},
+		data : {
+			simpleData: {
+				enable: true,
+				idKey: "id",
+				pIdKey: "pId",
+				rootPId: 0
+			}
+		}
+	};
+	
+	
+	
+	function loadMenu(resourceType, treeObjId,setting) {
+		//$.fn.zTree.init($("#" + treeObjId), setting, null);
+		$.ajax({
+			type : "POST",
+			url : resourceType,
+			dataType : "json",
+			success : function(data) {
+				// 如果返回数据不为空，加载"业务模块"目录
+				if (data != null) {
+					// 将返回的数据赋给zTree
+					$.fn.zTree.init($("#" + treeObjId), setting, data);
+					//              alert(treeObj);
+					zTree = $.fn.zTree.getZTreeObj(treeObjId);
+					if (zTree) {
+						// 默认展开所有节点
+						zTree.expandAll(true);
+					}
+				}
+			}
+		});
+	}
+	
+	/**菜单跳转**/
+	function target(id,url){
+		$("#columnForm").load(url);
+	}
+	
+
+	function jumpNormalPage(page) {
+		var checkid = null;
+		var typeName=$("#contentNameSearch").val();
+		
+		if (typeName!=null) {
+			$('.hk-main').load(indexUrl + "?pageNo=" + page+"&columnName="+typeName);
+		}else{
+			$('.hk-main').load(indexUrl + "?pageNo=" + page);
+		} 
+		
+		
+		
+	}
+
+	$(function() {
+		hk.methods.elHeightComputed('#treeWrap',123);
+		page.init();
+		loadMenu("${rc.contextPath}/column/allcolumnJson.do?", "treeDemo", setting);
+
+	});
+</script>

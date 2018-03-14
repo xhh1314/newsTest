@@ -1,0 +1,80 @@
+<div class="modal-dialog" role="document">
+<div class="modal-content">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal"
+			aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+		<h5 class="modal-title" id="myModalLabel">
+			<span class="glyphicon glyphicon-file"></span> <span id="modalTite"></span>
+		</h5>
+	</div>
+	<div class="modal-body">
+		<form class="form-horizontal" id="contentForm">
+			<div class="form-group form-group-sm">
+				<label for="inputEmail3" class="col-sm-2 control-label">类型名称</label>
+				<div class="col-sm-10">
+					<h3><#if (cmsContent)??>${categoryName}</#if></h3>
+					<div>
+						<select id="<#if (flow.flowId)??></#if>">
+						<#list page.list as flowStep>
+							<option value="<#if (flowStep.auditFlowStepsId)??>${flowStep.auditFlowStepsId}</#if>">${flowStep.sepDesc}</option>
+						</#list>
+						</select>
+					</div>
+					<div>
+						<ul>
+						  <li>审核流程步详情：${flowStep.sepDesc}</li>
+						  <li>审核人：${flowStep.stepAutidRoleName}</li>
+						</ul>
+						<button value="审核通过"  class="btn btn-info btn-sm"/>
+						<button value="审核不通过"  class="btn btn-info btn-sm"/>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-info btn-sm" data-dismiss="modal">
+			<span class="glyphicon glyphicon-remove"></span> 关闭
+		</button>
+		<button id="btnSave" data-action="" type="button"
+			class="btn btn-info btn-sm">
+			<span class="glyphicon glyphicon-saved"></span> 保存
+		</button>
+	</div>
+</div>
+</div>
+<script type="text/javascript">
+
+	//信息表单模态框
+	var $modalInfo = $('#modalInfo');
+	var $modalInfoTitle = $modalInfo.find('#modalTite');
+	
+	$modalInfo.modal({
+		backdrop:'static',
+		keyboard:false,
+		show:false
+	});		
+	//模态框完全关闭后重新load
+	$modalInfo.on('hidden.bs.modal', function () {
+		loadMain(indexUrl);
+	});
+	$("#btnSave").on('click',function(){
+		$.ajax({
+		    type:"POST",
+		    data:$("#contentForm").serialize(),
+		    dataType:"json",
+		    url:url,
+		    success:function(data){
+		    	if(data.status==200){
+		    		$modalInfo.modal('hide');//手动关闭模态框
+		    		alert(data.message);
+		    	}else{
+		    		alert(data.message);
+		    	}
+		    }
+		
+		});
+	});
+</script>

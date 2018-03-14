@@ -1,0 +1,297 @@
+
+<div class="hk-toolbar">
+	<div class="btn-group btn-group-sm">
+		<button type="button" class="btn btn-default">
+			<span class="glyphicon glyphicon-th-list"></span>
+			操作
+		</button>
+		<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu">
+		<@shiro.hasPermission name='/telCode/save.do'>
+			<li>
+                <a id="linkAddItems" href="javascript:toAdd()">
+					<span class="glyphicon glyphicon-plus"></span>
+					添加
+				</a>
+			</li>
+			</@shiro.hasPermission> 
+			<@shiro.hasPermission name='/telCode/del.do'>
+			<li>
+				<a id="linkDelItems" href="javascript:deleteItem()">
+					<span class="glyphicon glyphicon-remove"></span>
+					删除
+				</a>
+			</li>
+			</@shiro.hasPermission> 
+		</ul>
+	</div>
+</div>
+
+
+<div style="overflow-x: hidden; overflow-y: auto; height:450px; width:auto;">
+	<table id="simple-table" class="table  table-bordered table-hover">
+		<thead>
+		<tr>
+			<th class="center detail-col">
+				<label class="pos-rel">
+					<input type="checkbox" class="ace" id="all" onclick="selectAll()"/>
+					<span class="lbl"></span>
+				</label>
+			</th>
+			<th class="hidden-300">国家代号</th>
+			<th class="hidden-300">电话代码</th>
+			<th class="detail-col">国家中文名</th>
+			<th class="detail-col">国家英文名</th>
+			<th class="detail-col">国家繁体名</th>
+			<th class="detail-col"><i class="ace-icon fa fa-clock-o bigger-110 hidden-300"></i>操作</th>
+		</tr>
+		</thead>
+		<tbody id="tblBody">
+		<#list page.list as telCode>
+			<tr>
+				<td class="center detail-col">
+					<label class="pos-rel">
+						<input name="IDCheck" id="code" value="${telCode.id?c}" type="checkbox" class="ace" />
+						<span class="lbl"></span>
+					</label>
+				</td>
+				<td><#if (telCode.nationCode)??>${telCode.nationCode}<#else></#if></td>
+				<td><#if (telCode.phoneCode)??>${telCode.phoneCode}<#else></#if></td>
+				<td><#if (telCode.chineseName)??>${telCode.chineseName}<#else></#if></td>
+				<td><#if (telCode.englishName)??>${telCode.englishName}<#else></#if></td>
+				<td><#if (telCode.englishName)??>${telCode.nationNameTw}<#else></#if></td>
+				
+				<td>
+					<button type="button" class="btn-eidt btn btn-xs btn-info" onclick="toEdit('${telCode.id?c}')">编辑</button>
+					<button type="button" class="btn btn-xs btn-danger" onclick="removeUser('${telCode.id?c}')">删除</button>
+				</td>
+			</tr>
+		</#list>
+		</tbody>
+	</table>
+</div>
+<#include "../common/page.html">
+<div class="modal fade" id="modalInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h5 class="modal-title" id="myModalLabel">
+						<span class="glyphicon glyphicon-file"></span>
+						<span id="modalTite"></span>
+					</h5>
+				</div>
+				<div class="modal-body">
+					<form id="sysForm" class="form-horizontal">
+						<input type="hidden" name="id" id="telId"/>
+						<div class="form-group form-group-sm">
+							<label for="inputEmail3" class="col-sm-2 control-label">国家代号</label>
+							<div class="col-sm-10">
+								<input type="text" name="nationCode" id="nationCode" class="form-control" placeholder="国家代号" disabled="disabled">
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label for="inputEmail3" class="col-sm-2 control-label">电话代码</label>
+							<div class="col-sm-10">
+								<input type="text" name="phoneCode" id="phoneCode" class="form-control" placeholder="电话代码">
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label for="inputEmail3" class="col-sm-2 control-label">国家中文名</label>
+							<div class="col-sm-10">
+								<input type="text" name="chineseName" id="chineseName" class="form-control" placeholder="国家中文名"disabled="disabled">
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label for="inputEmail3" class="col-sm-2 control-label">国家英文名</label>
+							<div class="col-sm-10">
+								<input type="text" name="englishName" id="englishName" class="form-control" placeholder="国家英文名"disabled="disabled">
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label for="inputEmail3" class="col-sm-2 control-label">国家繁体名</label>
+							<div class="col-sm-10">
+								<input type="text" name="nationNameTw" id="nationNameTw" class="form-control" placeholder="国家繁体名"disabled="disabled">
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-info btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 关闭</button>
+					<button id="btnSave" data-action="" type="button" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-saved"></span> 保存</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+<script type="text/javascript">
+var $modalInfo = $('#modalInfo');
+var $modalInfoTitle = $modalInfo.find('#modalTite');
+var page = {
+        init : function() {
+            this.eventInit();
+        },
+        eventInit : function() {
+            //信息表单模态框
+           
+            $modalInfo.modal({
+                backdrop : 'static',
+                keyboard : false,
+                show : false
+            });
+            //添加一条数据
+            $('#linkAddItems').click(function () {
+                $modalInfoTitle.html('添加数据');
+                $modalInfo.modal('show');
+            });
+            //编辑一条数据
+            $('#linkEditItem').click(function() {
+                $modalInfoTitle.html('编辑数据');
+                $modalInfo.modal('show'); 
+            });
+            function jumpNormalPage(pageNo) {
+				$("#pageNo").val(pageNo);
+				$("#submitForm").submit();
+			}
+        }
+    }
+
+jQuery(function($) {
+    page.init();
+});
+function toAdd() {
+	$("#telId").val("");
+    $("#nationCode").val("");
+    $("#chineseName").val("");
+    $("#englishName").val("");
+    $("#phoneCode").val("");
+    $("#nationNameTw").val("");
+    $modalInfoTitle.html('添加数据');
+    $modalInfo.modal('show');
+    
+    
+}
+
+//新增操作
+$("#btnSave").click(function() {
+   
+        $.ajax({
+            type: 'POST',
+            url: "${rc.contextPath}/telCode/save.do",
+            data: $("#sysForm").serialize(),
+            dataType:'json',
+            success: function(data) {
+                alert(data);
+                hideModal($modalInfo);
+                var pageNo = ${page.pageNo};
+            	jumpNormalPage(pageNo);
+            }
+        });
+});
+function hideModal(model) {
+	model.removeClass("in");
+	$(".modal-backdrop").remove();
+	$('body').removeClass('modal-open');
+	$('body').css('padding-right', '');
+	model.hide();
+}
+
+//编辑前查询单个
+function toEdit(telId){
+	 $.ajax({
+         type: 'POST',
+         url: "${rc.contextPath}/telCode/find.do",
+         data:{"id":telId},
+         dataType:'json',
+         success: function(data) {
+             $modalInfo.modal('show'); 
+             $("#telId").val(data.id);
+             $("#nationCode").val(data.nationCode);
+             $("#chineseName").val(data.chineseName);
+             $("#englishName").val(data.englishName);
+             $("#phoneCode").val(data.phoneCode); 
+             $("#nationNameTw").val(data.nationNameTw);
+         }
+         
+     });
+}
+
+//删除
+function removeUser(telId){
+	 $.ajax({
+         type: 'POST',
+         url: "${rc.contextPath}/telCode/del.do",
+         data:{"id":telId},
+         dataType:'json',
+         success: function(data) {
+             alert(data);
+             $('.hk-main').load("${rc.contextPath}/telCode/list.do");
+
+         }
+     });
+}
+
+
+
+//批量删除操作
+function deleteItem() {
+    var telIds="";
+    $("input[id^='code']:checked").each(function(){
+        telIds+=$(this).val()+",";
+    });
+    if (!telIds) {
+        alert("请勾选要删除的记录！");
+        return;
+    }
+    $.ajax({
+        type: 'POST',
+        url: "${rc.contextPath}/telCode/del.do",
+        data: "allIDCheck="+telIds,
+        dataType:'json',
+        success: function(data) {
+            alert(data);    
+            $('.hk-main').load("${rc.contextPath}/telCode/list.do");
+        }
+    });
+};
+//分页查询
+function jumpNormalPage(page) {
+		$('.hk-main').load("${rc.contextPath}/telCode/list.do" + "?pageNo=" + page);
+	
+}
+
+
+//全选全不选，列表所有选中复选框选中，否则不选中
+function selectAll() {
+    if($("#all").is(":checked")){
+        $("input[id^='code']").each(function(){
+            $(this).prop("checked", true);
+        });
+    }else{
+        $("input[id^='code']").each(function(){
+            $(this).removeAttr("checked");
+        });
+    }
+}
+$("input[id^='code']").click(function(){
+    var all = $("#tblBody tr").size();
+    var size =$("input[id^='code']:checked").length;
+    if (all == size) {
+        $("#all").prop("checked", true);
+    } else {
+        $("#all").removeAttr("checked");
+    }
+});
+
+
+
+
+
+
+</script>

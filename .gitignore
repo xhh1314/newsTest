@@ -1,0 +1,60 @@
+##ignore this file##
+*target
+.iml
+.classpath
+.project
+*.settings/
+.settings
+bin
+*data      
+ ##filter databfile、sln file##
+*.mdb  
+*.ldb  
+*.sln    
+##class file##
+*.com  
+*.class  
+*.dll  
+*.exe  
+*.o  
+*.so  
+# compression file
+*.7z  
+*.dmg  
+*.gz  
+*.iso  
+*.jar  
+*.rar  
+*.tar  
+*.zip  
+*.via
+*.tmp
+*.err 
+# OS generated files #  
+.DS_Store  
+.DS_Store?  
+._*  
+.Spotlight-V100  
+.Trashes  
+Icon?  
+ehthumbs.db  
+Thumbs.db
+/.apt_generated/
+/target/
+/.setting/
+data/
+logs
+/root
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr

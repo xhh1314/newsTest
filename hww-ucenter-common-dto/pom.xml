@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.hww.ucenter</groupId>
+		<artifactId>hww-ucenter</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../hww-ucenter/pom.xml</relativePath>
+	</parent>
+	
+	<artifactId>hww-ucenter-common-dto</artifactId>
+	<packaging>jar</packaging>
+
+	<name>hww-ucenter-common-dto</name>
+
+	<properties>
+		<hibernate-validator-version>5.4.1.Final</hibernate-validator-version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.hww.base</groupId>
+			<artifactId>hww-base-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>${hibernate-validator-version}</version>
+		</dependency>
+	</dependencies>
+</project>

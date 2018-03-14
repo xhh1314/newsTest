@@ -1,0 +1,107 @@
+
+<html>
+<head>
+
+<title><#if contentDateVo??><#if contentDateVo.title??>${contentDateVo.title}</#if></#if></title>
+<style>
+img {
+				width: 100%;
+				max-height: 230px;
+			}
+</style>
+<link rel="stylesheet" href="${rc.contextPath}/stylesheets/haiwai_public.css" type="text/css">
+<link rel="stylesheet" href="${rc.contextPath}/stylesheets/a.css" type="text/css">
+<script type="text/javascript" src="${rc.contextPath}/js/jquery-1.7.min.js"></script>
+<script src="${rc.contextPath}/js/fontsize.js"></script>
+
+</head>
+<body>
+	<div class="main">
+		<div class="head">
+		   <a class="img" href=""><img src="${rc.contextPath}/logo.jpg"/></a>
+		   <a href="">推荐</a>
+				<a href="">评论</a>
+				<a class="more" href="">更多</a>
+				<a class="button" href="">立即打开</a>
+	     </div>
+	    <article>
+			<h1 class="content-title" id="content_title"><#if contentDateVo??><#if contentDateVo.title??></#if>${contentDateVo.title}</#if></h1>
+			<h2>
+			<address>
+				<#if contentDateVo??><#if contentDateVo.location??>${contentDateVo.location}</#if></#if>
+			</address>
+			<time >  <#if contentDateVo??><#if contentDateVo.releaseTime??>${ contentDateVo.releaseTime}</#if></#if></time></h2>
+			</p>
+			<#if contentDateVo??>
+			<#if contentDateVo.contenttypeId==2>
+			<p style="text-align: right;width: 100%;">
+			<#if contentDateVo.content??>${contentDateVo.content}</#if>
+			</p>
+			<#elseif contentDateVo.contenttypeId==5>
+			
+			<div style='text-align:center;' id="imgs"> <img style='width:97%;' src=''/><div>";	
+			<#else>
+			<section id="player">
+			<video style='width:100%;height:200px;' id="media"> <source id="v1" src=""></video>
+			</section>
+			</#if>
+			</#if>
+			<p class="author">作者：<#if contentDateVo??><#if contentDateVo.author??>${contentDateVo.author}</#if></#if></p>
+			<p class='hot'><!-- <a href="">热点词</a> --><p href="">关键词：<#if  contentDateVo??><#if contentDateVo.keywordIds??>${contentDateVo.keywordIds} </#if></#if></p></p>
+		</article>
+	</div>
+		
+
+
+
+<div style="display: none;">
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1000395642'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "w.cnzz.com/q_stat.php%3Fid%3D1000395642%26l%3D3' type='text/javascript'%3E%3C/script%3E"));</script></div>
+<div style="display: none;"><script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?d64698ba5baf899586690f3b8536ea7a";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+	<#if contentDateVo.contenttypeId==5>
+	var imgs=new Array();
+	<#if contentDateVo.attachmentUrls??>
+		imgs='${contentDateVo.attachmentUrls!''}';
+		if(imgs){
+	 		imgs = imgs.split(",");
+	 	}
+	</#if>
+	for(var i=0;i<imgs.length;i++){
+	var div = "<div class='col-sm-6 col-md-4' style='height: 130px;width: 150px;'>"
+		+ "<div align='center' style='height: 130px;width: 150px;'>"
+		+"<div class='thumbnail' style='height:130px;width:130px;' >"
+		+ "<img src='"+"http://127.0.0.1:7810/"+imgs[i]+"' style='width:100%;height:100%;'>"
+		+"</div>" + "</div>" + "</div>";
+		$("#imgs").append(div);
+	}
+	</#if>
+	
+	<#if contentDateVo.contenttypeId==6>
+	
+	var videos="";
+	<#if contentDateVo.vedioUrl??>
+	videos="${contentDateVo.vedioUrl!''}";
+     </#if>
+     if(videos){
+ 		document.getElementById("v1").src="http://127.0.0.1:7810/"+videos;
+         document.getElementById("media").load();
+ 	}
+
+	
+	
+	
+	
+	
+	</#if>
+	
+
+</script></div>
+
+</body>
+</html>

@@ -1,0 +1,91 @@
+
+<script type="text/javascript">
+    //本页面url
+    var loadSysListUrl ="${rc.contextPath}/recomm/list.do";
+</script>
+<form method="post" id="submitForm">
+<table class="table table-hover table-bordered" style="text-align: center">
+	<thead>
+	<tr>
+		<th style="text-align: center; width: 80px;">类型</th>
+		<th style="text-align: center">栏目名称</th>
+		<th style="text-align: center">推荐条数</th>
+	</tr>
+	</thead>
+	<tbody>
+	<#if (page.pageNo)??>
+		<#if page.pageNo == 1>
+			<#list specialList as special>
+				<tr>
+					<td>专题</td>
+					<td><input type="hidden" value="${special.columnId?c}" name="columnId" id="columnIds"/>${special.columnName}</td>
+					<td><input type="text" class="input" name="recommNum" id="recommNums" value="${special.recommNum}"/>&nbsp;条</td>
+				</tr>
+			</#list>
+			<#list newThingList as newThing>
+				<tr>
+					<td>新鲜事</td>
+					<td><input type="hidden" value="${newThing.columnId?c}" name="columnId" id="columnIdss"/>${newThing.columnName}</td>
+					<td><input type="text" class="input" name="recommNum" id="recommNumss" value="${newThing.recommNum}"/>&nbsp;条</td>
+				</tr>
+			</#list>
+		</#if>
+	</#if>
+	<#list page.list as recomm>
+		<tr>
+			<td>栏目</td>
+			<td><input type="hidden" value="${recomm.columnId?c}" name="columnId" id="columnId"/>${recomm.columnName}</td>
+			<td><input type="text" class="input" name="recommNum" id="recommNum" value="${recomm.recommNum}"/>&nbsp;条</td>
+		</tr>
+	</#list>
+	</tbody>
+	<tr>
+		<td colspan="3">
+			<input type="button" value="提交" id="subBtn"/>
+			<input type="button" value="清空" id="resetBtn"/>
+		</td>
+	</tr>
+	<input type="hidden" value="${page.pageNo}" name="pageNo" id="pageNo"/>
+</table>
+</form>
+<#include "../common/page.html" />
+<script type="text/javascript">
+	$(function() {
+	    // 修改
+	    $("#subBtn").click(function() {
+            var str = "";
+            $("#submitForm").find("tr").each(function() {
+                var tdArr = $(this).children();
+                var columnId = tdArr.eq(1).find('input').val();
+                var recommNum = tdArr.eq(2).find('input').val();
+                if(recommNum >= 0) {
+                    str+=columnId+","+recommNum+"#";
+				}
+            });
+            if(str != "") {
+                str = str.substring(0, str.length-1);
+			}
+			$.ajax({
+				type: 'POST',
+				url: "${rc.contextPath}/recomm/update.do",
+				data: "columnIds="+str,
+				dataType:'json',
+				success: function(data) {
+					alert(data);
+					loadMain("${rc.contextPath}/recomm/list.do");
+				}
+            });
+		});
+	    // 清空表单中的数据，置为0
+		$("#resetBtn").click(function () {
+			$(".input").attr("value",0);
+        })
+    });
+
+    //分页查询
+    function jumpNormalPage(pageNo) {
+        $("#pageNo").val(pageNo);
+        var data = $("#submitForm").serialize();
+        $('.hk-main').load(loadSysListUrl,data);
+    }
+</script>

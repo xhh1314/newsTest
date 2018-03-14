@@ -1,0 +1,131 @@
+<link rel="stylesheet" href="${rc.contextPath}/ztree/css/zTreeStyle/zTreeStyle.css" type="text/css">
+<!-- page specific plugin scripts -->
+<script type="text/javascript" src="${rc.contextPath}/ztree/js/jquery.ztree.core.js"></script>
+<script type="text/javascript" src="${rc.contextPath}/ztree/js/jquery.ztree.excheck.js"></script>
+<script type="text/javascript" src="${rc.contextPath}/ztree/js/jquery.ztree.exedit.js"></script>
+<script src="${rc.contextPath}/admin/js/treeInit.js"></script>
+<script src="${rc.contextPath}/admin/js/sidebar-menu.js"></script>
+<div class="row pd-8">
+	<div class="col-sm-3">
+		<div id="treeWrap" class="tree-wrap hk-scrollbar">
+			<ul id="treeDemo" class="ztree"></ul>
+		</div>
+	</div>
+	<div class="col-sm-9">
+		<div style="padding: 8px; height: 200px; border-radius: 2px;"
+			id="forumForm"></div>
+	</div>
+</div>
+<div class="modal fade" id="modalInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+			  <#include "forum_add.html">
+			  
+			</div>
+<script type="text/javascript">
+
+var zTree;
+function loadlistMenu(resourceType, treeObjId,setting) {
+	//$.fn.zTree.init($("#" + treeObjId), setting, null);
+	$.ajax({
+		type : "POST",
+		url : resourceType,
+		dataType : "json",
+		success : function(data) {
+			if (data != null) {
+				// 将返回的数据赋给zTree
+				$.fn.zTree.init($("#" + treeObjId), setting, data);
+					//              alert(treeObj);
+					zTree = $.fn.zTree.getZTreeObj(treeObjId);
+					if (zTree) {
+						zTree.expandAll(true);
+            	
+			}
+		}
+		}
+	});
+};
+
+var setting = {
+		view : {  
+            addHoverDom: addHoverDom,       // 用于当鼠标移动到节点上时，显示用户自定义控件。务必与 setting.view.removeHoverDom 同时使用  
+            removeHoverDom: removeHoverDom ,// 用于当鼠标移出节点时，隐藏用户自定义控件。务必与 addHoverDom 同时使用    
+        },
+		data : {
+			simpleData : {
+				enable: true,
+				idKey: "id",
+				pIdKey: "pId",
+				rootPId: null,
+				showLine : true,                  //是否显示节点间的连线       
+			}
+		}
+		  
+	};
+
+
+
+IDMark_A = "_a";
+function addHoverDom(treeId, treeNode) {
+	//if (treeNode.id==1) return;
+	var aObj = $("#" + treeNode.tId + IDMark_A);
+	if ($("#diyAddBtn_"+treeNode.id).length>0||$("#diyEditBtn_"+treeNode.id).length>0||$("#diyDelBtn_"+treeNode.id).length>0) return;
+	var editStr = "<span class='button add' id='diyAddBtn_" +treeNode.id+ "' title='添加子菜单' onfocus='this.blur();'></span>";
+	if(treeNode.pId!=null&&treeNode.id!=0&&treeNode.id!=1&&treeNode.id!=2){
+		editStr = editStr+"<span class='button remove' id='diyDelBtn_" +treeNode.id+ "' title='删除菜单' onfocus='this.blur();'></span>";
+	}	
+	
+	if(treeNode.pId!=null){
+		editStr = editStr+"<span class='button edit' id='diyEditBtn_" +treeNode.id+ "' title='修改菜单' onfocus='this.blur();'></span>";	
+	}	
+	
+	aObj.append(editStr);
+	if(treeNode.id!=0 && treeNode.id!=2){
+	var addbtn = $("#diyAddBtn_"+treeNode.id);
+	if (addbtn) addbtn.bind("click", function(){
+		$modalInfoTitle.html('添加数据');
+		$modalInfo.modal('show');
+		$("#parentId").val(treeNode.id);
+		$("#forumName").val("");
+		$("#forumId").val("");
+	});
+	}
+	//编辑子分类
+	var editbtn = $("#diyEditBtn_"+treeNode.id);
+	if (editbtn) editbtn.bind("click", function(){
+		var url= "${rc.contextPath}/sns/forum/toedit.do?forumId="+treeNode.id;
+		$modalInfo.load(url);
+		$modalInfoTitle.html('编辑数据');
+		$modalInfo.modal('show');
+		
+		
+		
+		
+		
+	});
+	 var editbtn = $("#diyDelBtn_"+treeNode.id);
+	if (editbtn) editbtn.bind("click", function(){
+		var url= "${rc.contextPath}/sns/forum/del.do?forumId="+treeNode.id;
+		$.ajax({
+			url:url,
+			type:"post",
+			dataType:"text",
+			success:function(data){
+				alert(data);
+				loadlistMenu("${rc.contextPath}/sns/forum/allMenuJsonForum.do?", "treeDemo",setting);
+			}
+		})
+		
+	}); 
+	
+	
+}
+function removeHoverDom(treeId, treeNode) {
+	$("#diyAddBtn_"+treeNode.id).unbind().remove();
+	$("#diyEditBtn_" +treeNode.id).unbind().remove();
+	$("#diyDelBtn_" +treeNode.id).unbind().remove();
+}
+$(function() {
+	loadlistMenu("${rc.contextPath}/sns/forum/allMenuJsonForum.do?", "treeDemo",setting);
+});
+
+
+</script>

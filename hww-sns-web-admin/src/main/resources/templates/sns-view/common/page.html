@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<script src="${rc.contextPath}/admin/js/form.js"></script>
+
+<div class="row">
+<#if (page.totalCount > 0)>
+	<div class="col-sm-8">
+						  			<ul class="pagination">
+								  		<li class="disabled">
+								      		<a href="javascript:jumpNormalPage(1);">首页</a>
+								    	</li>
+								    	<#if (page.pageNo > 1)>
+								    	<li class="active">
+								      		<a href="javascript:jumpNormalPage(${page.pageNo-1});">上一页</a>
+								    	</li>
+								    	</#if>
+								    	<#list page.pageNumList as num>
+								    		<li>
+								    		<a no="num" num="${num?string}" href="javascript:jumpNormalPage(${num?string});">${num?string}</a>
+								    	</li>
+								    	</#list>
+								    	<#if (page.pageNo < page.totalPage)>
+								    	<li>
+								      		<a href="javascript:jumpNormalPage(${page.pageNo+1});">下一页</a>
+								    	</li>
+								    	</#if>
+								    	<li>
+								      		<a href="javascript:jumpNormalPage(${page.totalPage});">尾页</a>
+								    	</li>
+								  	</ul>
+						  		</div>
+						  		<div class="col-sm-4">
+						  			<p class="hk-record-info">${page.pageNo}/${page.totalPage} 共 ${page.totalCount} 条</p>
+						  		</div>
+	<#else> 
+	<div class="col-sm-8">
+	暂无数据.
+	</div>
+</#if>
+						  		
+</div>			
+<script type="text/javascript">
+$(function(){
+	  var totalCount = ${page.totalCount};
+	  if(totalCount>0){
+		  var no=${page.pageNo}
+		   
+		   var pages=$("[no=num]")
+		   
+		   pages.each(function(){
+			   if ($(this).attr("num")==no) {
+				$(this).parent().addClass("active")
+			}
+			   
+			   
+		   }) 
+	  } 
+})
+</script>						  	
+						  		
+</html>													
+									
+									

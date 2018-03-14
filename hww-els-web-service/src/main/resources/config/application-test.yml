@@ -1,0 +1,21 @@
+spring:
+  profiles:
+    active: test
+  application:
+    name: hww-els-web-service-consumer 
+
+eureka:
+  client:
+    healthcheck: 
+      enabled: true
+    serviceUrl:
+       defaultZone: http://49.4.21.190:8761/eureka
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+    ip-address: 49.4.21.190
+    
+elastic.index.name: es_hww
+elastic.cluster-name: haiwainet_hww
+elastic.cluster-nodes: 192.168.0.212:9300

@@ -1,0 +1,26 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: hww-els-web-service-consumer
+ 
+server:
+  port: 7803
+  tomcat:
+    uri-encoding: UTF-8
+    max-threads: 800
+    max-connections: 800
+
+#日志配置
+logging:
+  file: logs/hww-els-web-service.log
+  level:
+    com.hww.els: debug
+
+    
+
+
+
+
+
+    

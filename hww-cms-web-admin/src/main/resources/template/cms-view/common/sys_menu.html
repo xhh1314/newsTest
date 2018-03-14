@@ -1,0 +1,197 @@
+<script type="text/javascript">
+	
+</script>
+
+<li class="active open">
+
+	<li class="">
+		<a href="" class="dropdown-toggle"> 
+			<i class="menu-icon glyphicon glyphicon-th-large"></i> 
+			<span class="menu-text"> 分类管理 </span> 
+			<b class="arrow fa fa-angle-down"></b>
+		</a> 
+		<b class="arrow"></b>
+		<ul class="submenu">
+			<li>
+				<a href="javascript:void(0)"
+					data-href="${rc.contextPath}/category/v_list.do"> 
+					<i class="menu-icon fa fa-caret-right"></i> 新闻类别管理
+				</a> 
+				<b class="arrow"></b>
+			</li>
+		</ul>
+	</li>
+
+	<li class="">
+		<a href="" class="dropdown-toggle"> <i
+			class="menu-icon glyphicon glyphicon-file"></i> <span
+			class="menu-text"> 新闻内容管理 </span> <b class="arrow fa fa-angle-down"></b>
+		</a> 
+		<b class="arrow"></b>
+		<ul class="submenu">
+			<li>
+				<a href="javascript:void(0)"
+					data-href="${rc.contextPath}/contentType/v_list.do"> <i
+						class="menu-icon fa fa-caret-right"></i> 内容类型管理
+				</a> <b class="arrow"></b>
+			</li>
+			<li>
+				<a href="javascript:void(0)"
+					data-href="${rc.contextPath}/content/v_list.do"> 
+					<i class="menu-icon fa fa-caret-right"></i> 内容管理
+				</a> 
+				<b class="arrow"></b>
+			</li>
+		</ul>
+	</li>
+
+	<li class="">
+		<a href="#" class="dropdown-toggle"> 
+			<i class="menu-icon glyphicon glyphicon-edit"></i> 
+			<span class="menu-text"> 审核管理 </span> 
+			<b class="arrow fa fa-angle-down"></b>
+		</a> 
+		<b class="arrow"></b>
+		<ul class="submenu">
+			<li>
+				<a href="javascript:void(0)"
+				data-href="${rc.contextPath}/contentAudit/audit_list.do"> <i
+					class="menu-icon fa fa-caret-right"></i> 新闻内容审核
+				</a> 
+				<b class="arrow"></b>
+			</li>
+			<li>
+				<a href="javascript:void(0)" data-href="${rc.contextPath}/contentAuditFlow/list.do"> 
+					<i class="menu-icon fa fa-caret-right"></i> 审核流程管理
+				</a> 
+				<b class="arrow"></b>
+			</li>
+		</ul>
+	</li>
+
+	<li class="">
+		<a href="#" class="dropdown-toggle"> 
+			<i class="menu-icon glyphicon glyphicon-book"></i> 
+			<span class="menu-text"> 专题管理 </span> 
+			<b class="arrow fa fa-angle-down"></b>
+		</a> 
+		<b class="arrow"></b>
+		<ul class="submenu">
+			<li>
+				<a href="javascript:void(0)" data-href="${rc.contextPath}/special/list.do"> 
+					<i class="menu-icon fa fa-caret-right"></i> 专题管理
+				</a> 
+				<b class="arrow"></b>
+			</li>
+		</ul>
+	</li>
+
+<li class="">
+						<a href="#" class="dropdown-toggle">
+							<i class="menu-icon glyphicon glyphicon-book"></i>
+							<span class="menu-text">
+													来源管理
+												</span>
+							<b class="arrow fa fa-angle-down"></b>
+						</a>
+						<b class="arrow"></b>
+						<ul class="submenu">
+							<li>
+								<a href="javascript:void(0)"
+								   data-href="${rc.contextPath}/origin/list.do">
+									<i class="menu-icon fa fa-caret-right"></i>
+									来源管理
+								</a>
+								<b class="arrow"></b>
+							</li>
+						</ul>
+					</li>
+
+					<!-- <li class="">
+						<a href="#" class="dropdown-toggle">
+							<i class="menu-icon glyphicon glyphicon-home"></i>
+							<span class="menu-text">
+								首页推荐管理
+							</span>
+							<b class="arrow fa fa-angle-down"></b>
+						</a>
+						<b class="arrow"></b>
+						<ul class="submenu">
+							<li>
+								<a href="javascript:void(0)"
+								   data-href="${rc.contextPath}/recomm/list.do">
+									<i class="menu-icon fa fa-caret-right"></i>
+									首页推荐内容设置
+								</a>
+								<b class="arrow"></b>
+							</li>
+						</ul>
+					</li>  -->
+<!-- <li class="">
+						<a href="#" class="dropdown-toggle">
+							<i class="menu-icon glyphicon glyphicon-fire"></i>
+							<span class="menu-text">
+								热词管理
+							</span>
+							<b class="arrow fa fa-angle-down"></b>
+						</a>
+						<b class="arrow"></b>
+						<ul class="submenu">
+							<li>
+								<a href="javascript:void(0)"
+								   data-href="${rc.contextPath}/searchHistory/list.do">
+									<i class="menu-icon fa fa-caret-right"></i>
+									热词库查询
+								</a>
+								<b class="arrow"></b>
+							</li>
+							<li>
+								<a href="javascript:void(0)"
+								   data-href="${rc.contextPath}/hotword/list.do">
+									<i class="menu-icon fa fa-caret-right"></i>
+									APP热词设置
+								</a>
+								<b class="arrow"></b>
+							</li>
+						</ul>
+					</li> -->
+<script type="text/javascript">
+	$(function($) {
+		pageMethods.init();
+	});
+	var pageMethods = {
+		init : function() {
+			$('.submenu li a').click(function(event) {
+				var $allLi = $('.submenu li');
+				var $this = $(this);
+				//iframe src跳转
+				var url = $this.attr('data-href');
+				$('.hk-main').load(url);
+				if (url) {
+					//console.info('click to href:' + url);
+					/* $.ajax({
+						  type: 'POST',
+						  url: url,
+						  async: true,   // 是否异步
+						  contentType: 'application/x-www-form-urlencoded',
+						  data: null,
+						  dataType: 'text', // 返回请求的类型，有text/json两种
+						  success: function(data){
+							  console.info('data:'+data);
+							  $('.hk-main').html(data);
+						  },
+					}); */
+
+					//激活状态更新
+					/* $allLi.removeClass('active');
+					$this.parentsUntil('.submenu', 'li').addClass(
+							'active'); */
+				}
+			});
+		}
+	};
+
+	function loadMain(url, data) {
+		$('.hk-main').load(url, data);
+	}
+</script>

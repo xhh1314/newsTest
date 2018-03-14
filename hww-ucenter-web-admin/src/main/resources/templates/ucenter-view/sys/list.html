@@ -1,0 +1,617 @@
+
+<script type="text/javascript">
+    //本页面url
+    var loadSysListUrl ="${rc.contextPath}/sys/query.do";
+</script>
+<@shiro.hasPermission name="/sys/query.do">  
+<form class="form-inline hk-search" id="searchForm" action="query.do" method="post">
+	<div class="row">
+		<div class="col-sm-2 col-xs-6" style="width: 125px;">
+			<#if (form.memberId)??>
+				<input id="sMemberId" name="memberId" type="text" value="${form.memberId?c}" class="form-control input-sm" placeholder="用户ID">
+				<#else>
+					<input id="sMemberId" name="memberId" type="text" class="form-control input-sm" placeholder="用户ID">
+			</#if>
+		</div>
+		<!--<div class="col-sm-2  col-xs-6">-->
+			<!--<#if (form.realName)??>-->
+				<!--<input id="sRealName" name="realName" type="text" value="${form.realName}" class="form-control input-sm" placeholder="姓名">-->
+				<!--<#else>-->
+					<!--<input id="sRealName" name="realName" type="text" class="form-control input-sm" placeholder="姓名">-->
+			<!--</#if>-->
+		<!--</div>-->
+		<div class="col-sm-2  col-xs-6" style="width: 125px;">
+			<#if (form.phoneNo)??>
+				<input id="sPhone" name="phoneNo" type="text" value="${form.phoneNo}" class="form-control input-sm" placeholder="联系电话">
+				<#else>
+					<input id="sPhone" name="phoneNo" type="text" class="form-control input-sm" placeholder="联系电话">
+			</#if>
+		</div>
+		<div class="col-sm-2  col-xs-6" style="width: 125px;">
+			<div class="input-group input-group-sm">
+				<span class="input-group-addon" id="basic-addon3">状态</span>
+				<#if (form.status)??>
+					<#if form.status==0>
+						<select class="form-control" id="sstatus" name="status">
+							<option value="">全部</option>
+							<option value="1">正常</option>
+							<option value="0" selected="selected">冻结</option>
+						</select>
+					</#if>
+					<#if form.status==1>
+						<select class="form-control" id="sstatus" name="status">
+							<option value="">全部</option>
+							<option value="1" selected="selected">正常</option>
+							<option value="0">冻结</option>
+						</select>
+					</#if>
+					<#else>
+						<select class="form-control" id="sstatus" name="status">
+							<option value="" selected="selected">全部</option>
+							<option value="1">正常</option>
+							<option value="0">冻结</option>
+						</select>
+				</#if>
+			</div>
+		</div>
+		<div class="col-sm-2  col-xs-6">
+			<button id="btnSearch" type="button" class="btn btn-info btn-sm" onclick="search()">
+				<span class="glyphicon glyphicon-search"></span>
+				<span>搜索</span>
+			</button>
+		</div>
+	</div>
+</form>
+	</@shiro.hasPermission>  
+	
+<div class="hk-toolbar">
+	<div class="btn-group btn-group-sm">
+		<button type="button" class="btn btn-default">
+			<span class="glyphicon glyphicon-th-list"></span>
+			操作
+		</button>
+		<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu">
+	
+		<!-- 	<li>
+				<a id="linkAddItem" href="javascript:toAdd()">
+					<span class="glyphicon glyphicon-plus"></span>
+					添加
+				</a>
+			</li> -->
+		
+			<@shiro.hasPermission name="/sys/handleStatu.do">  
+			
+			<li>
+				<a href="javascript:someHandleStatu(0)">
+					<span class="glyphicon glyphicon-floppy-remove"></span>
+					冻结
+				</a>
+			</li>
+			<li>
+				<a href="javascript:someHandleStatu(1)">
+					<span class="glyphicon glyphicon-floppy-saved"></span>
+					解冻
+				</a>
+			</li>
+			</@shiro.hasPermission>
+			<!-- <@shiro.hasPermission name="/sys/delete.do">  
+			<li>
+				<a id="linkDelItems" href="javascript:deleteItem()">
+					<span class="glyphicon glyphicon-remove"></span>
+					删除
+				</a>
+			</li>
+			</@shiro.hasPermission> -->
+		</ul>
+	</div>
+</div>
+	 
+<div style="overflow-x: auto; overflow-y: auto; height:300px; width:auto;">
+<table id="simple-table" class="table  table-bordered table-hover">
+	<thead>
+	<tr>
+		<th class="center detail-col">
+			<label class="pos-rel">
+				<input type="checkbox" class="ace" id="all" onclick="selectAll()"/>
+				<span class="lbl"></span>
+			</label>
+		</th>
+		<th class="hidden-300">用户ID</th>
+		<th class="detail-col">站点编号</th>
+		<th class="detail-col">真实姓名</th>
+		<!--<th class="detail-col">账号</th>-->
+		<th class="detail-col">昵称</th>
+		<th class="detail-col">笔名</th>
+		<th class="detail-col">联系电话</th>
+		<th class="detail-col">邮箱</th>
+		<th class="detail-col">状态</th>
+		<th class="detail-col">创建时间</th>
+		<th class="detail-col">最后修改时间</th>
+		<th class="detail-col"><i class="ace-icon fa fa-clock-o bigger-110 hidden-300"></i>操作</th>
+	</tr>
+	</thead>
+	<tbody id="tblBody">
+	<#list page.list as entity>
+		<tr>
+			<td class="center detail-col">
+				<label class="pos-rel">
+					<input name="IDCheck" id="code" value="${entity.memberId?c}" type="checkbox" class="ace" />
+					<span class="lbl"></span>
+				</label>
+			</td>
+			<td><#if (entity.memberId)??>${entity.memberId?c}<#else></#if></td>
+			<td><#if (entity.siteId)??>${entity.siteId}<#else></#if></td>
+			<td><#if (entity.realName)??>${entity.realName}<#else></#if></td>
+			<!--<td><#if (entity.membername)??>${entity.membername}<#else></#if></td>-->
+			<td><#if (entity.nickName)??>${entity.nickName}<#else></#if></td>
+			<td><#if (entity.pseudonym)??>${entity.pseudonym}<#else></#if></td>
+			<td><#if (entity.phoneNo)??>${entity.phoneNo}<#else></#if></td>
+			<td><#if (entity.email)??>${entity.email}<#else></#if></td>
+			<td><#if (entity.status==0)>冻结<#else>正常</#if></td>
+			<td><#if (entity.createTime)??>${entity.createTime}<#else></#if></td>
+			<td><#if (entity.lastModifyTime)??>${entity.lastModifyTime}<#else></#if></td>
+			<td>
+			<@shiro.hasPermission name="/sys/handleStatu.do">  	
+				<button type="button" class="btn btn-xs btn-warning" onclick="handleStatus(0,'${entity.memberId?c}')">冻结</button>
+				<button type="button" class="btn btn-xs btn-warning" onclick="handleStatus(1,'${entity.memberId?c}')">解冻</button>
+			</@shiro.hasPermission>	
+			<@shiro.hasPermission name="/sys/edit.do">  	
+				<button type="button" class="btn-eidt btn btn-xs btn-info" onclick="toEdit('${entity.memberId?c}')">编辑</button>
+			</@shiro.hasPermission>		
+			<!-- <@shiro.hasPermission name="/sys/delete.do">  		
+				<button type="button" class="btn btn-xs btn-danger" onclick="removeUser('${entity.memberId?c}')">删除</button>
+			</@shiro.hasPermission>	 -->
+			</td>
+		</tr>
+	</#list>
+	</tbody>
+</table>
+</div>
+<form id="submitForm" name="submitForm" action="query.do" method="post">
+	<#if (form.memberId)??>
+		<input type="text" name="memberId" id="memberIds" value="'${form.memberId?c}'"/>
+		<#else>
+			<input type="hidden" name="memberId" id="memberIds"/>
+	</#if>
+	<!--<#if (form.realName)??>-->
+		<!--<input type="hidden" name="realName" id="realNames" value="${form.realName}"/>-->
+		<!--<#else>-->
+			<!--<input type="hidden" name="realName" id="realNames"/>-->
+	<!--</#if>-->
+	<#if (form.phoneNo)??>
+		<input type="hidden" name="phoneNo" id="phoneNos" value="${form.phoneNo}"/>
+		<#else>
+			<input type="hidden" name="phoneNo" id="phoneNos"/>
+	</#if>
+	<#if (form.status)??>
+		<input type="hidden" name="status" id="statuss" value="${form.status}"/>
+		<#else>
+			<input type="hidden" name="status" id="statuss"/>
+	</#if>
+	<input type="hidden" name="pageNo" id="pageNo" value="${page.pageNo}"/>
+</form>
+<#include "../page.html">
+	<div class="modal fade" id="modalInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h5 class="modal-title" id="myModalLabel">
+						<span class="glyphicon glyphicon-file"></span>
+						<span id="modalTite"></span>
+					</h5>
+				</div>
+				<div class="modal-body">
+					<form id="sysForm" class="form-horizontal">
+						<input type="hidden" name="memberId" id="memberId"/>
+						<!--<div class="form-group form-group-sm">-->
+							<!--<label for="inputEmail3" class="col-sm-2 control-label">站点编号</label>-->
+							<!--<div class="col-sm-10">-->
+								<!--<input type="text" name="siteId" id="siteId" class="form-control" placeholder="站点编号">-->
+							<!--</div>-->
+						<!--</div>-->
+						<div class="form-group form-group-sm">
+							<label for="realName" class="col-sm-2 control-label">用户名</label>
+							<div class="col-sm-10">
+								<input type="text" name="realName" id="realName" class="form-control" placeholder="用户名">
+							</div>
+						</div>
+						<!--<div class="form-group form-group-sm">
+							<label for="inputEmail3" class="col-sm-2 control-label">账号</label>
+							<div class="col-sm-10">
+								<input type="text" name="membername" id="membername" class="form-control" placeholder="账号">
+							</div>
+						</div>-->
+						<div class="form-group form-group-sm">
+							<label for="pseudonym" class="col-sm-2 control-label">笔名</label>
+							<div class="col-sm-10">
+								<input type="text" name="pseudonym" id="pseudonym" class="form-control" placeholder="笔名">
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label for="nickName" class="col-sm-2 control-label">昵称</label>
+							<div class="col-sm-10">
+								<input type="text" name="nickName" id="nickName" class="form-control" placeholder="昵称(非必填项)">
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label for="phoneNo" class="col-sm-2 control-label">联系电话</label>
+							<div class="col-sm-10">
+								<input type="text" name="phoneNo" id="phoneNo" class="form-control" placeholder="联系电话">
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label for="email" class="col-sm-2 control-label">邮箱</label>
+							<div class="col-sm-10">
+								<input type="text" name="email" id="email" class="form-control" placeholder="邮箱">
+							</div>
+						</div>
+						<div class="form-group form-group-sm" id="pwdDiv">
+							<label for="password" class="col-sm-2 control-label">密码</label>
+							<div class="col-sm-10">
+								<input type="text" name="password" id="password" class="form-control" placeholder="密码">
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label for="status" class="col-sm-2 control-label">状态</label>
+							<div class="col-sm-10">
+								<input type="radio" value="1"  name="status" id="enable"/>正常
+								<input type="radio" value="0" name="status" id="disable"/>冻结
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+				
+					<button type="button" class="btn btn-info btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 关闭</button>
+					<button id="btnSave" data-action="" type="button" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-saved"></span> 保存</button>
+					<button id="btnUpdate" data-action="" type="button" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-saved"></span> 修改</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+        var page = {
+            init : function() {
+                this.eventInit();
+            },
+            eventInit : function() {
+                //信息表单模态框
+                var $modalInfo = $('#modalInfo');
+                var $modalInfoTitle = $modalInfo.find('#modalTite');
+                $modalInfo.modal({
+                    backdrop : 'static',
+                    keyboard : false,
+                    show : false
+                });
+                //添加一条数据
+                $('#linkAddItem').click(function() {
+                    resetForm();
+                    $modalInfoTitle.html('添加数据');
+                    $modalInfo.modal('show');
+                    $("#pwdDiv").show();
+                    $("#btnSave").show();
+                    $("#btnUpdate").hide();
+                });
+                //编辑一条数据
+                $('#linkEditItem').click(function() {
+                    $modalInfoTitle.html('编辑数据');
+                    $modalInfo.modal('show');
+                    $("#pwdDiv").show();
+                    $("#btnSave").hide();
+                    $("#btnUpdate").show();
+                });
+            }
+        }
+
+        jQuery(function($) {
+            page.init();
+        });
+        function toAdd() {
+            resetForm();
+            $modalInfoTitle.html('添加数据');
+            $modalInfo.modal('show');
+            $("#pwdDiv").show();
+            $("#btnSave").show();
+            $("#btnUpdate").hide();
+		}
+        //新增操作
+        $("#btnSave").click(function() {
+            var password = $("#password").val();
+            if (!password) {
+                alert("密码不能为空！");
+                return false;
+            }
+            if(validateForm()){
+                $.ajax({
+                    type: 'POST',
+                    url: "${rc.contextPath}/sys/save.do",
+                    data: $("#sysForm").serialize(),
+                    dataType:'json',
+                    success: function(data) {
+                        alert(data.message);
+                        $(".modal-backdrop").hide();
+                        $("#pageNo").val('${page.pageNo}');
+                        var data = $("#submitForm").serialize();
+                        $('.hk-main').load(loadSysListUrl, data);
+                    },
+                    error:function(data){
+                        alert("系统出现错误"+data);
+                        $('.hk-main').load(loadSysListUrl, data);
+                    }
+                });
+            }
+        });
+        //修改操作
+        $("#btnUpdate").click(function() {
+            if(validateForm()){
+                $.ajax({
+                    type: 'POST',
+                    url: "${rc.contextPath}/sys/update.do",
+                    data: $("#sysForm").serialize(),
+                    dataType:'json',
+                    success: function(data) {
+                        alert(data.message);
+                        $(".modal-backdrop").hide();
+                        $("#pageNo").val('${page.pageNo}');
+                        var data = $("#submitForm").serialize();
+                        $('.hk-main').load(loadSysListUrl, data);
+                    },
+                    error:function(data){
+                        alert("系统出现错误"+data);
+                        $('.hk-main').load(loadSysListUrl, data);
+                    }
+                });
+            }
+        });
+        //单个解冻与冻结操作
+        function handleStatus(status, memberId) {
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/sys/handleStatu.do",
+                data: "memberId="+memberId + "&status="+status,
+                dataType:'json',
+                success: function(data) {
+                    alert(data.message);
+                    $(".modal-backdrop").hide();
+                    $("#pageNo").val('${page.pageNo}');
+                    var data = $("#submitForm").serialize();
+                    $('.hk-main').load(loadSysListUrl, data);
+                },
+				error:function(data){
+                    alert("系统出现错误"+data.message);
+                    $('.hk-main').load(loadSysListUrl, data);
+				}
+            });
+        }
+        //单个删除操作
+        function removeUser(memberId) {
+            var flag = confirm("确定要删除吗？");
+            if (!flag) {
+                return;
+			}
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/sys/delete.do",
+                data: "memberId="+memberId,
+                dataType:'json',
+                success: function(data) {
+                    alert(data.message);
+                    $(".modal-backdrop").hide();
+                    $("#pageNo").val('${page.pageNo}');
+                    var data = $("#submitForm").serialize();
+                    $('.hk-main').load(loadSysListUrl, data);
+                }
+            });
+        }
+        //去修改查询单个操作
+        function toEdit(memberId) {
+            $("#pwdDiv").hide();
+            $("#btnSave").hide();
+            $("#btnUpdate").show();
+            var $modalInfo = $("#modalInfo");
+            var $modalInfoTitle = $modalInfo.find('#modalTite');
+            $modalInfo.modal({
+                backdrop : 'static',
+                keyboard : false,
+                show : false
+            });
+            $modalInfoTitle.html('编辑数据');
+            $modalInfo.modal('show');
+            resetForm();
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/sys/edit.do",
+                data: "memberId="+memberId,
+                dataType:'json',
+                success: function(data) {
+                    $("#memberId").val(data.memberId);
+                    $("#realName").val(data.realName);
+//                    $("#membername").val(data.membername);
+                    $("#pseudonym").val(data.pseudonym);
+                    $("#nickName").val(data.nickName);
+                    $("#phoneNo").val(data.phoneNo);
+                    $("#email").val(data.email);
+                    $("#password").val(data.password);
+                    if (data.status == 0) {
+                        $("#sysForm input[name='status']").get(1).checked=true;
+                    } else {
+                        $("#sysForm input[name='status']").get(0).checked=true;
+                    }
+                }
+            });
+        }
+        //重置表单
+        function resetForm() {
+            $("#realName").val("");
+//            $("#membername").val("");
+            $("#pseudonym").val("");
+            $("#nickName").val("");
+            $("#phoneNo").val("");
+            $("#email").val("");
+            $("#password").val("");
+            $("#sysForm input[name='status']").get(0).checked=true;
+        }
+        //验证表单
+        function validateForm() {
+//            var siteId = $("#siteId").val();
+            var realName = $("#realName").val();
+//            var membername = $("#membername").val();
+            var pseudonym = $("#pseudonym").val();
+            var phoneNo = $("#phoneNo").val();
+            var email = $("#email").val();
+           // var password = $("#password").val();
+//            if (!siteId) {
+//                alert("站点编号不能为空！");
+//                return false;
+//            }
+//            if(isNaN(parseInt(siteId))) {
+//                alert("站点编号必须是数字类型！");
+//                return false;
+//            }
+            if (!realName) {
+                alert("用户名不能为空！");
+                return false;
+            }
+//            if (!membername) {
+//                alert("账号不能为空！");
+//                return false;
+//            }
+            if (!pseudonym) {
+                alert("昵称不能为空！");
+                return false;
+            }
+            if (!phoneNo) {
+                alert("联系电话不能为空！");
+                return false;
+            }
+            if (!email) {
+                alert("邮箱不能为空！");
+                return false;
+            }
+
+            return true;
+        }
+
+        //批量解冻与冻结操作
+        function someHandleStatu(status) {
+            var memberIds="";
+            $("input[id^='code']:checked").each(function(){
+                memberIds+=$(this).val()+",";
+            });
+            if (!memberIds) {
+                alert("请勾选要冻结/解冻的记录！");
+                return;
+            }
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/sys/handleStatu.do",
+                data: "allIDCheck="+memberIds+"&status="+status,
+                dataType:'json',
+                success: function(data) {
+                    alert(data.message);
+                    $(".modal-backdrop").hide();
+                    $("#pageNo").val('${page.pageNo}');
+                    var data = $("#submitForm").serialize();
+                    $('.hk-main').load(loadSysListUrl, data);
+                }
+            });
+        };
+        //批量删除操作
+        function deleteItem() {
+            var memberIds="";
+            $("input[id^='code']:checked").each(function(){
+                memberIds+=$(this).val()+",";
+            });
+            if (!memberIds) {
+                alert("请勾选要删除的记录！");
+                return;
+            }
+            var flag = confirm("确定要删除吗？");
+            if (!flag) {
+                return;
+            }
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/sys/delete.do",
+                data: "allIDCheck="+memberIds,
+                dataType:'json',
+                success: function(data) {
+                    alert(data.message);
+                    $(".modal-backdrop").hide();
+                    $("#pageNo").val('${page.pageNo}');
+                    var data = $("#submitForm").serialize();
+                    $('.hk-main').load(loadSysListUrl, data);
+                }
+            });
+        };
+        //分页查询
+        function jumpNormalPage(pageNo) {
+            $("#pageNo").val(pageNo);
+            //$("#submitForm").submit();
+            var data = $("#submitForm").serialize();
+            $('.hk-main').load(loadSysListUrl,data);
+        }
+        //条件查询操作
+        function search() {
+            var memberId = $("#sMemberId").val();
+            if(memberId != null && memberId !="") {
+                if( isNaN(parseInt(memberId))) {
+                    alert("用户ID必须是数字类型！");
+                    return false;
+                }
+            }
+            var data = $("#searchForm").serialize();
+            $('.hk-main').load(loadSysListUrl,data);
+        }
+        //批量重置密码
+        $("#linkResetPwdItem").click(function(){
+            var memberIds="";
+            $("input[id^='code']:checked").each(function(){
+                memberIds+=$(this).val()+",";
+            });
+            if (!memberIds) {
+                alert("请勾选要重置密码的记录！");
+                return false;
+            }
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/sys/resetPassword.do",
+                data: "allIDCheck="+memberIds,
+                dataType:'json',
+                success: function(data) {
+                    alert(data);
+                    $(".modal-backdrop").hide();
+                    $("#pageNo").val('${page.pageNo}');
+                    var data = $("#submitForm").serialize();
+                    $('.hk-main').load(loadSysListUrl, data);
+                }
+            });
+        });
+        //全选全不选，列表所有选中复选框选中，否则不选中
+        function selectAll() {
+            if($("#all").is(":checked")){
+                $("input[id^='code']").each(function(){
+                    $(this).prop("checked", true);
+                });
+            }else{
+                $("input[id^='code']").each(function(){
+                    $(this).removeAttr("checked");
+                });
+            }
+        }
+        $("input[id^='code']").click(function(){
+            var all = $("#tblBody tr").size();
+            var size =$("input[id^='code']:checked").length;
+            if (all == size) {
+                $("#all").prop("checked", true);
+            } else {
+                $("#all").removeAttr("checked");
+            }
+        });
+	</script>

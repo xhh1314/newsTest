@@ -1,0 +1,163 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.hww.cms</groupId>
+    <artifactId>hww-cms</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../hww-cms/pom.xml</relativePath>
+  </parent>
+
+  <artifactId>hww-cms-web-service</artifactId>
+  <packaging>jar</packaging>
+  <name>hww-cms-web-service</name>
+  <description/>
+
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>1.5.9.RELEASE</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.hww.framework</groupId>
+      <artifactId>hww-framework-web-service</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <!--  <exclusion>
+           <groupId>org.springframework</groupId>
+           <artifactId>spring-web</artifactId>
+         </exclusion> -->
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>com.hww.sns</groupId>
+      <artifactId>hww-sns-common</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.hww.framework</groupId>
+          <artifactId>hww-framework-common</artifactId>
+        </exclusion>
+       
+      </exclusions>
+    </dependency>
+    
+        <dependency>
+          <groupId>com.hww.sns</groupId>
+          <artifactId>hww-sns-common-dto</artifactId>
+          <version>${project.version}</version>
+       </dependency> 
+       
+    <dependency>
+          <groupId>com.hww.app</groupId>
+          <artifactId>hww-app-common-dto</artifactId>
+          <version>${project.version}</version>
+       </dependency> 
+       
+    <dependency>
+      <groupId>com.hww.cms</groupId>
+      <artifactId>hww-cms-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.hww.file</groupId>
+      <artifactId>hww-file-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.hww.els</groupId>
+      <artifactId>hww-els-common</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.hww.ucenter</groupId>
+      <artifactId>hww-ucenter-common</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui -->
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger-ui</artifactId>
+      <version>2.7.0</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger2 -->
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger2</artifactId>
+      <version>2.7.0</version>
+    </dependency>
+
+
+
+
+
+    <dependency>
+      <groupId>com.hww.app</groupId>
+      <artifactId>hww-app-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+     <dependency>
+      <groupId>com.hww.sns</groupId>
+      <artifactId>hww-sns-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+      <dependency>
+      <groupId>com.hww.file</groupId>
+      <artifactId>hww-file-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+       <dependency>
+      <groupId>com.hww.els</groupId>
+      <artifactId>hww-els-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>1.5.9.RELEASE</version>
+        <configuration>
+          <mainClass>com.hww.cms.CmsWebServiceApplication</mainClass>
+          <layout>ZIP</layout>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+    <finalName>hww-cms-web-service</finalName>
+  </build>
+</project>

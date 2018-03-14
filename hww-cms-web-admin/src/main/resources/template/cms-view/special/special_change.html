@@ -1,0 +1,356 @@
+
+<div class="modal-dialog" role="document" style="width: 70%">
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+				aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+			<h5 class="modal-title">
+				<span class="glyphicon glyphicon-file"></span> <span
+					id="modalInfoTitle"></span>
+			</h5>
+		</div>
+		<div class="modal-body">
+			<form id="specialform22" method="post" action=""
+				enctype="multipart/form-data" class="form-horizontal">
+				<div class="tabbable">
+					<div class="tab-content">
+						<div class="form-group form-group-sm" >
+							<label class="col-sm-2 control-label no-padding-right">专题名称</label>
+							<div class="col-sm-4">
+								<input type="text" id="specialName_change" name="specialName"
+									value="<#if specialOld??>${specialOld.specialName!''}</#if>"
+									class="typeahead scrollable" placeholder="专题名称">
+							</div>
+							<label class="col-sm-2 control-label no-padding-right" >关键词</label>
+							<div class="col-sm-4">
+								<input type="text" id="keywords_change" name="keywords"
+									value="<#if specialOld??>${specialOld.keywords!''}</#if>"
+									class="typeahead scrollable" placeholder="关键词">
+							</div>
+						</div>
+						
+						<div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label no-padding-right">显示顺序：</label>
+							<div class="col-sm-4">
+								<div class="pos-rel">
+									<input id="sortNum" name="sortNum" value="<#if specialOld??>${specialOld.sortNum!''}</#if>"
+											class="typeahead scrollable" type="number" placeholder="显示顺序" />
+								</div>
+							</div>
+							<label class="col-sm-2 control-label">推荐权重</label>
+							<div class="col-sm-4">
+								<input type="number" id="recommPriority" name="recommPriority"
+									class="typeahead scrollable" placeholder="推荐权重"
+									value="<#if specialOld??>${specialOld.recommPriority!''}</#if>"/>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-sm-2 control-label no-padding-right">关联新闻分类</label>
+							<div class="col-sm-4">
+								<div class="tree-wrap hk-scrollbar">
+									<ul id="categoryTree" class="ztree"></ul>
+								</div>
+							</div>
+							<label class="col-sm-2 control-label">摘要</label>
+							<div class="col-sm-4">
+								<textarea id="summary_change" name="summary" class="form-control"
+									placeholder="摘要" cols="30" rows="5"><#if specialOld??>${specialOld.summary!''}</#if></textarea>
+							</div>
+						</div>
+						<div>
+						
+						
+						</div>
+						<div class="form-group">
+								<div class="form-group form-group-sm">
+					    			<label  class="col-sm-2 control-label">封面组图
+					    			</label>
+						    		<div class="col-sm-8">
+										<input id="add_logo2" type="file" name="myfile" multiple="multiple">
+						    			<input type="hidden" id="logo2" name="logo" value="<#if specialOld??>${specialOld.logo!''}</#if>"/>
+						    			<input type="hidden" id="logoIdsChange" name="logoIdsChange" value="<#if specialOld??>${specialOld.logo!''}</#if>"/>
+						    			<input type="hidden" id="logoUrlsChange" name="logoUrlsChange" value="<#if specialOld??>${specialOld.logoUrls!''}</#if>"/>
+						    		</div> 
+					    		</div> 
+					    		<label class="col-sm-2 control-label no-padding-right"></label>
+					  		</div>
+					  		
+					  		<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right"></label>
+								
+								<div class="col-sm-8" id="div_logos_change" style="height:300px; overflow:auto">
+									<div class="special-main">
+										<div class="row" id="logo_img_list_change">
+								 					 			
+								 		</div>
+									</div>
+								</div>
+								<label class="col-sm-2 control-label no-padding-right"></label>
+							</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-info btn-sm" data-dismiss="modal">
+						<span class="glyphicon glyphicon-remove"></span> 关闭
+					</button>
+					<button data-action="" type="button" class="btn btn-info btn-sm"
+						onclick="saveUpdateSpecial()">
+						<span class="glyphicon glyphicon-save"></span> 保存
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+
+
+function add_List(){
+	var img_url = "<#if specialOld??>${specialOld.logoUrls!}</#if>"; 
+	var img_id = "<#if specialOld??>${specialOld.logo!}</#if>";
+	if(img_url!=null&&img_url!=""){
+		var img_urls = img_url.split(",");
+		var img_ids = img_id.split(",");
+		for(var i in img_urls){
+			var div="<div class='col-sm-6 col-md-4' id='"+img_ids[i]+"_div' style='height: 200px;width: 130px;'>"
+			 	+"<div class='thumbnail' style='height: 130px;width: 130px;'>"
+			 	+"<img src='"+file_upload_prefix+img_urls[i]+" 'id='"+img_ids[i]+"_img'>"
+			 	+"<div class='caption'>"
+			 	+"<p style='text-align:center'><a class='btn btn-primary' id='"+img_ids[i]+"' onclick='logos_delete2(event);' role='button'>删除</a></p>"
+			 	+"</div>"
+			 	+"</div>"
+			 	+"</div>";
+		 	$("#logo_img_list_change").append(div);
+		}
+	}
+}
+
+$('#add_logo2').fileinput({
+	language:'zh',//语言中文
+	msgPlaceholder:"选择封面图片...",
+	showCaption:true,//文本框
+	showPreview:false,//预览
+	showUpload:true,//上传按钮
+	uploadAsync: false, //默认异步上传,此处改为同步
+	showClose:true,//预览框关闭按钮
+	showBrowse:true,//上传按钮
+	browseOnZoneClick:false,//点击拖拽区不上传
+	initialPreviewShowDelete:true,
+	allowedFileExtensions:['jpg','png','gif'],//允许文件类型
+	browseClass:'btn btn-info btn-sm', //样式
+	captionClass:'input-sm', 
+	removeClass:'btn btn-info btn-sm',
+	uploadClass:'btn btn-info btn-sm',
+	enctype: 'multipart/form-data',
+	maxFileCount:20,
+	uploadUrl:img_upload_url,//服务器端图片接收处理路径
+}).on("filebatchuploadsuccess", function (event, data, previewId, index) {
+	 //同步上传返回结果处理
+		if (data.response) {
+			  var obj = data.response;
+			  var urls = obj.urls;
+			  var ids = obj.ids;
+		     var logoIdsChange = $("#logoIdsChange").val();
+			  if(logoIdsChange){
+				  $("#logoIdsChange").val(logoIdsChange+","+ids)
+			  }else{
+				  $("#logoIdsChange").val(ids);
+			  }
+			  logoIdsChange=$("#logoIdsChange").val();
+			  
+		      var logoUrlsChange = $("#logoUrlsChange").val();
+			  if(logoUrlsChange){
+				  $("#logoUrlsChange").val(logoUrlsChange+","+urls)
+			  }else{
+				  $("#logoUrlsChange").val(urls);
+			  }
+			  logoUrlsChange=$("#logoUrlsChange").val();
+			  $("#logo2").val(logoIdsChange);
+			  
+		      var urlArray=urls.split(",");
+		      var idArray=ids.split(",");
+		      var div="";
+		      for(var i= 0;i<urlArray.length;i++){
+		    	  div=div+"<div class='col-sm-6 col-md-4' id='"+idArray[i]+"_div' style='height: 200px;width: 130px;'>"
+				 	+"<div class='thumbnail' style='height: 130px;width: 130px;'>"
+				 	+"<img src='"+file_upload_prefix+urlArray[i]+"' id='"+idArray[i]+"_img'>"
+				 	+"<div class='caption'>"
+				 	+"<p style='text-align:center'><a class='btn btn-primary' id='"+idArray[i]+"' onclick='logos_delete2(event);' role='button'>删除</a></p>"
+				 	+"</div>"
+				 	+"</div>"
+				 	+"</div>";
+	          } 
+		      
+		 	$("#logo_img_list_change").append(div); 
+		}
+  });
+function logos_delete2(event){
+	var id = event.target.id+"";	 
+	 $("#"+id+"_div").remove();
+	 <#if specialOld??>logoIdsChang=${specialOld.logo!''}</#if>
+	  
+	 var logoIdsChange = $("#logoIdsChange").val();
+	 var logoUrlsChange = $("#logoUrlsChange").val();
+	  
+	 var urlArray=logoUrlsChange.split(",");
+    var idArray=logoIdsChange.split(",");
+    var logoIdsChange_new="";
+    var logoUrlsChange_new="";
+    for(var i= 0;i<idArray.length;i++){
+  	  if(idArray[i]!=id){
+  		  logoIdsChange_new=logoIdsChange_new+idArray[i]+",";
+  		  logoUrlsChange_new=logoUrlsChange_new+urlArray[i]+",";
+  	  }
+    }
+    logoIdsChange_new=logoIdsChange_new.substr(0,logoIdsChange_new.length-1);
+    logoUrlsChange_new=logoUrlsChange_new.substr(0,logoUrlsChange_new.length-1);
+    
+    $("#logoIdsChange").val(logoIdsChange_new);
+    $("#logo2").val(logoIdsChange_new);
+    $("#logoUrlsChange").val(logoUrlsChange_new);
+}
+	var editSpecialType = "${rc.contextPath}/special/editSpecialType.do";
+	
+	function saveUpdateSpecial() {
+		var files=$("#add_logo2").val();
+		if(files!=""){
+			alert("请先上传选定的图片，或删除它！");
+			return;
+		}
+		
+		var data = $("#specialform22").serialize();
+		<#if specialOld??>
+			var specialId2='${specialOld.specialId!''}';
+		</#if>
+		var treeObj = $.fn.zTree.getZTreeObj("categoryTree");
+		var nodes = treeObj.getCheckedNodes(true);
+        var id_array = [];
+		if(nodes.length>0){
+			for(var i=0;i<nodes.length;i++){
+				id_array.push(nodes[i].id);
+			}
+		}
+		var relatedCategoryId = id_array.toString();
+		data = data+"&categoryIds="+relatedCategoryId;
+		
+		
+		data=data+"&specialId="+specialId2;
+		 $.ajax({
+			type: 'POST',
+			url: editSpecialType,
+			dataType:'json',
+			data:data,
+			success: function(data) {
+				if(data) {
+					alert(data.message);
+					if(data.result==1){
+						$modalChange.modal('hide');
+						getSpecialTree(3);
+						loadMenuByJsonStr(treeJson, "specialListTreeDemo", special_list_setting);
+						var url=childListUrl+"?specialId="+currentTreeNode+"&specialName="+'${parentName!}';
+			    		$("#childPage").load(url);
+					}
+				}else{
+					alert("修改失败！");
+				}
+			},
+			errer:function(e){
+				alert("");
+			}
+		});
+	
+	}
+	
+
+	var speical_child_add_page = {
+			onClick:function(e, treeId, treeNode) {
+				var zTree = $.fn.zTree.getZTreeObj("categoryTree"),
+				nodes = zTree.getSelectedNodes(),
+				v = "";
+				nodes.sort(function compare(a,b){return a.id-b.id;});
+				for (var i=0, l=nodes.length; i<l; i++) {
+					v += nodes[i].name + ",";
+				}
+				if (v.length > 0 ) v = v.substring(0, v.length-1);
+				var cityObj = $("#citySel");
+				cityObj.attr("value", v);
+				
+				v2 = "";
+				for (var i=0, l=nodes.length; i<l; i++) {
+					v2 += nodes[i].id + ",";
+				}
+				if (v2.length > 0 ) v2 = v2.substring(0, v2.length-1);
+				var parentObj = $("#parentId");
+				parentObj.attr("value", v2);
+			}
+	};
+	var special_child_add_setting = {
+			view: {
+				dblClickExpand: false
+			},
+			data: {
+				simpleData: {
+					enable: true
+				}
+			},
+			callback: {
+				onClick: speical_child_add_page.onClick
+			},
+			check: {
+				enable: true,   //true / false 分别表示 显示 / 不显示 复选框或单选框
+			　　autoCheckTrigger: true,   //true / false 分别表示 触发 / 不触发 事件回调函数
+			　　chkStyle: "checkbox",   //勾选框类型(checkbox 或 radio）
+			　　chkboxType: { "Y": "s", "N": "s" }   //勾选 checkbox 对于父子节点的关联关系
+			}
+		};
+
+		jQuery(function($) {
+				//初始化新闻分类树
+				add_List();
+		loadMenuByJsonStr(getCategoryTree(), "categoryTree", special_child_add_setting);
+		var ztree = $.fn.zTree.getZTreeObj("categoryTree");	
+		<#if specialOld??>
+			var array = "${specialOld.categoryIds!''}";
+				if(array!=""){
+					if(array.indexOf(",")>0){
+						array = array.split(",");
+					}else{
+						array = new Array(array);
+					}
+					for(var i=0;i<array.length;i++){
+						//设置树节点选中状态
+						var node = ztree.getNodeByParam("id", array[i], null);
+						if(node!=null){
+							//treeObj.selectNode(node,true);//true追加选中
+							node.checked = true;
+							ztree.updateNode(node); //重要
+						}
+					}
+			}
+				</#if>
+	  });
+		var treeJson;
+		function getCategoryTree(typeId){
+			var url = loadCategoryTreeUrl;
+			if(typeId){
+				//url = "getCategoryJsonByType.do" +"?typeId="+typeId;
+			}
+			$.ajax({
+				type : "POST",
+				async: false, //同步
+				url : url,
+				dataType : "json",
+				success : function(data) {
+					if (data != null) {
+						treeJson = data;
+					}
+				}
+			});
+			return treeJson;
+		}
+	
+</script>

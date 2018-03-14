@@ -1,0 +1,508 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" type="text/css" href="./static/css/haiwai_public.css">
+    <link rel="stylesheet" type="text/css" href="./static/js/lib/swiper3/swiper.min.css">
+    <link rel="stylesheet" href="./static/css/haike-ztnr.css"/>
+    <title id="specialName"></title>
+    <script src="./static/js/fontSize.js"></script>
+        
+        <style type="text/css">
+        
+        	.swiper-slide img {
+				 height: 30vh;
+			}
+		   .newsimg{
+			width: 30%!important;
+			height:120px!important;
+		   }
+		   .div.list ul li.li1 div.r{
+		   	margin-left: -65%;
+		   }
+        </style>
+</head>
+<body>
+<div style='margin:0 auto;display:none;'>
+<img src="./static/image/haike_300.jpg"/>
+</div>
+<!--<div class="header">
+    <div class="inner">
+        <a href="javascript:;" target="_blank" id="specialNames"></a>
+        <!-- <a href="javascript:;" target="_blank"></a>
+        <a href="javascript:;" target="_blank"></a> -->
+    <!--</div>
+</div>-->
+<div class="banner">
+    <div class="swiper-container">
+        <div class="swiper-wrapper">
+        <!-- 填充轮播slider-->
+        </div>
+        <div class="swiper-pagination"></div>
+    </div>
+        <div class="inner">
+        <p class="desc"></p>
+    </div>
+</div>
+<div class="nav inner">
+    <!-- 填充频道内容-->
+</div>
+<!-- 填充list新闻列表-->
+
+<script src="./static/js/lib/jquery-1.11.3.min.js" ></script>
+<script src="./static/js/lib/swiper3/swiper.min.js" ></script>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+
+<script>
+var pageNo = 0;
+var pageSize = 10;
+function getid(key){
+	var reg = new RegExp('(^|&)' + key + '=([^&]*)(&|$)', 'i')
+	var arr = window.location.search.substring(1).match(reg)
+	if (arr === null) return null
+	var id= decodeURIComponent(arr[2]);
+	return id;
+}
+
+$(function(){
+    var swiperSlide = "";
+    var nav = "";
+    var list = "";
+
+    /*手机端 锚点*/
+    document.addEventListener('touchend',function(ev){
+        if($(ev.target).is('.nav a')){
+            var _index = $(ev.target).index();
+            var y = $('.list').eq(_index).offset().top;
+            $("html,body").animate({scrollTop:y},600);
+        }
+    },false);
+
+	var id =getid("id");
+    $.post("cms/special/specialShareDetail.do",{"specialId":""+id,"pageNo":pageNo,"pageSize":pageSize},function(result){
+		 if(result.status==200){
+				//console.log(result.msg);
+				var data = result.msg;
+				var  fileurl = result.filedomain.split("#"); 
+				var rooturl = fileurl[0];
+				console.log(data);
+				var specialId = data.specialId;
+				//专题
+				$("#specialName").html(data.specialName);
+				$("#specialNames").html(data.specialName);
+	            //轮播图
+	            var topPicNews= new Array();
+	            topPicNews = data.logoUrl.split(",");
+	            //摘要
+	            var subjectInfo =data.summary;
+	            var specialUrl = data.specialUrl;
+	            //轮播图 swiper 填充
+	            var images;
+	            for(var i= 0;i<topPicNews.length;i++){
+	            	images  = rooturl+topPicNews[i];
+	                swiperSlide += '<div class="swiper-slide">';
+	                swiperSlide += '  <a href="' +specialUrl+ '" target="_blank">';
+	                swiperSlide += "<img style='height:200px' src='" +images+ "'>";
+	                swiperSlide += '  </a>';
+	                swiperSlide += '</div>';
+	            }
+	            $('.swiper-wrapper').append(swiperSlide);
+	            if(topPicNews.length == 1){
+	                var swiper = new Swiper('.swiper-container', {
+	                    loop: true,
+	                    autoplayDisableOnInteraction : false
+	                });
+	            }else{
+	                var swiper = new Swiper('.swiper-container', {
+	                    loop: true,
+	                    autoplay : 3000,
+	                    autoplayDisableOnInteraction : false,
+	                });
+	            }
+	 			//添加摘要
+	            $('p.desc').append(subjectInfo);
+	            
+	            //如果不存在子栏目
+	             //新闻列表
+	            var newsList = data.cmsContentVoList;
+	            
+	            if(newsList != null && newsList.length > 0){//无子栏目
+		            //获取新闻
+		            for(var a= 0;a < newsList.length; a++) {
+			            	list += '<div class="list">';
+			                list += '  <ul class="inner" id="'+specialId+'">';
+	                        var row=newsList[a];
+	                        var thumbType =row.contenttypeId; //新闻类型 2图文 5图集 6视频
+	                        var newsTitle = row.title;//标题
+	                        var newsShareLink  = row.linkUrl;//链接
+	        	            var thumbUrls= new Array();//缩略图
+	        	            if(row.thumbUrl != null){
+		                        thumbUrls = row.thumbUrl.split(",");
+	        	            }
+	        	            var thumbUrlLenth = thumbUrls.length;
+	        	            if(thumbType == 5){//图集
+	        	            	var imgList= new Array();
+	        	            	imgList = thumbUrls;
+		                        switch (imgList.length) {
+	                            case 1 :
+	                                <!--li1 一图-->
+	                                list += '<li class="li1">';
+	                                list += '  <a href="' + newsShareLink + '" target="_blank"><img class="newsimg" src="' + rooturl+thumbUrls[0] + '"/></a>';
+	                                list += '  <div class="r" style="margin-left: -65%;">';
+	                                list += '     <h3><a href="' + newsShareLink + '" target="_blank">'
+	                                        + newsTitle +
+	                                        '</a></h3>';
+	                                list += '</li>';
+	                                break;
+	                          case 2 :
+	                                <!--li2 三图-->
+	                                list += '<li class="li2">';
+	                                list += '  <h3><a href="' + newsShareLink + '" target="_blank">'
+	                                        + newsTitle +
+	                                        '</a></h3>';
+	                                list += '   <ul>';
+	                                for (var j = 0; j < imgList.length; j++) {
+	                                    list += '<li><a href="' + newsShareLink + '" target="_blank"><img class="newsimg" src="' + rooturl+thumbUrls[j] + '"/></a></li>';
+	                                }
+
+	                                list += '   </ul>';
+	                                list += '</li>';
+	                                break;
+	                            case 3 :
+	                                <!--li2 三图-->
+	                                list += '<li class="li2">';
+	                                list += '  <h3><a href="' + newsShareLink + '" target="_blank">'
+	                                        + newsTitle +
+	                                        '</a></h3>';
+	                                list += '   <ul>';
+	                                for (var j = 0; j < imgList.length; j++) {
+	                                    list += '<li><a href="' + newsShareLink + '" target="_blank"><img class="newsimg" src="' + rooturl+thumbUrls[j] + '"/></a></li>';
+	                                }
+
+	                                list += '   </ul>';
+	                                list += '</li>';
+	                                break;
+	                            default:
+	                                <!--li2 三图-->
+	                                list += '<li class="li2">';
+	                                list += '  <h3><a href="' + newsShareLink + '" target="_blank">'
+	                                        + newsTitle +
+	                                        '</a></h3>';
+	                                list += '   <ul>';
+	                                for (var j = 0; j < imgList.length; j++) {
+	                                    list += '<li><a href="' + newsShareLink + '" target="_blank"><img class="newsimg" src="' + rooturl+thumbUrls[j] + '"/></a></li>';
+	                                }
+	
+	                                list += '   </ul>';
+	                                list += '</li>';
+	                                break;
+	                    	 }
+	        	            }else if(thumbType == 6){
+	        	        	 <!--li3 视频大图-->
+	                            list += '<li class="li3">';
+	                            list += '  <h3><a href="' + newsShareLink + '" target="_blank">' + newsTitle + '</a></h3>';
+	                            list += '  <div>';
+	                            list += '     <img  style="height:220px"  src="' + rooturl+thumbUrls[0] + '"/>';
+	                            list += '     <a href="' + newsShareLink + '" target="_blank"></a>';
+	                            list += '  </div>';
+	                            list += '</li>';
+	        	            }else if(thumbType == 2){
+	        	        	 <!--li1 一图-->
+	                            list += '<li class="li1">';
+	                            list += '  <a href="' + newsShareLink + '" target="_blank"><img class="newsimg" src="' + rooturl+thumbUrls[0] + '"/></a>';
+	                            list += '  <div class="r" style="margin-left: -65%;">';
+	                            list += '     <h3><a href="' + newsShareLink + '" target="_blank">'
+	                                    + newsTitle +
+	                                    '</a></h3>';
+	                            list += '</li>';
+	        	           }
+		                
+		                list += '  </ul>';
+						
+		               /*  if(newsList.length > 10){
+		                    list += '  <div class="more">';
+		                    list += '    <a href=javascript:void(0) onclick="aClick('+specialId+')" target="_blank">查看更多</a>';
+		                    list += '  </div>';
+		                } */
+		                list += '  </div>';
+		            }
+		            $('body').append(list);
+	            }else{
+	            	console.log("加载子");
+	            	 //存在在子栏目
+		            //nav 频道列表
+		            var childSpecial =data.childSpecialVo;
+
+		            //获取频道
+		            for(var i= 0;i<childSpecial.length;i++){
+		                nav += '<a href="javascript:;" target="_blank">' +childSpecial[i].specialName+ '</a>';
+		            }
+		            //nav += ' <a href="javascript:;" target="_blank"><span>更多</span> </a>';
+		            $('.nav').append(nav);
+					
+		            //获取新闻
+		            for(var ia= 0; ia < childSpecial.length;ia++){
+		                list += '<div class="list">';
+		                list += '  <div class="tt"><em></em>' +childSpecial[ia].specialName+ '</div>';
+		                list += '  <ul class="inner" id ="'+childSpecial[ia].specialId+'">';
+		                var _len =[];
+		                if(childSpecial[ia].cmsContentVoList != null){
+		                	_len = childSpecial[ia].cmsContentVoList;
+		                }
+		                for(var y= 0;y < _len.length; y++) {
+	                        var row=_len[y];
+	                        var thumbType =row.contenttypeId;//新闻类型 2图文 5图集 6视频
+	                        var newsTitle = row.title;//标题
+	                        var newsShareLink  = row.linkUrl;//链接
+	        	            var thumbUrls= new Array();//缩略图
+	        	            if(row.thumbUrl != null){
+		                        thumbUrls = row.thumbUrl.split(",");
+	        	            }
+	        	            var thumbUrlLenth = thumbUrls.length;
+	        	            if(thumbType == 5){//图集
+	        	            	var imgList= new Array();
+	        	            	imgList = thumbUrls;
+		                        switch (imgList.length) {
+	                            case 1 :
+	                                <!--li1 一图-->
+	                                list += '<li class="li1">';
+	                                list += '  <a href="' + newsShareLink + '" target="_blank"><img class="newsimg" src="' + rooturl+thumbUrls[0] + '"/></a>';
+	                                list += '  <div class="r" style="margin-left: -65%;">';
+	                                list += '     <h3><a href="' + newsShareLink + '" target="_blank">'
+	                                        + newsTitle +
+	                                        '</a></h3>';
+	                                list += '</li>';
+	                                break;
+	                          case 2 :
+	                                <!--li2 三图-->
+	                                list += '<li class="li2">';
+	                                list += '  <h3><a href="' + newsShareLink + '" target="_blank">'
+	                                        + newsTitle +
+	                                        '</a></h3>';
+	                                list += '   <ul>';
+	                                for (var j = 0; j < imgList.length; j++) {
+	                                    list += '<li><a href="' + newsShareLink + '" target="_blank"><img class="newsimg" src="' + rooturl+thumbUrls[j] + '"/></a></li>';
+	                                }
+
+	                                list += '   </ul>';
+	                                list += '</li>';
+	                                break;
+	                            case 3 :
+	                                <!--li2 三图-->
+	                                list += '<li class="li2">';
+	                                list += '  <h3><a href="' + newsShareLink + '" target="_blank">'
+	                                        + newsTitle +
+	                                        '</a></h3>';
+	                                list += '   <ul>';
+	                                for (var j = 0; j < imgList.length; j++) {
+	                                    list += '<li><a href="' + newsShareLink + '" target="_blank"><img class="newsimg" src="' + rooturl+thumbUrls[j] + '"/></a></li>';
+	                                }
+
+	                                list += '   </ul>';
+	                                list += '</li>';
+	                                break;
+	                            default:
+	                                <!--li2 三图-->
+	                                list += '<li class="li2">';
+	                                list += '  <h3><a href="' + newsShareLink + '" target="_blank">'
+	                                        + newsTitle +
+	                                        '</a></h3>';
+	                                list += '   <ul>';
+	                                for (var j = 0; j < imgList.length; j++) {
+	                                    list += '<li><a href="' + newsShareLink + '" target="_blank"><img class="newsimg" src="' + rooturl+thumbUrls[j] + '"/></a></li>';
+	                                }
+	
+	                                list += '   </ul>';
+	                                list += '</li>';
+	                                break;
+	                    	 }
+	        	            }else if(thumbType == 6){
+	        	        	 <!--li3 视频大图-->
+	                            list += '<li class="li3">';
+	                            list += '  <h3><a href="' + newsShareLink + '" target="_blank">' + newsTitle + '</a></h3>';
+	                            list += '  <div>';
+	                            list += '     <img  style="height:220px;" src="' + rooturl+thumbUrls[0] + '"/>';
+	                            list += '     <a href="' + newsShareLink + '" target="_blank"></a>';
+	                            list += '  </div>';
+	                            list += '</li>';
+	        	            }else if(thumbType == 2){
+	        	        	 <!--li1 一图-->
+	                            list += '<li class="li1">';
+	                            list += '  <a href="' + newsShareLink + '" target="_blank"><img class="newsimg" src="' + rooturl+thumbUrls[0] + '"/></a>';
+	                            list += '  <div class="r" style="margin-left: -65%;">';
+	                            list += '     <h3><a href="' + newsShareLink + '" target="_blank">'
+	                                    + newsTitle +
+	                                    '</a></h3>';
+	                            list += '</li>';
+	        	           }
+
+	                   }
+		                
+		                list += '  </ul>';
+						
+		               /*  if(_len.length  > 10){
+		                    list += '  <div class="more">'; 
+		                    list += '    <a href=javascript:void(0) onclick="aClick('+specialId+')" target="_blank">查看更多</a>';
+		                    list += '  </div>';
+		                } */
+		                list += '  </div>';
+		            }
+		            $('body').append(list);
+			 }
+		  }else{
+			 alert("分享失败");
+		 }    
+	 });
+    });
+    
+    function aClick(id){//加载5个
+    	pageNo = pageNo+pageSize;
+    	$.post("/cms/special/loadContentBySpecialId.do",{"specialId":""+id,"pageNo":pageNo,"pageSize":pageSize},function(result){
+    		if(result.status==200){
+    			var data = result.data;
+	             //新闻列表
+	            var newsLists = data.cmsContentVoList;
+    			 //获取新闻
+    			var row;
+	            for(var n= 0; n < newsLists.length; n++) {
+		            	row = newsLists[n];
+	                    var thumbType =row.contenttypeId;//新闻类型 2图文 5图集 6视频
+	                    var newsTitle = row.title;//标题
+	                    var newsShareLink  = row.linkUrl;//链接
+	    	            var thumbUrls= new Array();//缩略图
+	                    thumbUrls = row.thumbUrl.split(",");
+	    	            var thumbUrlLenth = thumbUrls.length;
+	    	            if(thumbType == 5){//图集
+	    	            	var imgList= new Array();
+	    	            	imgList = thumbUrls;
+	                        switch (imgList.length) {
+	                        case 1 :
+	                            <!--li1 一图-->
+	                            list += '<li class="li1">';
+	                            list += '  <a href="' + newsShareLink + '" target="_blank"><img src="' + rooturl+thumbUrls[0] + '"/></a>';
+	                            list += '  <div class="r">';
+	                            list += '     <h3><a href="' + newsShareLink + '" target="_blank">'
+	                                    + newsTitle +
+	                                    '</a></h3>';
+	                            list += '</li>';
+	                            break;
+	                        case 3 :
+	                            <!--li2 三图-->
+	                            list += '<li class="li2">';
+	                            list += '  <h3><a href="' + newsShareLink + '" target="_blank">'
+	                                    + newsTitle +
+	                                    '</a></h3>';
+	                            list += '   <ul>';
+	                            for (var j = 0; j < imgList.length; j++) {
+	                                list += '<li><a href="' + newsShareLink + '" target="_blank"><img src="' + rooturl+thumbUrls[j] + '"/></a></li>';
+	                            }
+	
+	                            list += '   </ul>';
+	                            list += '</li>';
+	                            break;
+	                        case 4 :
+	                            <!--li4 三合一图-->
+	                            list += '<li class="li4">';
+	                            list += '   <h3><a href="' + newsShareLink + '" target="_blank">' + newsTitle + '</a></h3>';
+	                            list += '   <a href="' + newsShareLink + '" target="_blank"><img src="' + rooturl+thumbUrls[0] + '"/></a>';
+	                            list += '</li>';
+	                            break;
+	                        case 5 :
+	                            <!--li5 大图-->
+	                            list += '<li class="li5">';
+	                            list += '   <h3><a href="' + newsShareLink + '" target="_blank">' + newsTitle + '</a></h3>';
+	                            list += '   <a href="' + newsShareLink + '" target="_blank"><img src="' + rooturl+thumbUrls[0] + '"/></a>';
+	                            list += '</li>';
+	                            break;
+	                	 }
+	    	            }else if(thumbType == 6){
+	    	        	 <!--li3 视频大图-->
+	                        list += '<li class="li3">';
+	                        list += '  <h3><a href="' + newsShareLink + '" target="_blank">' + newsTitle + '</a></h3>';
+	                        list += '  <div>';
+	                        list += '     <img src="' + rooturl+thumbUrls[0] + '"/>';
+	                        list += '     <a href="' + newsShareLink + '" target="_blank"></a>';
+	                        list += '  </div>';
+	                        list += '</li>';
+	    	            }else if(thumbType == 2){
+	    	        	 <!--li1 一图-->
+	                        list += '<li class="li1">';
+	                        list += '  <a href="' + newsShareLink + '" target="_blank"><img src="' + rooturl+thumbUrls[0] + '"/></a>';
+	                        list += '  <div class="r">';
+	                        list += '     <h3><a href="' + newsShareLink + '" target="_blank">'
+	                                + newsTitle +
+	                                '</a></h3>';
+	                        list += '</li>';
+	    	           }
+	
+	               	}
+            	  $("#specialId").append(list);
+    		}
+    	});
+    }
+    
+/* switch (imgList.length) {
+case 0 :
+    <!--li0 无图-->
+    list += '<li class="li2">';
+    list += ' <h3><a href="' + newsShareLink + '" target="_blank">'
+            + newsTitle +
+            '</a></h3>';
+    list += '</li>';
+    break;
+case 1 :
+    <!--li1 一图-->
+    list += '<li class="li1">';
+    list += '  <a href="' + newsShareLink + '" target="_blank"><img src="' + thumbUrls[0] + '"/></a>';
+    list += '  <div class="r">';
+    list += '     <h3><a href="' + newsShareLink + '" target="_blank">'
+            + newsTitle +
+            '</a></h3>';
+    list += '</li>';
+    break;
+case 2 :
+    <!--li2 三图-->
+    list += '<li class="li2">';
+    list += '  <h3><a href="' + newsShareLink + '" target="_blank">'
+            + newsTitle +
+            '</a></h3>';
+    list += '   <ul>';
+    for (var j = 0; j < thumbUrls.length; j++) {
+        list += '<li><a href="' + newsShareLink + '" target="_blank"><img src="' + thumbUrls[j] + '"/></a></li>';
+    }
+
+    list += '   </ul>';
+    list += '</li>';
+    break;
+case 3 :
+    <!--li3 视频大图-->
+    list += '<li class="li3">';
+    list += '  <h3><a href="' + newsShareLink + '" target="_blank">' + newsTitle + '</a></h3>';
+    list += '  <div>';
+    list += '     <img src="' + thumbUrls[0] + '"/>';
+    list += '     <a href="' + newsShareLink + '" target="_blank"></a>';
+    list += '  </div>';
+    list += '</li>';
+    break;
+case 4 :
+    <!--li4 三合一图-->
+    list += '<li class="li4">';
+    list += '   <h3><a href="' + newsShareLink + '" target="_blank">' + newsTitle + '</a></h3>';
+    list += '   <a href="' + newsShareLink + '" target="_blank"><img src="' + thumbUrls[0] + '"/></a>';
+    list += '</li>';
+    break;
+case 5 :
+    <!--li5 大图-->
+    list += '<li class="li5">';
+    list += '   <h3><a href="' + newsShareLink + '" target="_blank">' + newsTitle + '</a></h3>';
+    list += '   <a href="' + newsShareLink + '" target="_blank"><img src="' + thumbUrls[0] + '"/></a>';
+    list += '</li>';
+    break;
+} */
+ 
+
+</script>
+</body>
+</html>

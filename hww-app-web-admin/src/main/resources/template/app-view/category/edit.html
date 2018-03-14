@@ -1,0 +1,415 @@
+
+<form id="submitForm" class="form-horizontal" role="form">
+	<input type="hidden" name="columnId" value="${entity.columnId}"
+		id="columnId" /> <input type="hidden" name="parentId"
+		value="${entity.parent.columnId}" id="parentId" />
+	<div class="tabbable">
+		<ul class="nav nav-tabs padding-12 tab-color-blue background-blue"
+			id="myTab4">
+			<li class="active"><a data-toggle="tab" href="#home4">栏目信息</a></li>
+		</ul>
+		<div class="tab-content">
+			<div id="home4" class="tab-pane in active">
+				<div class="form-group">
+					<label class="col-sm-2 control-label no-padding-right">上级栏目：</label>
+					<div class="col-sm-4">
+						<div class="pos-rel">
+							<input id="citySel" value="${entity.parent.columnName!}"
+								class="typeahead scrollable" type="text" readonly="readonly" />
+						</div>
+					</div>
+					<label class="control-label col-xs-2 col-sm-2 no-padding-right"
+						for="food">所属站点：</label>
+					<div class="col-xs-4 col-sm-4">
+						<select name="siteId" id="siteId">
+							<option value="">--请选择--</option>
+							<#list sites as site> 
+							<#if entity.siteId?? && site.siteId==entity.siteId>
+							<option value="${site.siteId}" selected="selected">${site.siteName}</option>
+							<#else>
+							<option value="${site.siteId}">${site.siteName}</option></#if> </#list>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label no-padding-right">栏目名称：</label>
+					<div class="col-sm-4">
+						<div class="pos-rel">
+							<input id="columnName" name="columnName"
+								value="${entity.columnName!}" class="typeahead scrollable"
+								type="text" placeholder="栏目名称" required="" />
+						</div>
+					</div>
+					<label class="control-label col-xs-2 col-sm-2 no-padding-right"
+						for="food">状态：</label>
+					<div class="col-xs-5 col-sm-4">
+						<select name="status" id="status">
+							<#if entity??> <#if entity.status??>
+							<#if entity.status==1>
+							<option value="1" selected="selected">启用</option>
+							<option value="2">禁用</option>
+							<option value="0">删除</option>
+							<#elseif entity.status==2>
+							<option value="0" >删除</option>
+							<option value="1">启用</option>
+							<option value="2" selected="selected">禁用</option>
+							<#else>
+							<option value="0" selected="selected">删除</option>
+							<option value="1">启用</option>
+							<option value="2">禁用</option>
+							</#if> </#if></#if>
+						</select>
+					</div>
+					
+					
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label no-padding-right">显示顺序：</label>
+					<div class="col-sm-4">
+						<div class="pos-rel">
+							<input id="sort" name="sort" value="${entity.sort!}"
+								class="typeahead scrollable" type="number" min="2" placeholder="显示顺序" />
+						</div>
+					</div>
+					<label class="col-sm-2 control-label no-padding-right">描述：</label>
+					<div class="col-sm-4">
+						<div class="pos-rel">
+							<input id="columnDesc" name="columnDesc"
+								value="${entity.columnDesc!}" class="typeahead scrollable"
+								type="text" placeholder="描述" />
+						</div>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-2 control-label no-padding-right">默认推荐：</label>
+					<div class="col-sm-4">
+						<div class="pos-rel">
+							<label> <#if entity??> <#if entity.isDefault??>
+								<#if entity.isDefault==1> <input id="isDefault"
+									name="isDefault" value="1" class="ace ace-switch ace-switch-2"
+									checked="checked" type="checkbox" /> <#else> <input
+									id="isDefault" name="isDefault" value="1"
+									class="ace ace-switch ace-switch-2" type="checkbox" /></#if> <#else>
+								<input id="isDefault" name="isDefault" value="1"
+									class="ace ace-switch ace-switch-2" type="checkbox" /> </#if> </#if> <span
+									class="lbl"></span></label>
+						</div>
+					</div>
+					<label class="col-sm-2 control-label no-padding-right">是否自定义：</label>
+					<div class="col-sm-4">
+						<div class="pos-rel">
+							<label> <#if entity??> <#if entity.isCustom??>
+								<#if entity.isCustom==1> <input id="isCustom"
+									name="isCustom" value="1" class="ace ace-switch ace-switch-2"
+									checked="checked" type="checkbox" /> <#else> <input
+									id="isCustom" name="isCustom" value="1"
+									class="ace ace-switch ace-switch-2" type="checkbox" /></#if> <#else>
+								<input id="isCustom" name="isCustom" value="1"
+									class="ace ace-switch ace-switch-2" type="checkbox" /> </#if> </#if> <span
+									class="lbl"></span></label>
+						</div>
+					
+					</div>
+						<label class="col-sm-2 control-label no-padding-right">是否显示：</label>
+					<div class="col-sm-4">
+						<div class="pos-rel">
+							<label> 
+							<#if entity??> 
+							<#if entity.isDisplay??>
+								<#if entity.isDisplay==1>
+								<input id="isDisplay" name="isDisplay" checked="checked" value="1" class="ace ace-switch ace-switch-2" type="checkbox" /> 
+
+								<#else> 
+								<input id="isDisplay" name="isDisplay" value="1" class="ace ace-switch ace-switch-2" type="checkbox" /> 
+								</#if>
+						 <#else>
+								<input id="isDisplay" name="isDisplay" checked="checked" value="1" class="ace ace-switch ace-switch-2" type="checkbox" />
+						 </#if> 
+						</#if> 
+
+					
+								<span
+								class="lbl"></span>
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2 col-sm-2 no-padding-right"
+						for="food">与新闻分类关联：</label>
+					<div class="col-sm-8" style="height: 300px; overflow: auto">
+						<div id="cmsCategoryTree_edit" class="tree-wrap hk-scrollbar">
+							<ul id="cmsCategoryTree_edit_demo" class="ztree"></ul>
+							<input id="cmsCategoryEditIds" name="cmsCategoryIds" value=""
+								type="hidden" />
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<!-- 基础信息 -->
+
+			<div class="clearfix form-actions">
+				<div class="col-md-offset-5 col-md-9">
+
+					<@shiro.hasPermission name="/category/updateColumn.do">
+
+
+					<button class="btn btn-info" type="button" id="submitbutton">
+						<i class="ace-icon fa fa-check bigger-110"></i> 提交
+					</button>
+
+					</@shiro.hasPermission> &nbsp; &nbsp; &nbsp;
+					<button class="btn" type="reset">
+						<i class="ace-icon fa fa-undo bigger-110"></i> 重置
+					</button>
+				</div>
+			</div>
+
+
+
+		</div>
+	</div>
+</form>
+<script type="text/javascript">
+
+
+	var loadCmsCategoryTreeUrl="${rc.contextPath}/category/allCmsCategoryJson.do";
+
+	var cms_category_edit_page = {
+		onClick:function(e, treeId, treeNode) {
+			var zTree = $.fn.zTree.getZTreeObj("cmsCategoryTree_edit_demo"),
+			nodes = zTree.getSelectedNodes(),
+			v = "";
+			nodes.sort(function compare(a,b){return a.id-b.id;});
+			for (var i=0, l=nodes.length; i<l; i++) {
+				v += nodes[i].name + ",";
+			}
+			if (v.length > 0 ) v = v.substring(0, v.length-1);
+			var cityObj = $("#citySel");
+			cityObj.attr("value", v);
+			
+			v2 = "";
+			for (var i=0, l=nodes.length; i<l; i++) {
+				v2 += nodes[i].id + ",";
+			}
+			if (v2.length > 0 ) v2 = v2.substring(0, v2.length-1);
+			var parentObj = $("#parentId");
+			parentObj.attr("value", v2);
+		}
+	};
+
+	var cms_category_edit_setting = {
+		view: {
+			dblClickExpand: false
+		},
+		data: {
+			simpleData: {
+				enable: true
+			}
+		},
+		callback: {
+			onClick: cms_category_edit_page.onClick
+		},
+		check: {
+			enable: true,   //true / false 分别表示 显示 / 不显示 复选框或单选框
+		　　autoCheckTrigger: true,   //true / false 分别表示 触发 / 不触发 事件回调函数
+		　　chkStyle: "checkbox",   //勾选框类型(checkbox 或 radio）
+		　　chkboxType: { "Y": "s", "N": "s" }   //勾选 checkbox 对于父子节点的关联关系
+		}
+	};
+	
+	
+		jQuery(function($) {
+			
+			$.ajax({
+				type : "POST",
+				url : loadCmsCategoryTreeUrl,
+				dataType : "json",
+				success : function(data) {
+					// 如果返回数据不为空，加载"业务模块"目录
+					if (data != null) {
+						// 将返回的数据赋给zTree
+						$.fn.zTree.init($("#cmsCategoryTree_edit_demo"), cms_category_edit_setting, data);
+						//              alert(treeObj);
+						zTree = $.fn.zTree.getZTreeObj("cmsCategoryTree_edit_demo");
+						if (zTree) {
+							// 默认展开所有节点
+							zTree.expandAll(true);
+							<#if r??>
+							var array = "${r!''}";
+							if(array!=""){
+								if(array.indexOf(",")>0){
+									array = array.split(",");
+								}else{
+									array = new Array(array);
+								}
+								for(var i=0;i<array.length;i++){
+									//设置树节点选中状态
+									var node = zTree.getNodeByParam("id", array[i]);
+									if(node!=null){
+										//treeObj.selectNode(node,true);//true追加选中
+										node.checked = true;
+										zTree.updateNode(node); //重要
+									}
+								}
+							}
+						</#if>
+						}
+					}
+				}
+			});
+			<#if entity??>
+				var id='${entity.columnId!}';
+				if(id==1||id==2){
+					$("#sort").attr("disabled","disabled")
+				}
+			</#if>
+			if($("#columnId").val()<100){
+				$("#status").attr("disabled","disabled");
+			}
+			
+			
+			//var ztree = $.fn.zTree.getZTreeObj("cmsCategoryTree_edit_demo");
+			
+			
+			$("#submitbutton").click(function() {
+				
+				if(validateForm()==false){
+					return;
+				}
+		
+				var sortVal = $("#sort").val();
+				var oldVal=${entity.sort!};
+				
+				if(sortVal!=oldVal){
+					$.ajax({
+						type : 'POST',
+						url : "${rc.contextPath}/category/sort.do",
+						data : {"sort":sortVal},
+						dataType : 'json',
+						success : function(data) {
+							if(data){
+								if(data.result==-1){
+									alert(data.message);
+									return;
+								}
+								if(data.result==0){
+									alert("显示顺序："+data.exist+"已经被占用！");
+								}
+								if(data.result==1){
+									var data2 = $("#submitForm").serialize();
+
+									if (document.getElementById("status").checked == false) {
+										data2 = data2 + "&status=" + 0;
+									}
+									if (document.getElementById("isCustom").checked == false) {
+										data2 = data2 + "&isCustom=" + 0;
+									}
+									if (document.getElementById("isDefault").checked == false) {
+										data2 = data2 + "&isDefault=" + 0;
+									}
+								
+									$.ajax({
+										type : 'POST',
+										url : "${rc.contextPath}/category/saveColumn.do",
+										data : data2,
+										dataType : 'json',
+										success : function(data3) {
+											if (data3) {
+												//artDialog({content:'提交成功', x:'right', y:'bottom', time:'1', fixed:true});
+												alert("提交成功");
+												$('.hk-main').load(indexUrl);
+											}
+										}
+									});
+								}
+							}
+						},
+						errer:function(e){
+							alert(e);
+						}
+					});
+				}else{
+					var data = $("#submitForm").serialize();
+
+					if (document.getElementById("isCustom").checked == false) {
+						data = data + "&isCustom=" + 0;
+					}
+					if (document.getElementById("isDefault").checked == false) {
+						data = data + "&isDefault=" + 0;
+					}
+				
+					$.ajax({
+						type: 'POST',
+						url: "${rc.contextPath}/category/updateColumn.do",
+						data: data,
+						dataType:'json',
+						success: function(data) {
+						if(data) {
+							alert("提交成功");
+							$('.hk-main').load(indexUrl);
+						}
+						}
+					}); 
+				}
+			});
+		})
+		
+		function validateForm(){
+			
+			var treeObj = $.fn.zTree.getZTreeObj("cmsCategoryTree_edit_demo");
+			var nodes = treeObj.getCheckedNodes(true);
+	        var id_array = [];
+			if(nodes.length>0){
+				for(var i=0;i<nodes.length;i++){
+					id_array.push(nodes[i].id);
+				}
+			}
+			var relatedCategoryId = id_array.toString();
+			$("#cmsCategoryEditIds").val(relatedCategoryId);
+			
+			if(relatedCategoryId==""){
+				alert("请至少选择一个新闻分类！");
+				return false;
+			}
+			
+			var sortVal=$("#sort").val();
+			if($.trim(sortVal)==""){
+				alert("显示顺序不能为空！");
+				return false;
+			}
+			if(sortVal<2){
+				alert("显示顺序必须大于等于2！");
+				return false;
+			}
+			if(trim($("#columnName").val())==""){
+				alert("栏目名称不能为空！");
+				return false;
+			}
+			return true;
+		}
+		function trim(str){ 
+			   return LTrim(RTrim(str)); 
+		}
+		function LTrim(str){ 
+			  var i; 
+			  for(i=0;i<str.length;i++){
+			    if(str.charAt(i)!=" ") 
+			      break; 
+			  } 
+			  str = str.substring(i,str.length); 
+			  return str; 
+		}
+		function RTrim(str){ 
+			  var i; 
+			  for(i=str.length-1;i>=0;i--){ 
+			    if(str.charAt(i)!=" ") 
+			      break; 
+			  } 
+			  str = str.substring(0,i+1); 
+			  return str; 
+		}
+</script>
+

@@ -1,0 +1,263 @@
+<script type="text/javascript">
+	var editUrl = "${rc.contextPath}/category/v_edit.do";
+	var deleteUrl = "${rc.contextPath}/category/o_delete.do";
+	var indexUrl = "${rc.contextPath}/category/v_list.do"
+</script>
+<form id="submitForm" class="form-horizontal" role="form">
+<!-- <input type="hidden" name="parentId" value="${form.parentId}" id="parentId"/> -->
+<div class="tabbable">
+									<ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab4">
+										<li class="active">
+											<a data-toggle="tab" href="#home4">栏目信息</a>
+										</li>
+										<li>
+											<a data-toggle="tab" href="#profile4">模板配置</a>
+										</li>
+									</ul>
+<div class="tab-content">
+										<div id="home4" class="tab-pane in active">
+											<div class="form-group">
+												<label class="col-sm-2 control-label no-padding-right">上级分类：</label>
+												<div class="col-sm-4">
+													<!-- <div class="pos-rel">
+														<input id="citySel" value="${parent.columnName}" class="typeahead scrollable" type="text" readonly="readonly"/><a id="menuBtn" href="#" onclick="showMenu(); return false;">选择</a>
+													</div> -->
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="col-sm-2 control-label no-padding-right">栏目名称：</label>
+												<div class="col-sm-4">
+													<div class="pos-rel">
+														<input id="columnName" name="columnName" value="" class="typeahead scrollable" type="text" placeholder="栏目名称" required=""/>
+													</div>
+												</div>
+												<label class="control-label col-xs-2 col-sm-2 no-padding-right" for="food">状态：</label>
+												<div class="col-xs-5 col-sm-4">
+													<@p.select value="0" name="status" id="status" />
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="col-sm-2 control-label no-padding-right">显示顺序：</label>
+												<div class="col-sm-4">
+													<div class="pos-rel">
+														<input id="priority" name="priority" value="" class="typeahead scrollable" type="text" placeholder="显示顺序" />
+													</div>
+												</div>
+												<label class="col-sm-2 control-label no-padding-right">前台显示？：</label>
+												<div class="col-sm-4">
+													<div class="pos-rel">
+														<label>
+															<input id="display" name="display" value="1" class="ace ace-switch ace-switch-2" type="checkbox" />
+															<span class="lbl"></span>
+														</label>
+													</div>
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="col-sm-2 control-label no-padding-right">外链：</label>
+												<div class="col-sm-4">
+													<div class="pos-rel">
+														<input id="link" name="link" value="" class="typeahead scrollable" type="text" placeholder="外链"/>
+													</div>
+												</div>
+												<label class="control-label col-xs-2 col-sm-2 no-padding-right" for="food">所属站点：</label>
+												<div class="col-xs-4 col-sm-4">
+													<select name="siteId" id="siteId" >
+							                            <option value="">--请选择--</option>
+							                            <#list sites as site>
+							                            	<#if site.siteId==form.siteId>
+							                            		<option value="${site.siteId}" selected="selected">${site.siteName}</option>
+							                            		<#else>
+							                            		<option value="${site.siteId}">${site.siteName}</option>
+							                            	</#if>
+							                            </#list>
+							                        </select>
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="col-sm-2 control-label no-padding-right">keywords：</label>
+												<div class="col-sm-4">
+													<div class="pos-rel">
+														<input id="keywords" name="keywords" value="" class="typeahead scrollable" type="text" placeholder="keywords"/>
+													</div>
+												</div>
+												<label class="col-sm-2 control-label no-padding-right">description：</label>
+												<div class="col-sm-4">
+													<div class="pos-rel">
+														<textarea id="description" name="description" class="form-control" placeholder="description"></textarea>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div id="profile4" class="tab-pane">
+											<button class="btn btn-minier btn-primary" onclick="addRow();">添加模板配置行</button>
+											
+										</div>
+									</div>
+								</div>
+									
+								<div class="clearfix form-actions">
+									<div class="col-md-offset-3 col-md-9">
+										<button class="btn btn-info" type="button" id="submitbutton">
+											<i class="ace-icon fa fa-check bigger-110"></i>
+											提交
+										</button>
+										&nbsp; &nbsp; &nbsp;
+										<button class="btn" type="reset">
+											<i class="ace-icon fa fa-undo bigger-110"></i>
+											重置
+										</button>
+									</div>
+								</div>
+								</form>
+								
+								<div id="category_content_tpl" style="display: none;">
+									<div class="form-group">
+										<div class="col-sm-2">
+											<label>模板类型：</label>
+											<div class="pos-rel">
+												<input  name="tplTypeIds" value="" class="col-xs-12" type="text" placeholder="模板类型" required=""/>
+											</div>
+										</div>
+										<div class="col-sm-2">
+											<label>栏目模板id：</label>
+											<div class="pos-rel">
+												<input  name="categoryTplIds"  class="col-xs-12" type="text" placeholder="栏目模板id" required=""/>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<label>栏目url规(首页)：</label>
+											<div class="pos-rel">
+												<input  name="channeIndexUrlRules" class="typeahead scrollable" type="text" placeholder="栏目url规" required=""/>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<label>栏目url规(分页)：</label>
+											<div class="pos-rel">
+												<input  name="categoryPageUrlRules" class="typeahead scrollable" type="text" placeholder="栏目url规" required=""/>
+											</div>
+										</div>
+										<div class="col-sm-2">
+											<label>附属于模板类型：</label>
+											<div class="pos-rel">
+												<input  name="attachedToTplTypeIds" class="col-xs-12" type="text" placeholder=""/>
+											</div>
+										</div>
+										<div class="col-sm-2">
+											<label>文章模板id：</label>
+											<div class="pos-rel">
+												<input  name="contentTplIds" class="col-xs-12" type="text" placeholder="文章模板id" required=""/>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<label>文章url规则(首页)：</label>
+											<div class="pos-rel">
+												<input  name="contentIndexUrlRules" class="typeahead scrollable" type="text" placeholder="文章url规则" required=""/>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<label>文章url规则(分页)：</label>
+											<div class="pos-rel">
+												<input  name="contentPageUrlRules" class="typeahead scrollable" type="text" placeholder="文章url规则" required=""/>
+											</div>
+										</div>
+										<div class="col-sm-2">
+											<label></label>
+											<div class="pos-rel">
+												<button class="btn btn-minier btn-primary" onclick="delRow(this);">删除</button>
+											</div>
+										</div>
+									</div>
+								</div>							
+		<script type="text/javascript">
+		jQuery(function($) {
+			$("#submitbutton").click(function() {
+				if(validateForm()){
+					$.ajax({
+						type: 'POST',
+						url: "${rc.contextPath}/category/o_save.do",
+						data: $("#submitForm").serialize(),
+						dataType:'json',
+						success: function(data) {
+						if(data) {
+							//artDialog({content:'提交成功', x:'right', y:'bottom', time:'1', fixed:true});
+							alert("提交成功");
+							$('.hk-main').load(indexUrl);
+						}
+						}
+					});
+				}
+			});
+		})
+		
+		function validateForm(){
+			return true;
+		}
+		
+		function addRow(){
+			var html = $("#category_content_tpl").html();
+			
+			$("#profile4").append(html);
+		}
+		
+		function delRow(obj){
+			var tar = obj.parentNode.parentNode.parentNode;
+			if(tar.className="form-group"){
+				tar.remove();
+			}
+		}
+		
+		var zTree;
+		var setting = {
+			view: {
+				dblClickExpand: false
+			},
+			data: {
+				simpleData: {
+					enable: true
+				}
+			},
+			callback: {
+				onClick: onClick
+			}
+		};
+		
+		function onClick(e, treeId, treeNode) {
+			var zTree = $.fn.zTree.getZTreeObj("treeDemo"),
+			nodes = zTree.getSelectedNodes(),
+			v = "";
+			nodes.sort(function compare(a,b){return a.id-b.id;});
+			for (var i=0, l=nodes.length; i<l; i++) {
+				v += nodes[i].name + ",";
+			}
+			if (v.length > 0 ) v = v.substring(0, v.length-1);
+			var cityObj = $("#citySel");
+			cityObj.attr("value", v);
+			
+			v2 = "";
+			for (var i=0, l=nodes.length; i<l; i++) {
+				v2 += nodes[i].id + ",";
+			}
+			if (v2.length > 0 ) v2 = v2.substring(0, v2.length-1);
+			var parentObj = $("#parentId");
+			parentObj.attr("value", v2);
+		}
+
+		function showMenu() {
+			var cityObj = $("#citySel");
+			var cityOffset = $("#citySel").offset();
+			$("#menuContent").css({left:cityOffset.left + "px", top:cityOffset.top + cityObj.outerHeight() + "px"}).slideDown("fast");
+
+			$("body").bind("mousedown", onBodyDown);
+		}
+		function hideMenu() {
+			$("#menuContent").fadeOut("fast");
+			$("body").unbind("mousedown", onBodyDown);
+		}
+		function onBodyDown(event) {
+			if (!(event.target.id == "menuBtn" || event.target.id == "menuContent" || $(event.target).parents("#menuContent").length>0)) {
+				hideMenu();
+			}
+		}
+			
+		</script>						

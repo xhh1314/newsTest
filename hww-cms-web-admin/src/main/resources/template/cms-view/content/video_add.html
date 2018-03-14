@@ -1,0 +1,697 @@
+<script type="text/javascript">
+	var saveOrUpdateVideoUrl = "${rc.contextPath}/content/saveOrUpdateVideo.do"
+	var videoContentList = "${rc.contextPath}/content/v_list.do"
+</script>
+<!-- Modal 视频内容-添加-->
+<div class="modal-dialog modal-lg" role="document" style="width: 80%">
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+				aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+			<h5 class="modal-title">
+				<span class="glyphicon glyphicon-file"></span> <span>添加数据</span>
+			</h5>
+		</div>
+		<div class="modal-body">
+			<form id="videoform" name="videoform" class="form-horizontal">
+				<div class="row">
+					<div class="col-md-8" style="height: 700px;">
+						<div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label">标题</label>
+							<div class="col-sm-10">
+								<input type="text" name="title" id="video_add_title"
+									value="<#if r??>${r.title!}</#if>" class="form-control"
+									placeholder="标题">
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label">摘要</label>
+							<div class="col-sm-10">
+								<textarea class="form-control" id="video_add_summary"
+									name="summary" placeholder="摘要" cols="30" rows="5"></textarea>
+							</div>
+						</div>
+						<textarea id="videoContentTextarea" style="display: none"
+							name="content">
+					 		</textarea>
+						<div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label">内容</label>
+							<div class="col-sm-10">
+								<div id="videoContentEditor">
+									<#if contentData??> ${contentData.content!} </#if>
+								</div>
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label"></label>
+							<div class="col-sm-10" id="video_img_list_add"
+								style="height: 200px; overflow: auto"></div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label">封面 </label>
+							<div class="col-sm-10">
+								<input id="modalvideo_add_filecover" type="file" name="myfile"
+									multiple="multiple"> <input type="hidden"
+									name="thumbUrl" id="videothumbUrl"> <input
+									type="hidden" id="thumbIds" name="thumbIds">
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label">上传视频</label>
+							<div class="col-sm-10">
+								<input id="modalvideo_add_filevideo" name="videofiles"
+									type="file"> <input type="hidden" id="attachmentIds"
+									name="attachmentIds">
+							</div>
+						</div>
+
+						<div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label"></label>
+							<div class="col-sm-10">
+								<section id="player">
+									<video id="media" src="" width="500px" height="300px" controls>
+
+									</video>
+								</section>
+							</div>
+
+						</div>
+						<div class="form-group form-group-sm">
+
+							<label class="col-sm-2 control-label">时长(分钟:秒)：</label>
+							<div class="col-sm-6">
+								<input id="videoLength" name="videoLength" type="text">
+								<button id="getTimeByVideo" data-action="" type="button"
+									class="btn btn-info btn-sm">获取时长</button>
+							</div>
+						</div>
+
+					</div>
+
+					<div class="col-md-4">
+						<div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label">新闻标题</label>
+							<div class="col-sm-10">
+								<p class="form-control-static">
+									<#if (news.top)??> <#if news.top==0>否</#if> <#if 
+										news.top==1>是</#if> <#else>否</#if>
+								</p>
+							</div>
+						</div>
+						<div class="form-group form-group-sm" style="margin-left: 15px;">
+							<div class="col-sm-5 input-group input-group-sm">
+								<span class="input-group-addon">新闻类型</span> <select
+									id="contentTypeId" name="contenttypeId" class="form-control">
+									<option value="6">视频</option>
+								</select>
+							</div>
+						</div>
+						<!-- <div class="form-group form-group-sm" style="margin-left: 15px;">
+							<div class="col-sm-5 input-group input-group-sm">
+								<span class="input-group-addon">选择审核流程</span> <select
+									id="auditFlowId_video" name="auditFlowId" class="form-control">
+									<option value="-1">...请选择...</option>
+									<#if auditList??> <#list auditList as a>
+									<option value="${a.flowId}">${a.flowName}</option>
+									</#list> </#if>
+								</select>
+							</div>
+						</div> -->
+						<div class="form-group form-group-sm" style="margin-left: 15px;">
+							<div class="col-sm-5 input-group input-group-sm">
+								<span class="input-group-addon">选择来源</span> <select
+									id="auditFlowId_tuji" name="originId" class="form-control">
+									<#if originList??> <#list originList as s>
+									<option value="${s.originId}"><#if s.originName??>${s.originName}</#if></option>
+									</#list> </#if>
+								</select>
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label">来源链接</label>
+							<div class="col-sm-10">
+								<input type="text" id="video_add_origin_url" name="originUrl"
+									class="form-control" placeholder="来源链接">
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label">是否置顶</label>
+							<div class="col-sm-10">
+								<#if (r.top)??> <#if r.top==0> <input
+									type="radio" value="1" name="top" id="enable" />是 <input
+									type="radio" value="0" name="top" id="disable"
+									checked="checked" />否 </#if> <#if r.top==1> <input
+									type="radio" value="1" name="top" id="enable" checked="checked" />是
+								<input type="radio" value="0" name="top" id="disable" />否 </#if> <#else>
+								<input type="radio" value="1" name="top" id="enable" />是 <input
+									type="radio" value="0" name="top" id="disable"
+									checked="checked" />否 </#if>
+							</div>
+						</div>
+
+						<div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label">显示位置</label>
+							<div class="col-sm-10">
+								<input type="number" min="1" max="20" id="video_add_manuallySortNum"
+									name="manuallySortNum"
+									value="<#if  r??>${r.manuallySortNum!}</#if>"
+									class="form-control" placeholder="在列表中显示的位置(1-20)，可不填">
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label">推荐权重</label>
+							<div class="col-sm-10">
+								<input type="number" min="1" max="10" id="video_add_priority" name="priority"
+									value="<#if  r??>${r.priority!}</#if>" class="form-control"
+									placeholder="推荐权重(1-10)">
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label">作者</label>
+							<div class="col-sm-10">
+								<input type="text" id="video_add_author" name="author"
+									value="<#if r??>${r.author!}</#if>" class="form-control"
+									placeholder="作者">
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label">关键词</label>
+							<div class="col-sm-10">
+								<input type="text" name="keywordIds" id="video_add_keywordIds"
+									value="<#if r??>${r.keywordIds!}</#if>" class="form-control"
+									placeholder="关键词">
+							</div>
+						</div>
+
+						<div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label">短标题</label>
+							<div class="col-sm-10">
+								<input type="text" name="shortTitle" id="video_add_shortTitle"
+									value="<#if r??>${r.shortTitle!}</#if>" class="form-control"
+									placeholder="短标题">
+							</div>
+						</div>
+
+						<div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label">选择位置</label>
+							<div class="col-sm-10">
+								<div class="form-group form-group-sm">
+									<div class="col-sm-3">
+										地址: <input id="videocityName" type="text" name="location"
+											style="width: 100px; margin-right: 10px;" /> <input
+											type="button" value="查询" onclick="videoMapSearch()" />
+									</div>
+									<div class="col-sm-3">
+										纬度:<input type="text" name="latitude" id="videojd"
+											value="<#if r??>${r.latitude!}</#if>" readonly="readonly" />
+									</div>
+									<div class="col-sm-3">
+										经度:<input type="text" name="longitude" id="videowd"
+											value="<#if r??>${r.longitude!}</#if>" readonly="readonly" />
+									</div>
+								</div>
+								<div style="height: 200px;" id="videomap"></div>
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label">原始分类</label>
+							<div class="col-sm-8 input-group input-group-sm">
+								<select
+									id="srcCategoryId_video" name="srcCategoryId" class="form-control">
+									<option value="-1">--请先选择分类--</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label">所属分类</label> <input
+								type="hidden" id="videocategoryIds" name="categoryIds" />
+							<div class="col-sm-10">
+								<ul id="videotreeDemo" class="ztree"
+									style="margin-top: 0; width: 260px;"></ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-info btn-sm"
+				data-dismiss="modal">
+				<span class="glyphicon glyphicon-remove"></span> 关闭
+			</button>
+			<button id="btnSaveVideo" data-action="" type="button"
+				class="btn btn-info btn-sm">
+				<span class="glyphicon glyphicon-saved"></span> 保存
+			</button>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+<!-- document.getElementById("media").duration -->
+	$("#getTimeByVideo").on('click', function() {
+		var duration = document.getElementById("media").duration;
+		if (!duration) {
+			alert("请先上传视频！");
+			return;
+		}
+		var time = parseInt(duration);
+		var str = parseInt(time / 60);
+		var s = time - str * 60;
+		if(s<10){
+			s="0"+s;
+		}
+		str = str + ":" + s;
+		$("#videoLength").val(str);
+	});
+	function drowImageAAAAAAAAAAAA(img_url, img_id) {
+		$("#video_img_list_add").children().remove();
+		if (img_url != null && img_url != "") {
+			var img_urls = img_url.split(",");
+			var img_ids = img_id.split(",");
+			for ( var i in img_urls) {
+				
+				var div = "<div id='"+img_ids[i]+"_div' class='col-sm-6 col-md-4' style='height: 180px;width: 180px;'>"
+				+ "<div align='center' style='height:180px;width: 180px;'>"
+				+"<div class='thumbnail' style='height:130px;width:130px;' >"
+				+ "<img src='"+file_upload_prefix+img_urls[i]+"' style='width:100%;height:100%;'>"
+				+"</div>"
+				+ "<div class='caption'>"
+				+ "<p style='text-align:center'><a class='btn btn-primary' id='"+img_ids[i]
+				+ "' role='button' onclick='video_img_delete_add(event);'>删除</a></p>"
+				+ " </div>" + "</div>" + "</div>";
+				
+				/* var div = "<div class='col-sm-6 col-md-4' id='"+img_ids[i]+"_div' style='height: 200px;width: 130px;'>"
+						+ "<div class='thumbnail' style='height: 130px;width: 130px;'>"
+						+ "<img src='"+file_upload_prefix+img_urls[i]+" 'id='"+img_ids[i]+"_img'>"
+						+ "<div class='caption'>"
+						+ "<p style='text-align:center'><a class='btn btn-primary' id='"
+						+ img_ids[i]
+						+ "' onclick='video_img_delete_add(event);' role='button'>删除</a></p>"
+						+ "</div>" + "</div>" + "</div>"; */
+				$("#video_img_list_add").append(div);
+			}
+		}
+	}
+	function video_img_delete_add(event) {
+		var id = event.target.id + "";
+		$("#" + id + "_div").remove();
+		var logoIdsChange = $("#thumbIds").val();
+		var logoUrlsChange = $("#videothumbUrl").val();
+
+		var urlArray = logoUrlsChange.split(",");
+		var idArray = logoIdsChange.split(",");
+		var logoIdsChange_new = "";
+		var logoUrlsChange_new = "";
+		for (var i = 0; i < idArray.length; i++) {
+			if (idArray[i] != id) {
+				logoIdsChange_new = logoIdsChange_new + idArray[i] + ",";
+				logoUrlsChange_new = logoUrlsChange_new + urlArray[i] + ",";
+			}
+		}
+		logoIdsChange_new = logoIdsChange_new.substr(0,
+				logoIdsChange_new.length - 1);
+		logoUrlsChange_new = logoUrlsChange_new.substr(0,
+				logoUrlsChange_new.length - 1);
+		$("#thumbIds").val(logoIdsChange_new);
+		$("#videothumbUrl").val(logoUrlsChange_new);
+	}
+	var video_add_page = {
+		/* ueditorInit:function(){
+			//命名形式：ue_模态框_内容类型_操作类型(如：ue_modal_video_edit代表视频编辑模态框下的ueditor编辑器)
+			var ue_modal_imgtext_add = UE.getEditor('ue_modal_imgtext_add');
+			var ue_modal_imgtext_edit = UE.getEditor('ue_modal_imgtext_edit');
+			var ue_modal_video_add = UE.getEditor('ue_modal_video_add');
+			var ue_modal_video_edit = UE.getEditor('ue_modal_video_edit');
+		} */
+		//wangEditor 控件实例演示
+		wangEditorInit : function() {
+			var editor = new wangEditor('#videoContentEditor');
+			editor.customConfig.uploadFileName = 'myfile'
+			editor.customConfig.uploadImgServer = img_upload_url;//图片服务器上传路径
+			editor.customConfig.onchange = function(html) {
+				// 监控变化，同步更新到 textarea
+				$('#videoContentTextarea').val(html)
+			}
+			editor.customConfig.uploadImgHooks = {
+				success : function(xhr, editor, result) {
+					// 图片上传并返回结果，图片插入成功之后触发
+				},
+				// （但是，服务器端返回的必须是一个 JSON 格式字符串！！！否则会报错）
+				customInsert : function(insertImg, result, editor) {
+					if (result) {
+						var url = result.urls;
+						url = file_show_prefix + url;
+						insertImg(url)
+					}
+				}
+			}
+			editor.create();
+
+		},
+		//表单校验
+		formValidate : function() {
+			var zTreeO = $.fn.zTree.getZTreeObj("videotreeDemo");
+			var nodeIds = zTreeO.getCheckedNodes(true);
+			if (nodeIds == null || nodeIds.length == 0) {
+				alert("至少选择一个所属分类!");
+				return false;
+			}
+			if ($.trim($("#video_add_title").val()) == null
+					|| $.trim($("#video_add_title").val()).length == 0) {
+				alert("请填写标题!");
+				return false;
+			}
+			if ($.trim($("#video_add_summary").val()) == null
+					|| $.trim($("#video_add_summary").val()).length == 0) {
+				alert("请填写摘要!");
+				return false;
+			}
+			if ($.trim($("#video_add_keywordIds").val()) == null
+					|| $.trim($("#video_add_keywordIds").val()).length == 0) {
+				alert("请填关键词!");
+				return false;
+			}
+			if ($.trim($("#video_add_shortTitle").val()) == null
+					|| $.trim($("#video_add_shortTitle").val()).length == 0) {
+				alert("请填短标题!");
+				return false;
+			}
+			if ($.trim($("#videojd").val()).length == 0
+					|| $.trim($("#videowd").val()).length == 0) {
+				alert("请选择位置!");
+				return false;
+			}
+			
+			if ($("#srcCategoryId_video").val() == -1) {
+				alert("请选择原始分类!");
+				return false;
+			}
+			/* if ($("#auditFlowId_video").val() == -1) {
+				alert("请选择审核流程!");
+				return false;
+			} */
+			/* if ($.trim($("#video_add_author").val()).length == 0) {
+				alert("请输入作者名!");
+				return false;
+			} */
+			if ($.trim($("#videoLength").val()).length == 0) {
+				alert("请输入视频时长!");
+				return false;
+			}
+			var sortNum = $("#video_add_manuallySortNum").val();
+			if (sortNum) {
+				if (sortNum<1||sortNum>20) {
+					alert("列表显示位置必须是1-20");
+					return false;
+				}
+			}
+			var priority=$("#video_add_priority").val();
+			if(priority){
+				if(priority<1||priority>10){
+					alert("推荐权重必须是1-10");
+					return false;
+				}
+			}else{
+				$("#video_add_priority").val("1");
+			}
+			
+			return true;
+		},
+		loadMenu : function(resourceType, treeObjId, setting) {
+			//$.fn.zTree.init($("#" + treeObjId), setting, null);
+			$.ajax({
+				type : "POST",
+				url : resourceType,
+				dataType : "json",
+				success : function(data) {
+					// 如果返回数据不为空，加载"业务模块"目录
+					if (data != null) {
+						// 将返回的数据赋给zTree
+						zTree = $.fn.zTree.init($("#" + treeObjId), setting,
+								data);
+						if (zTree) {
+							// 默认展开所有节点
+							zTree.expandAll(true);
+							//如果是编辑，选中节点
+							var treeNodeId = '<#if r??>${r.categoryId!}</#if>';
+							if (treeNodeId != '') {
+								var nodes = zTree.getNodesByParam("id",
+										treeNodeId, null);
+								if (nodes.length > 0) {
+									for (var i = 0; i < nodes.length; i++) {
+										nodes[i].checked = true;
+										zTree.updateNode(nodes[i]); //重要
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+		}
+	};
+
+	function filter(node) { //过滤器直选中2级节点累加 
+		return (node.checked == true);
+	}
+
+	function ztreeCheck(e, treeId, treeNode) { //这是将所有选中节点的名字 用,分割做拼接 用于持久化到数据库 
+		//console.info(treeNode.tId + ", " + treeNode.name + "," + treeNode.checked);
+		var zTreeObj = $.fn.zTree.getZTreeObj(treeId);
+		var zTree = zTreeObj.getNodesByFilter(filter);
+		var choose = "";
+		var idListStr = "";
+		var div="";
+		if(zTree.length>0){
+			div=div+"<option value='-1'>--请选择--</option>";
+		}else{
+			div=div+"<option value='-1'>--请先选择分类--</option>";
+		}
+		for (var i = 0; i < zTree.length; i++) {
+			if (zTree[i].name != null) {
+				choose += (i == (zTree.length - 1)) ? zTree[i].name
+						: zTree[i].name + ",";
+			}
+			if (zTree[i].id != null) {
+				idListStr += (i == (zTree.length - 1)) ? zTree[i].id
+						: zTree[i].id + ",";
+			}
+			div=div+"<option value='"+zTree[i].id+"'>"+zTree[i].name+"</option>"
+		}
+		$("#srcCategoryId_video").children().remove();
+		$("#srcCategoryId_video").append(div);
+		//设值
+		$("#videocategoryIds").attr('value', idListStr);
+	}
+
+	var setting = {
+		check : {
+			enable : true,
+			chkStyle : "checkbox",
+			chkboxType : {
+				"Y" : "",
+				"N" : ""
+			}
+		},
+		callback : {
+			onCheck : ztreeCheck
+		},
+
+		data : {
+			simpleData : {
+				enable : true,
+				idKey : "id",
+				pIdKey : "pId",
+				rootPId : 0
+			}
+		}
+	};
+	/*********新闻分类树end***********/
+
+	function videofileInputInit() {
+		//上传封面
+		$('#modalvideo_add_filecover').fileinput({
+			language : 'zh',//语言中文
+			msgPlaceholder:"选择封面图片...",
+			showCaption : true,//文本框
+			showPreview : false,//预览
+			showUpload : true,//上传按钮
+			uploadAsync : false, //默认异步上传,此处改为同步
+			showClose : true,//预览框关闭按钮
+			showBrowse : true,//上传按钮
+			browseOnZoneClick : false,//点击拖拽区不上传
+			initialPreviewShowDelete : true,
+			allowedFileExtensions : [ 'jpg', 'png', 'gif' ],//允许文件类型
+			browseClass : 'btn btn-info btn-sm', //样式
+			captionClass : 'input-sm',
+			removeClass : 'btn btn-info btn-sm',
+			uploadClass : 'btn btn-info btn-sm',
+			enctype : 'multipart/form-data',
+			uploadUrl : img_upload_url,//服务器端图片接收处理路径
+		}).on("filebatchuploadsuccess",
+				function(event, data, previewId, index) {
+					//同步上传返回结果处理
+					console.info(data.response);
+					if (data.response) {
+						var obj = data.response;
+						var urls = obj.urls;
+						var ids = obj.ids;
+						var oldUrl = $("#videothumbUrl").val();
+						var oldIds = $("#thumbIds").val();
+						if (oldUrl != "") {
+							oldUrl = oldUrl + "," + urls;
+						} else {
+							oldUrl = urls;
+						}
+						if (oldIds != "") {
+							oldIds = oldIds + "," + ids;
+						} else {
+							oldIds = ids;
+						}
+						$("#videothumbUrl").val(oldUrl);
+						$("#thumbIds").val(oldIds);
+						drowImageAAAAAAAAAAAA(oldUrl, oldIds);
+					}
+				});
+
+		//上传视频
+		$('#modalvideo_add_filevideo')
+				.fileinput({
+					language : 'zh',//语言中文
+					msgPlaceholder:"选择视频文件...",
+					showCaption : true,//文本框
+					showPreview : false,//预览
+					showUpload : true,//上传按钮
+					uploadAsync : false, //默认异步上传,此处改为同步
+					showClose : true,//预览框关闭按钮
+					showBrowse : true,//上传按钮
+					browseOnZoneClick : false,//点击拖拽区不上传
+					initialPreviewShowDelete : true,
+					allowedFileExtensions : [ 'ogg', 'mp4', 'webm' ],//允许文件类型
+					browseClass : 'btn btn-info btn-sm', //样式
+					captionClass : 'input-sm',
+					removeClass : 'btn btn-info btn-sm',
+					uploadClass : 'btn btn-info btn-sm',
+					enctype : 'multipart/form-data',
+					maxFileCount : 1,
+					uploadUrl : video_upload_url,//视频上传路径
+				})
+				.on("filebatchuploadsuccess",
+						function(event, data, previewId, index) {
+							//同步上传返回结果处理
+							if (data.response) {
+								var obj = data.response;
+								var urls = obj.urls;
+								var ids = obj.ids;
+								$("#attachmentIds").attr('value', ids);
+								document.getElementById("media").src = file_upload_prefix + urls;
+								document.getElementById("media").load();
+								/* document.getElementById("media").ondurationchange(function(){
+									var tol = document.getElementById("media").duration;//获取总时长
+									alert("时长："+tol);
+								}); */
+							}
+						}
+				)
+				.on("filebatchselected", function(event, files) {
+				});
+	}
+
+	
+	
+	var videolocal;
+	$(function() {
+		//video_add_page.ueditorInit();
+		video_add_page.wangEditorInit();
+		videofileInputInit();
+		video_add_page.loadMenu(
+				"${rc.contextPath}/category/allCategoryJson.do?status=1",
+				"videotreeDemo", setting);
+		var map = new BMap.Map("videomap");
+		var point = new BMap.Point(116.331398, 39.897445);
+		map.centerAndZoom(point, 11);
+		map.addEventListener("click", function(e) {
+			
+			/* $("#videowd").attr("value", e.point.lng);
+			$("#videojd").attr("value", e.point.lat); */
+			$("#videowd").val( e.point.lng);
+			$("#videojd").val(e.point.lat);
+			 searchAddress_video();
+		});
+		map.enableScrollWheelZoom();
+		map.addControl(new BMap.NavigationControl());
+		videolocal = new BMap.LocalSearch(map, {
+			renderOptions : {
+				map : map
+			}
+		});
+	});
+function searchAddress_video(){
+		
+		var lon=$("#videowd").val();
+		var lat=$("#videojd").val();
+		$.ajax({
+			url:"content/apiAddress.do",
+			data:{"longitude":lon,"latitude":lat},
+			dataType:"json",
+			type:"post",
+			success:function(data){
+				console.log(data);
+				if(data!=null){
+					$("#videocityName").val(data);
+				}
+			}
+		});	
+	}
+	
+	function videoMapSearch() {
+		var city = $("#videocityName").val();
+		if (city != "") {
+			videolocal.search(city);
+		}
+	}
+	//视频添加
+	$("#btnSaveVideo").on('click', function() {
+		if($("#videoLength").val()==null){
+			alert("请校验视频时长！");
+			return;
+		}
+		var validated = video_add_page.formValidate();
+		if (validated == false) {
+			return false;
+		}
+		/* //先上传封面,回调成功再往下执行
+		$('#modalvideo_add_filecover').fileinput('upload');
+		//上传视频
+		$('#modalvideo_add_filevideo').fileinput('upload'); */
+		cotent_save();
+	});
+	function cotent_save() {
+		document.getElementById("btnSaveVideo").disabled = false;
+		$.ajax({
+			type : "POST",
+			data : $("#videoform").serialize(),
+			dataType : "json",
+			url : saveUrl,
+			success : function(data) {
+				if (data.status == 200) {
+					alert(data.message);
+					$modalInfoVideo.modal('hide');
+				} else {
+					alert(data.message);
+					$modalInfoVideo.modal('hide');
+				}
+				document.getElementById("btnSaveVideo").disabled = true;
+			},
+			error : function(e) {
+				alert("异常！");
+				document.getElementById("btnSaveVideo").disabled = true;
+			}
+
+		});
+
+	}
+</script>

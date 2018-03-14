@@ -1,0 +1,24 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hww</groupId>
+		<artifactId>hww-parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../hww-parent/pom.xml</relativePath>
+	</parent>
+
+	<groupId>com.hww.cms</groupId>
+	<artifactId>hww-cms</artifactId>
+	<packaging>pom</packaging>
+	
+	<modules>
+		<module>../hww-cms-common</module>
+		<module>../hww-cms-web-admin</module>
+		<module>../hww-cms-common-dto</module>
+		<module>../hww-cms-web-service</module>
+		<module>../hww-cms-api</module>
+	</modules>
+
+</project>

@@ -1,0 +1,126 @@
+
+	<!-- <li class="active open"><a href="javascript:void(0)"
+		class="dropdown-toggle"> <i class="menu-icon fa fa-desktop"></i> <span
+			class="menu-text"> 控制台 </span> <b class="arrow fa fa-angle-down"></b>
+	</a> <b class="arrow"></b>
+		<ul class="submenu">
+			<li class="active"><a href="javascript:void(0)"
+				data-href="${rc.contextPath}/console.do"> <i class="menu-icon fa fa-caret-right"></i>
+					控制台
+			</a> <b class="arrow"></b></li>
+		</ul></li> -->
+	<li class=""><a href="" class="dropdown-toggle"> <i
+			class="menu-icon glyphicon glyphicon-th-large"></i> <span
+			class="menu-text"> 板块管理 </span> <b class="arrow fa fa-angle-down"></b>
+	</a> <b class="arrow"></b>
+		<ul class="submenu">
+			<li><a href="javascript:void(0)"
+				data-href="${rc.contextPath}/sns/forum/list.do"> <i
+					class="menu-icon fa fa-caret-right"></i> 板块管理
+			</a> <b class="arrow"></b></li>
+		</ul></li>
+	<!-- <li class=""><a href="" class="dropdown-toggle"> <i
+			class="menu-icon glyphicon glyphicon-duplicate"></i> <span
+			class="menu-text"> 板块管理 </span> <b class="arrow fa fa-angle-down"></b>
+	</a> <b class="arrow"></b>
+		<ul class="submenu">
+			<li><a href="javascript:void(0)"
+				data-href="${rc.contextPath}/sns/forum/list.do"> <i
+					class="menu-icon fa fa-caret-right"></i> 板块管理
+			</a> <b class="arrow"></b></li>
+		</ul>
+	</li> -->
+	<li class="">
+						<a href="" class="dropdown-toggle">
+							<i class="menu-icon glyphicon glyphicon-edit"></i>
+							<span class="menu-text">
+								社交数据审核
+							</span>
+							<b class="arrow fa fa-angle-down"></b>
+						</a>
+						<b class="arrow"></b>
+						<ul class="submenu">
+							<li>
+								<a href="javascript:void(0)" class="dropdown-toggle"
+									data-href="${rc.contextPath}/sns/topic/freshnews_audit_list.do">
+									<i class="menu-icon fa fa-caret-right"></i>
+									主题审核
+								</a>
+								<b class="arrow"></b>
+							</li>
+							<li>
+								<a href="javascript:void(0)" class="dropdown-toggle"
+									data-href="${rc.contextPath}/sns/post/freshnews_post_audit_list.do">
+									<i class="menu-icon fa fa-caret-right"></i>
+									评论审核
+									<b class="arrow fa fa-angle-down"></b>
+								</a>
+								<b class="arrow"></b>
+							</li>
+						</ul>
+	</li>
+	<li class=""><a href="" class="dropdown-toggle"> <i
+			class="menu-icon glyphicon glyphicon-warning-sign"></i> <span
+			class="menu-text"> 敏感词管理 </span> <b class="arrow fa fa-angle-down"></b>
+	</a> <b class="arrow"></b>
+		<ul class="submenu">
+			<li><a href="javascript:void(0)"
+					data-href="${rc.contextPath}/sns/senstive/senstiveword_list.do?wordType=0"> 
+					<i class="menu-icon fa fa-caret-right"></i>敏感词 
+			</a> <b class="arrow"></b></li>
+			<li><a href="javascript:void(0)"
+					data-href="${rc.contextPath}/sns/senstive/filterword_list.do?wordType=1"> 
+					<i class="menu-icon fa fa-caret-right"></i>过滤词 
+			</a> <b class="arrow"></b></li>
+		</ul></li>
+	<!-- <li class=""><a href="" class="dropdown-toggle"> <i
+			class="menu-icon glyphicon glyphicon-signal"></i> <span
+			class="menu-text"> 统计管理 </span> <b class="arrow fa fa-angle-down"></b>
+	</a> <b class="arrow"></b>
+		<ul class="submenu">
+			<li><a href="javascript:void(0)"
+				data-href="${rc.contextPath}/sns/news/follow/news_follow_list.do"> 
+				<i class="menu-icon fa fa-caret-right"></i> 推荐数据查询
+			</a> <b class="arrow"></b></li>
+		</ul></li> -->
+	<script type="text/javascript">
+		
+		var pageMethods = {
+			init : function() {
+				$('.submenu li a').click(
+						function(event) {
+							var $allLi = $('.submenu li');
+							var $this = $(this);
+							//iframe src跳转
+							var url = $this.attr('data-href');
+							if (url) {
+								$('.hk-main').load(url);
+								/* $.ajax({
+									  type: 'POST',
+									  url: url,
+									  async: true,   // 是否异步
+									  contentType: 'application/x-www-form-urlencoded',
+									  data: null,
+									  dataType: 'text', // 返回请求的类型，有text/json两种
+									  success: function(data){
+										  $('.hk-main').html(data);
+									  },
+								}); */
+
+								//激活状态更新
+								$allLi.removeClass('active');
+								$this.parentsUntil('.submenu', 'li').addClass(
+										'active');
+							}
+						});
+			}
+		};
+		$(function($) {
+			pageMethods.init();
+			var consoleUrl = "${rc.contextPath}/console.do";
+			$('.hk-main').load(consoleUrl);
+		});
+		function loadMain(url,data){
+			$('.hk-main').load(url,data);
+		}
+	</script>

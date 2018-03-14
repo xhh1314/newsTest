@@ -1,0 +1,204 @@
+<script type="text/javascript">
+    var updateOriginUrl = "${rc.contextPath}/origin/update.do";
+    var saveOriginUrl = "${rc.contextPath}/origin/save.do";
+</script>
+<div class="modal-dialog" role="document">
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+			<h5 class="modal-title" id="myModalLabel">
+				<span class="glyphicon glyphicon-file"></span> <span id="modalTite"></span>
+			</h5>
+		</div>
+		<div class="modal-body">
+			<form class="form-horizontal" id="originForm">
+				<div class="form-group form-group-sm">
+					<label for="inputEmail3" class="col-sm-2 control-label">来源名称</label>
+					<div class="col-sm-10">
+						<input type="hidden" id="originId" name="originId" value="<#if entity??>${entity.originId?c}</#if>">
+						<input type="text" class="form-control" placeholder="来源名称" name="originName"  id="originName" value="<#if entity??>${entity.originName!}</#if>">
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<label for="inputEmail3" class="col-sm-2 control-label">来源路径</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" placeholder="来源路径" name="originUrl" id="originUrl" value="<#if entity??>${entity.originUrl!}</#if>">
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<label for="inputEmail3" class="col-sm-2 control-label">来源链接</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" placeholder="来源链接" name="link" id="link" value="<#if entity??>${entity.link!}</#if>">
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<label for="inputEmail3" class="col-sm-2 control-label">文字</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" placeholder="文字" name="word" id="word" value="<#if entity??>${entity.word!}</#if>">
+					</div>
+				</div>
+				<!-- <div class="form-group">
+					<div class="form-group form-group-sm">
+					    <label  class="col-sm-2 control-label">图标</label>
+						<div class="col-sm-10">
+							<input id="add_logo" type="file" name="myfile" multiple="multiple">
+							<input type="hidden" id="icon" name="icon"/>
+						</div> 
+					</div> 
+				</div> -->
+				<div class="form-group form-group-sm">
+					<label for="inputEmail3" class="col-sm-2 control-label">状态</label>
+					<div class="col-sm-10">
+						<#if entity??>
+							<#if entity.status==0>
+								<input type="radio" value="1"  name="status" id="enable"/>正常
+								<input type="radio" value="0" name="status" id="disable" checked="checked"/>冻结
+							</#if>
+							<#if entity.status==1>
+								<input type="radio" value="1"  name="status" id="enable" checked="checked"/>正常
+								<input type="radio" value="0" name="status" id="disable"/>冻结
+							</#if>
+							<#else>
+								<input type="radio" value="1"  name="status" id="enable" checked="checked"/>正常
+								<input type="radio" value="0" name="status" id="disable"/>冻结
+						</#if>
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-info btn-sm" data-dismiss="modal">
+				<span class="glyphicon glyphicon-remove"></span> 关闭
+			</button>
+			<button id="btnSave" data-action="" type="button"
+					class="btn btn-info btn-sm">
+				<span class="glyphicon glyphicon-saved"></span> 保存
+			</button>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+
+//上传封面
+	$('#add_logo').fileinput({
+		language:'zh',//语言中文
+		showCaption:true,//文本框
+		showPreview:false,//预览
+		showUpload:true,//上传按钮
+		uploadAsync: false, //默认异步上传,此处改为同步
+		showClose:true,//预览框关闭按钮
+		showBrowse:true,//上传按钮
+		browseOnZoneClick:false,//点击拖拽区不上传
+		initialPreviewShowDelete:true,
+		allowedFileExtensions:['jpg','png','gif'],//允许文件类型
+		browseClass:'btn btn-info btn-sm', //样式
+		captionClass:'input-sm', 
+		removeClass:'btn btn-info btn-sm',
+		uploadClass:'btn btn-info btn-sm',
+		enctype: 'multipart/form-data',
+		maxFileCount:1,
+		uploadUrl:img_upload_url,//服务器端图片接收处理路径
+	}).on("filebatchuploadsuccess", function (event, data, previewId, index) {
+		 //同步上传返回结果处理
+			console.info(data.response);
+			if (data.response) {
+				  var obj = data.response;
+				  var urls = obj.urls;
+				  var ids = obj.ids;
+			      $("#icon").val(urls);
+			}
+	  });
+
+	//信息表单模态框
+	var $modalInfo = $('#modalInfo');
+	var $modalInfoTitle = $modalInfo.find('#modalTite');
+	
+	$modalInfo.modal({
+		backdrop:'static',
+		keyboard:false,
+		show:false
+	});		
+	
+	//选中
+	var currentparentid = null;
+	<#if category??>
+		currentparentid = "${category.parentId!'null'}";
+    </#if>;
+	//载入页面加载分类下拉列表
+	/* loadCategorys();
+	
+	function loadCategorys(){
+		$.ajax({
+		    type:"GET",
+		    dataType:"json",
+		    url:listAllUrl,
+		    success:function(data){
+		    	var optionstring = "";
+		    	//if(currentCategory!=null){
+		    		//选中当前父类
+		    		//$("#parentCategory").val(currentCategory);
+		    		//$('#parentCategory option:eq(currentCategory)').attr('selected','selected');
+		    	//}
+		    	for(var i in data){
+		    		if(currentparentid!=null){
+		    			if(data[i].categoryId==currentparentid){
+		        			optionstring+="<option value='"+data[i].categoryId+"' selected='selected'>"+data[i].categoryName+"</option>";
+		        			continue;
+		        		}
+		    		}
+		        	optionstring+="<option value='"+data[i].categoryId+"'>"+data[i].categoryName+"</option>";
+		        }
+		    	//默认留空为主分类
+		    	$("#parentCategory").html("<option value='' selected='selected'>请选择</option>"+optionstring);
+		        
+		    }
+		});
+	} */
+	
+	$("#btnSave").on('click',function(){
+		
+		//ajax提交
+		/* if(!$("#icon").val()){
+			alert("请上传图片！");
+			return false;
+		}
+		 */	 
+		 if(!$("#originName").val()){
+				alert("请填写来源名称！");
+				return false;
+			}
+		 if(!$("#originUrl").val()){
+				alert("请填写来源地址！");
+				return false;
+			}
+		 if(!$("#link").val()){
+				alert("请填写链接！");
+				return false;
+			}
+		 if(!$("#word").val()){
+				alert("请填写一段文字内容！");
+				return false;
+			}
+		var originId=$("#originId").val();
+		var url=null;
+		if (originId==null ||  originId=="") {
+			url= saveOriginUrl;
+		}else{
+			url=updateOriginUrl;
+		}
+		
+
+		$.ajax({
+		    type:"POST",
+		    data:$("#originForm").serialize(),
+		    dataType:"json",
+		    url:url,
+		    success:function(data){
+                $modalInfo.modal('hide');//手动关闭模态框
+		    }
+		});
+	});
+</script>

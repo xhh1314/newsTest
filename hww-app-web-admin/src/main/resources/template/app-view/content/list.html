@@ -1,0 +1,435 @@
+
+<script type="text/javascript">
+	var editUrl = "${rc.contextPath}/content/v_edit.do";
+	var deleteUrl = "${rc.contextPath}/content/o_delete.do";
+	//本页面
+	var indexUrl = "${rc.contextPath}/content/v_list.do";
+	var saveUrl = "${rc.contextPath}/content/o_save.do";
+	var updateUrl="${rc.contextPath}/content/o_update.do";
+	//新闻审核详情
+    var newsAuditDetailUrl = "${rc.contextPath}/audit/news_audit_detail.do";
+  	//新闻内容详情
+	var getNewsDetailUrl = "${rc.contextPath}/content/detail.do";
+</script>
+<#setting number_format="#">
+
+	
+<div class="row">  
+<div class="col-sm-2">
+<div id="treeWrap_v" class="tree-wrap hk-scrollbar" style="height: 100%; ">
+			      		<ul id="treeDemo_v" class="ztree"></ul>
+			      	</div>
+			      	</div>
+<div class="col-sm-10">	
+<form name="searchform" id="searchform" class="form-inline hk-search">
+	<div class="row">
+		<div class="col-sm-2 col-xs-6">
+			<input type="text" name="title" value="${form.title!}" class="form-control input-sm" placeholder="标题">
+		</div>
+		<div class="col-sm-2 col-xs-6">
+			<input type="text" name="summary" value="${form.summary!}" class="form-control input-sm" placeholder="摘要">
+		</div>
+		<div class="col-sm-2 col-xs-6">
+			<input type="text"  id="categoryName" name="categoryName" value="${form.categoryName!}"   class="form-control input-sm">
+			<input type="hidden" name="categoryId" value="${form.categoryId!}" id="categoryId">
+		</div>
+		<div class="col-sm-2  col-xs-6">
+			<div class="input-group input-group-sm">
+				<span class="input-group-addon">新闻类型</span> <select id="contentTypeId" name="contenttypeId"
+					class="form-control">
+					<option value="0">全部</option>
+					<#list typeList as type>
+					<#if type.contentTypeName!='焦点'>
+						<option value="${type.contentTypeId}">${type.contentTypeName}</option>
+					</#if>
+					</#list>
+				</select>
+			</div>
+		</div>
+		<div class="col-sm-2  col-xs-6">
+			<div class="input-group input-group-sm">
+				<span class="input-group-addon" id="basic-addon3">审核状态</span> 
+				<select class="form-control" id="auditStatus" name="auditStatus">
+					<option value="" >全部</option>
+					<option value="0" >待审核</option>
+					<option value="1" >已审核</option>
+				</select>
+			</div>
+		</div>
+		<div class="col-sm-2  col-xs-6">
+			<button id="btnSearch" type="button" onclick="jumpNormalPage(${page.pageNo})" class="btn btn-info btn-sm">
+				<span class="glyphicon glyphicon-search"></span> <span>搜索</span>
+			</button>
+		</div>
+	</div>
+</form>		      	
+<div class="hk-toolbar">
+	<div class="btn-group btn-group-sm">
+		<button type="button" class="btn btn-default">
+			<span class="glyphicon glyphicon-th-list"></span> 操作
+		</button>
+		<button type="button" class="btn btn-default dropdown-toggle"
+			data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<span class="caret"></span>
+		</button>
+		<!-- <button id="linkAddItemImgtext" type="button" class="btn btn-default" style="margin-left:10px">
+				  		<span
+					class="glyphicon glyphicon-list-alt"></span> 添加图文内容
+		</button>
+		<button id="linkAddItemImgset" type="button" class="btn btn-default" style="margin-left:10px">
+				  		<span
+					class="glyphicon glyphicon-picture"></span> 添加图集内容
+		</button> -->
+		<button id="linkAddItemVideo" type="button" class="btn btn-default" style="margin-left:10px">
+				  		<span
+					class="glyphicon glyphicon-film"></span> 添加
+		</button>
+		<ul class="dropdown-menu">
+			<!--  <li role="separator" class="divider"></li> -->
+			<li><a id="linkDelItems" href="#"><span
+					class="glyphicon glyphicon-remove"></span> 批量删除</a></li>
+		</ul>
+	</div>
+</div>
+<table class="table table-hover table-bordered" id="table_list">
+	<thead>
+		<tr>
+			<th><input type="checkbox"  id="checkall" onclick="selectAll()"></th>
+			<th style="width:35%;">标题</th>
+			<th>内容类型</th>
+			<th>摘要</th>
+			<th>审核状态</th>
+			<th>审核详情</th>
+			<th>发布时间</th>
+			<th>操作</th>
+		</tr>
+	</thead>
+	<tbody>
+
+		<#list page.list as p>
+		<tr>
+			<td><input type="checkbox" name="newsContentCheckbox" value="${p.contentId}"></td>
+			<td>${p.title!}</td>
+			<td><#if p.contentType??>${p.contentType.contentTypeName}</#if></td>
+			<td>${p.description!}</td>
+			<td>
+				<#if p.auditStatus == 0>
+					未审核
+				</#if>
+				<#if p.auditStatus == 1>
+					已审核
+				</#if>
+			</td>
+			<td><a href="javascript:newsAuditDetail(${p.contentId})"
+				class="btn btn-info btn-xs linkTimeLine">详情</a></td>
+			<td>${p.releaseTime!}</td>
+			
+			<td>
+			<a href="javascript:linkNewsDetail(${p.contentId},<#if p.categoryId??>${p.categoryId}</#if>)" 
+			class="btn btn-info btn-xs linkNewDetail">详情</a> 
+			<a href="javascript:editItem(${p.contentId},${p.categoryId},<#if p.contentType??>${p.contentType.contentTypeId}</#if>)" 
+				class="btn btn-info btn-xs" >编辑</a> 
+			<a href="javascript:deleteItem(${p.contentId},<#if p.categoryId??>${p.categoryId}</#if>)" class="btn btn-danger btn-xs">删除</a></td>
+			
+		</tr>
+		</#list>
+	</tbody>
+</table>
+<#include "../common/page.html">  
+<!-- Modal 图文内容-->
+<div class="modal fade" id="modalInfoImgtext" tabindex="-1"
+	role="dialog" aria-labelledby="myModalLabel">
+	<#include "tuwen_add.html">
+</div>
+
+<!-- Modal 图集内容-->
+<div class="modal fade" id="modalInfoImgset" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel">
+	<#include "tuji_add.html">
+</div>
+
+<!-- Modal 视频内容-->
+<div class="modal fade" id="modalInfoVideo" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel">
+	<#include "video_add.html">
+</div>
+
+<!-- Modal新闻详情-图文 -->
+<div class="modal fade" id="modalNewDetailImgtext" tabindex="-1"
+	role="dialog">
+</div>
+<!-- Modal新闻详情-图集 -->
+<div class="modal fade" id="modalNewDetailImgset" tabindex="-1"
+	role="dialog">
+</div>
+<!-- Modal新闻详情-视频 -->
+<div class="modal fade" id="modalNewDetailVideo" tabindex="-1" 
+	role="dialog">
+</div>
+<!-- Modal新闻详情-通用modal -->
+<div class="modal fade" id="modalNewDetail" tabindex="-1" role="dialog">
+			
+</div>
+
+<!-- Modal审核详情 -->
+<div class="modal fade" id="modalTimeLine" tabindex="-1" role="dialog">
+</div>
+</div>
+</div>
+
+<!-- 区块：主内容区域 end --> 
+<script type="text/javascript">
+	
+	
+	var length = $("tbody tr").length;
+	//var begin = (${page.pageNo}-1)*length+1;
+	for (var i = 0; i < length; i++) {
+		$("tbody tr:eq(" + i + ") td[data-field='index']").text(i + 1);
+	}
+
+	//新闻详情模态框
+	var $modalNewDetail = $('#modalNewDetail');
+	//新闻详情模态框-图文
+	var $modalNewDetailImgtext = $('#modalNewDetailImgtext');
+	//新闻详情模态框-图集
+	var $modalNewDetailImgset = $('#modalNewDetailImgset');
+	//新闻详情模态框-视频
+	var $modalNewDetailVideo = $('#modalNewDetailVideo');
+	//审核详情模态框
+	var $modalTimeLine = $('#modalTimeLine');
+	
+	//图文内容模态框相关
+	var $modalInfoImgtext = $('#modalInfoImgtext');
+	$modalInfoImgtext.on('hidden.bs.modal', function () {
+		var currentSearchData = content_list_page.getCurrentSearchData();
+		loadMain(indexUrl,currentSearchData);
+	});
+	//图集内容模态框添加
+	var $modalInfoImgset = $('#modalInfoImgset');
+	$modalInfoImgset.on('hidden.bs.modal', function () {
+		var currentSearchData = content_list_page.getCurrentSearchData();
+		loadMain(indexUrl,currentSearchData);
+	});
+	//视频内容模态框相关
+	var $modalInfoVideo = $('#modalInfoVideo');
+	$modalInfoVideo.on('hidden.bs.modal', function () {
+		var currentSearchData = content_list_page.getCurrentSearchData();
+		loadMain(indexUrl,currentSearchData);
+	});
+	
+	//此页面
+	var content_list_page = {
+		//事件绑定
+		eventInit : function() {
+			$modalInfoImgtext.modal({
+				backdrop : 'static',//点击模态透明层不隐藏
+				keyboard : false,//键盘不控制模态框 如：esc按下模态框不消失
+				show : false
+			//实例化后默认不显示
+			});
+			
+			$modalInfoImgset.modal({
+				backdrop : 'static',
+				keyboard : false,
+				show : false
+			});
+			
+			
+			$modalInfoVideo.modal({
+				backdrop : 'static',
+				keyboard : false,
+				show : false
+			});
+			
+			$modalTimeLine.modal({
+				backdrop : 'static',
+				keyboard : false,
+				show : false
+			});
+
+			
+			$modalNewDetailImgtext.modal({
+				backdrop : 'static',
+				keyboard : false,
+				show : false
+			});
+
+			
+			$modalNewDetailImgset.modal({
+				backdrop : 'static',
+				keyboard : false,
+				show : false
+			});
+
+			
+			$modalNewDetailVideo.modal({
+				backdrop : 'static',
+				keyboard : false,
+				show : false
+			});
+			//添加一条数据 图文
+			$('#linkAddItemImgtext').on('click',function() {
+				console.info('click');
+				$modalInfoImgtext.modal('show');//模态框显示
+			});
+			//添加一条数据 图集
+			$('#linkAddItemImgset').on('click',function() {
+				$modalInfoImgset.modal('show');
+			});
+			//添加一条数据 视频
+			$('#linkAddItemVideo').on('click',function() {
+				$modalInfoVideo.modal('show');//模态框显示
+			});
+			
+		},
+		getCurrentSearchData:function(){
+			var searchData = $("#searchform").serialize()||'';
+			if(searchData!=''){
+				searchData = searchData+"&pageNo="+${page.pageNo};
+			}else{
+				searchData = "pageNo="+${page.pageNo};
+			}
+			return searchData;
+		}
+	}
+	
+	// 百度地图API功能
+
+	//备注：此处目前仅作为展示 点击详情仅显示图文类型新闻详情
+	//实际开发应根据被查看数据判断新闻类型（图文，图集，视频）以对应详情展示
+	//查看新闻内容详细 
+	function linkNewsDetail(contentId,categoryId){
+		var data = {"contentId":contentId,"categoryId":categoryId};
+		//根据新闻内容类型展示
+		$modalNewDetail.load(getNewsDetailUrl,data);
+		$modalNewDetail.modal('show');
+		//$modalNewDetailImgtext.modal('show');
+	}	
+	//查看审核详细
+	function newsAuditDetail(contentId){
+		var url = newsAuditDetailUrl + "?contentId=" + contentId;
+		//先加载页面
+		
+		var $modalTimeLine=$("#modalTimeLine")
+		
+		$modalTimeLine.load(url);
+		// $modalInfoTitle.html('审核详情');
+		$modalTimeLine.modal('show');
+		
+	}
+	
+	
+	function editItem(contentId,categoryId,contentTypeId){
+		var url = editUrl + "?contentId="+ contentId+"&categoryId="+categoryId;
+		if (contentTypeId==5) {
+			$modalNewDetailVideo.load(url);
+			$modalNewDetailVideo.modal('show');
+		}
+		else if (contentTypeId==6) {
+			$modalNewDetailVideo.load(url);
+			$modalNewDetailVideo.modal('show');
+		}else{
+			$modalNewDetailVideo.load(url);
+			$modalNewDetailVideo.modal('show');
+		}
+	}	
+	
+	//删除一条数据
+	function deleteItem(contentid,categoryid) {
+		var c = confirm("确定删除" + categoryId + "么?");
+		if (c == true) {
+			var data = {"contentId":contentid,"categoryId":categoryid};
+			$.ajax({
+				type : "POST",
+				dataType : "text",
+				data:data,
+				url : deleteUrl,
+				success : function(data, status) {
+					if (status = 'success' && data == 'true') {
+						var currentSearchData = content_list_page.getCurrentSearchData();
+						$('.hk-main').load(indexUrl,currentSearchData);
+					}
+				}
+			});
+		}
+
+	}
+	
+	//页面跳转
+	function jumpNormalPage(page) {
+		var searchData = $("#searchform").serialize()||'';
+		if(searchData!=''){
+			searchData = searchData+"&pageNo="+page;
+		}else{
+			searchData = "pageNo="+page;
+		}
+		$('.hk-main').load(indexUrl,searchData);
+		
+	}
+	//全选全不选，列表所有选中复选框选中，否则不选中
+	function selectAll() {
+		if($("#checkall").is(":checked")){
+			$("input[name='newsContentCheckbox']").each(function(){  
+	             $(this).prop("checked", true);  
+	         });  
+	    }else{  
+	    	$("input[name='newsContentCheckbox']").each(function(){  
+	             $(this).removeAttr("checked");  
+	         });  
+	    }  
+	}
+	
+	$("#auditStatus").val(${form.auditStatus!})
+	
+	$("#contentTypeId").val(${form.contenttypeId!})
+
+	$(function() {
+		content_list_page.eventInit();
+		hk.methods.elHeightComputed('#treeWrap_v',123);
+		loadlistMenu("${rc.contextPath}/category/allCategoryJson.do?", "treeDemo_v", setting);
+	});
+	function loadlistMenu(resourceType, treeObjId,setting) {
+		//$.fn.zTree.init($("#" + treeObjId), setting, null);
+		$.ajax({
+			type : "POST",
+			url : resourceType,
+			dataType : "json",
+			success : function(data) {
+				console.log(data);
+				// 如果返回数据不为空，加载"业务模块"目录
+				if (data != null) {
+					// 将返回的数据赋给zTree
+					initTree(data);
+				}
+			}
+		});
+	}
+	
+	function initTree(data){
+		var setting = {
+				callback: {
+					onClick: function(event, treeId, treeNode){
+						console.log(treeNode);
+						$("#categoryId").val(treeNode.id);
+						$("#categoryName").val(treeNode.name);
+						jumpNormalPage(${page.pageNo});
+					}
+				},
+			data : {
+				simpleData: {
+					enable: true,
+					idKey: "id",
+					pIdKey: "pId",
+					rootPId: 0
+				}
+			},
+		};
+		zTree =$.fn.zTree.init($("#treeDemo_v"), setting, data);
+		//zTree = $.fn.zTree.getZTreeObj(treeObjId);
+		if (zTree) {
+			// 默认展开所有节点
+			zTree.expandAll(true);
+		}
+	}
+
+</script>

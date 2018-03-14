@@ -1,0 +1,51 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.hww.framework</groupId>
+    <artifactId>hww-framework</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../hww-framework/pom.xml</relativePath>
+  </parent>
+
+  <groupId>com.hww.api</groupId>
+  <artifactId>hww-api-center</artifactId>
+  <packaging>jar</packaging>
+
+  <name>hww-api-center</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-eureka-server</artifactId>
+    </dependency>
+  </dependencies>
+
+
+  <build>
+    <finalName>hww-api-center</finalName>
+    <plugins>
+
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>1.5.9.RELEASE</version>
+        <configuration>
+          <mainClass>com.hww.api.center.ApiCenterApplication</mainClass>
+          <layout>ZIP</layout>
+          <project>
+          </project>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

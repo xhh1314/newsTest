@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<meta name="description" content="">
+		<meta name="keywords" content="">
+		<title id="content_title"></title>
+		<link rel="stylesheet" type="text/css" href="./static/css/i.css">
+
+		<style type="text/css">
+			.content-body img {
+				width: 100%;
+				max-height: 230px;
+			}
+			
+			.page .content .content-body {
+				max-height: 100% !important;
+			}
+			
+			.content-body video {
+				width: 100%;
+				display: block;
+				max-width: 100%;
+				/*max-height:500px;*/
+				margin: 0 auto;
+				height: auto;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="page">
+			<div class="header">
+				<a href="http://statics.haiwainet.cn/special/mobile_promotion.html">
+					<img src="./static/img/1.jpg" />
+				</a>
+			</div>
+			<div class="content">
+				<h1 class="content-title" id="content_title"></h1>
+				<p class="content-info">
+					<span id="originName"></span>
+					<span id="content_time"></span>
+				</p>
+				<p class="content-body" id="jsdplus">
+				</p>
+				<div class="content-extra">
+					<p style="text-align: right;width: 100%;">责任编辑：<span id="author"></span></p>
+					<!-- <a class="share" href="#">分享</a> -->
+				</div>
+			</div>
+			<div class="header">
+				<a href="http://statics.haiwainet.cn/special/mobile_promotion.html">
+					<img src="./static/img/2.jpg" />
+				</a>
+			</div>
+		</div>
+
+		<script type="text/javascript" src="./static/js/jquery-1.7.min.js"></script>
+		<script type="text/javascript" src="./static/js/i.js"></script>
+		<script type="text/javascript">
+			$(function() {
+				var id = getid("id");
+				$.post("cms/content/newsShareDetail.do", {
+					"id": "" + id
+				}, function(result) {
+					if(result.status == 200) {
+						var dataJson = result.data;
+						console.log(dataJson);
+						var originName = dataJson.origin.originName;
+						var filedomain = result.filedomain;
+						var title = dataJson.title;
+						var shortTitle = dataJson.shortTitle;
+						var releaseTime = dataJson.releaseTime;
+						var content = dataJson.content;
+						var author = dataJson.author;
+						var releaseTimeStr = dataJson.releaseTimeStr;
+						//var ly= dataJson.
+						$(".content-title").html(title);
+						$("#content_title").html(title);
+						$("#originName").html("来源:"+originName);  
+						$("#content_time").html("发布时间：" + releaseTimeStr);
+
+						if(dataJson.contenttypeId === 6) {
+							var contentxx = "";
+							contentxx += "<video style='width:100%;height:200px;' src=" + filedomain + dataJson.vedioUrl + " controls=\"controls\">您的浏览器不支持video</video>"
+							contentxx += "<div style='width:100%;'><span>" + dataJson.content + "</span><div>";
+							//视频
+							$("#jsdplus").html(contentxx);
+						} else if(dataJson.contenttypeId === 5) { //图集
+							var atlasContent = dataJson.atlasContent;
+							var contentx = "";
+							$.each(atlasContent, function(i, item) {
+								contentx += "<div style='text-align:center;'> <img style='width:97%;' src='" + filedomain + "/" + item.imgUrl + "'/><div>";
+								contentx += "<div  style='text-align:center;'><span>" + item.fileDesc + "</span><div>";
+								contentx += "<br/>"　　
+							});
+							$("#jsdplus").html(contentx);
+						} else {
+							$("#jsdplus").html(content);
+						}
+						$("#author").html(author);
+						//$("#content_title").html(content_title);
+						// $("#jsdplus").html(content);
+					}
+					// $("span").html(result);
+				});
+			});
+
+			function getid(key) {
+				var reg = new RegExp('(^|&)' + key + '=([^&]*)(&|$)', 'i')
+				var arr = window.location.search.substring(1).match(reg)
+				if(arr === null) return null
+				var id = decodeURIComponent(arr[2]);
+				return id;
+			}
+		</script>
+		<div class="none">
+			<!-- 站长统计 -->
+			<script type="text/javascript">
+				var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+				document.write(unescape("%3Cspan id='cnzz_stat_icon_1000395642'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "w.cnzz.com/q_stat.php%3Fid%3D1000395642%26l%3D3' type='text/javascript'%3E%3C/script%3E"));
+			</script>
+			<!-- 百度统计 -->
+			<script>
+				var _hmt = _hmt || [];
+				(function() {
+					var hm = document.createElement("script");
+					hm.src = "//hm.baidu.com/hm.js?d64698ba5baf899586690f3b8536ea7a";
+					var s = document.getElementsByTagName("script")[0];
+					s.parentNode.insertBefore(hm, s);
+				})();
+			</script>
+			<script type="text/javascript" src="./static/js/tongji_dplus_editor.js"></script>
+			<!-- dplus统计 -->
+			<script type="text/javascript">
+				! function(a, b) {
+					if(!b.__SV) {
+						var c, d, e, f;
+						window.dplus = b, b._i = [], b.init = function(a, c, d) {
+							function g(a, b) {
+								var c = b.split(".");
+								2 == c.length && (a = a[c[0]], b = c[1]), a[b] = function() {
+									a.push([b].concat(Array.prototype.slice.call(arguments, 0)))
+								}
+							}
+							var h = b;
+							for("undefined" != typeof d ? h = b[d] = [] : d = "dplus", h.people = h.people || [], h.toString = function(a) {
+									var b = "dplus";
+									return "dplus" !== d && (b += "." + d), a || (b += " (stub)"), b
+								}, h.people.toString = function() {
+									return h.toString(1) + ".people (stub)"
+								}, e = "disable track track_links track_forms register unregister get_property identify clear set_config get_config get_distinct_id track_pageview register_once track_with_tag time_event people.set people.unset people.delete_user".split(" "), f = 0; f < e.length; f++) g(h, e[f]);
+							b._i.push([a, c, d])
+						}, b.__SV = 1.1, c = a.createElement("script"), c.type = "text/javascript", c.charset = "utf-8", c.async = !0, c.src = "//w.cnzz.com/dplus.php?id=1261971623", d = a.getElementsByTagName("script")[0], d.parentNode.insertBefore(c, d)
+					}
+				}(document, window.dplus || []), dplus.init("1261971623");
+			</script>
+		</div>
+	</body>
+
+</html>

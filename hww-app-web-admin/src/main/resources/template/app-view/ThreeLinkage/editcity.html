@@ -1,0 +1,105 @@
+<div class="modal-dialog modal-lg" role="document" style="width: 50%;">
+			    <div class="modal-content">
+			      <div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h5 class="modal-title">
+						<span class="glyphicon glyphicon-file"></span> <span>修改城市</span>
+					</h5>
+					</div>
+			      <div class="modal-body">
+			      <form class="form-horizontal">
+					<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">城市名称</label>
+						<div class="col-sm-8">
+						<input type="text" class="form-control" id="city_update_name" placeholder="城市名称">
+					</div>
+					</div>
+				</form>
+								<form class="form-horizontal">
+					<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">经度</label>
+						<div class="col-sm-8">
+						<input type="text" class="form-control" id="city_update_longitude" placeholder="经度" >
+					</div>
+					</div>
+				</form>
+				<form class="form-horizontal">
+					<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">纬度</label>
+						<div class="col-sm-8">
+						<input type="text" class="form-control" id="city_update_latitude" placeholder="纬度" >
+					</div>
+					</div>
+				</form>
+				<form class="form-horizontal" id="contenttypeForm">
+					<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">半径</label>
+						<div class="col-sm-8">
+						<input type="text" class="form-control" id="city_update_radius" placeholder="经度" >
+					</div>
+					</div>
+				</form>
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-info btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span>关闭</button>
+			        <button data-action="" onclick="citySaveOrUpdate_edit();" type="button" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-saved"></span>保存</button>
+			      </div>
+			    </div>
+			  </div>
+<script type="text/javascript">
+
+
+	$
+	function citySaveOrUpdate_edit(){
+		var cityAddName = $("#city_update_name").val();
+        
+		var cityAddLongitude = $("#city_update_longitude").val();
+        var cityAddLatitude = $("#city_update_latitude").val();
+        var cityAddRadius = $("#city_update_radius").val();
+
+		if (!cityAddLongitude) {
+            alert("经度不能为空！");
+            return false;
+        }
+        if (!cityAddLatitude) {
+            alert("纬度不能为空！");
+            return false;
+        }
+        if (!cityAddRadius) {
+            alert("半径不能为空！");
+            return false;
+        }
+		
+		if(!cityAddName){
+			alert("请输入城市名称!");
+			return false;
+		}
+		
+		$.ajax({
+		    type:"POST",
+		    data:{"cityName":cityAddName,
+		    	"countryId":countryIds,
+		    	"provinceId":provinceIds,
+		    	"cityId":cityIds,
+		    	"longitude":cityAddLongitude,
+		    	"latitude":cityAddLatitude,
+		    	"radius":cityAddRadius},
+		    dataType:"json",
+		    url: "${rc.contextPath}/city/v_save.do",
+		    success:function(data){
+				alert(data.message);
+				hideModal($ecityModal);
+		    	var dateCur={"countryId":curCountryId,"provinceId":curProvinceId};
+		    	$(".hk-main").load(countryUrl,dateCur);
+		    }
+		});
+	}
+	//��֤��
+    function validateForm() {
+
+        return true;
+    }
+</script>
+		

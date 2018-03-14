@@ -1,0 +1,94 @@
+<div class="modal-dialog modal-lg" role="document" style="width: 50%;">
+			    <div class="modal-content">
+			      <div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h5 class="modal-title">
+						<span class="glyphicon glyphicon-file"></span> <span>修改省份</span>
+					</h5>
+					</div>
+			      <div class="modal-body">
+			      <form class="form-horizontal">
+					<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">省份名称</label>
+						<div class="col-sm-8">
+						<input type="text" class="form-control" id="province_update_name" placeholder="省份名称">
+					</div>
+					</div>
+				</form>
+				<form class="form-horizontal">
+					<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">经度</label>
+						<div class="col-sm-8">
+						<input type="text" class="form-control" id="province_update_longitude" placeholder="经度" >
+					</div>
+					</div>
+				</form>
+				<form class="form-horizontal">
+					<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">纬度</label>
+						<div class="col-sm-8">
+						<input type="text" class="form-control" id="province_update_latitude" placeholder="纬度" >
+					</div>
+					</div>
+				</form>
+				<form class="form-horizontal" id="contenttypeForm">
+					<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">半径</label>
+						<div class="col-sm-8">
+						<input type="text" class="form-control" id="province_update_radius" placeholder="经度" >
+					</div>
+					</div>
+				</form>
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-info btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span>关闭</button>
+			        <button data-action="" onclick="provinceSaveOrUpdate_edit();" type="button" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-saved"></span>保存</button>
+			      </div>
+			    </div>
+			  </div>
+<script type="text/javascript">
+	function provinceSaveOrUpdate_edit(){
+		var provinceUpdataName = $("#province_update_name").val();
+		var provinceLongitude = $("#province_update_longitude").val();
+        var provinceLatitude = $("#province_update_latitude").val();
+        var provinceRadius = $("#province_update_radius").val();
+		if (!provinceLongitude) {
+            alert("经度不能为空！");
+            return false;
+        }
+        if (!provinceLatitude) {
+            alert("纬度不能为空！");
+            return false;
+        }
+        if (!provinceRadius) {
+            alert("半径不能为空！");
+            return false;
+        }
+		
+		if(!provinceUpdataName){
+			alert("请输入省份名称!");
+			return false;
+		}
+		
+			$.ajax({
+		    type:"POST",
+		    data:{"provinceName":provinceUpdataName,
+		    	"countryId":countryIds,
+		    	"provinceId":provinceIds,
+		    	"longitude":provinceLongitude,
+		    	"latitude":provinceLatitude,
+		    	"radius":provinceRadius},
+		    dataType:"json",
+		    url: "${rc.contextPath}/province/v_save.do",
+		    success:function(data){
+		    	alert(data.message);
+		    	hideModal($eprovinceModal);
+		    	var dateCur={"countryId":curCountryId,"provinceId":curProvinceId};
+		    	$(".hk-main").load(countryUrl,dateCur);
+		    }
+		});
+	}
+</script>
+		

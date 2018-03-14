@@ -1,0 +1,192 @@
+@charset "UTF-8";
+/* line 3, ../sass/a.scss */
+body {
+  width: 100%;
+  top: 0;
+  left: 0;
+  padding: 0;
+  margin: 0;
+}
+
+/* line 10, ../sass/a.scss */
+.main {
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+}
+
+/* line 15, ../sass/a.scss */
+a {
+  text-decoration: none;
+}
+
+/* line 18, ../sass/a.scss */
+h1 {
+  font-family: PingFang SC, Lantinghei SC, Helvetica Neue, Helvetica, Arial, Microsoft YaHei, å¾®è½¯é›…é»‘, STHeitiSC-Light, simsun, å®‹ä½“, WenQuanYi Zen Hei, WenQuanYi Micro Hei, sans-serif;
+  font-size: 40px;
+  line-height: 60px;
+  font-family: PingFang SC, Lantinghei SC, Helvetica Neue, Helvetica, Arial, Microsoft YaHei, å¾®è½¯é›…é»‘, STHeitiSC-Light, simsun, å®‹ä½“, WenQuanYi Zen Hei, WenQuanYi Micro Hei, sans-serif;
+  font-size: 0.4rem;
+  line-height: 0.6rem;
+  color: #333;
+  width: 6rem;
+  margin: 0.5rem auto 0.2rem auto;
+  text-align: center;
+}
+
+/* line 24, ../sass/a.scss */
+h2 {
+  font-family: PingFang SC, Lantinghei SC, Helvetica Neue, Helvetica, Arial, Microsoft YaHei, å¾®è½¯é›…é»‘, STHeitiSC-Light, simsun, å®‹ä½“, WenQuanYi Zen Hei, WenQuanYi Micro Hei, sans-serif;
+  font-size: 28px;
+  line-height: 60px;
+  font-family: PingFang SC, Lantinghei SC, Helvetica Neue, Helvetica, Arial, Microsoft YaHei, å¾®è½¯é›…é»‘, STHeitiSC-Light, simsun, å®‹ä½“, WenQuanYi Zen Hei, WenQuanYi Micro Hei, sans-serif;
+  font-size: 0.28rem;
+  line-height: 0.6rem;
+  color: #333;
+  width: 6rem;
+  margin: 0.2rem auto;
+  text-align: center;
+}
+/* line 29, ../sass/a.scss */
+h2 address, h2 time {
+  display: inline-block;
+  margin-right: 0.15rem;
+}
+/* line 33, ../sass/a.scss */
+h2 time {
+  color: #999;
+}
+
+/* line 37, ../sass/a.scss */
+.head {
+  width: 100%;
+  height: 1.2rem;
+  overflow: hidden;
+  border-bottom: 1px solid #b6b6b6;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  justify-content: space-between;
+  padding: 0 0.3rem;
+}
+/* line 50, ../sass/a.scss */
+.head a {
+  font-family: PingFang SC, Lantinghei SC, Helvetica Neue, Helvetica, Arial, Microsoft YaHei, å¾®è½¯é›…é»‘, STHeitiSC-Light, simsun, å®‹ä½“, WenQuanYi Zen Hei, WenQuanYi Micro Hei, sans-serif;
+  font-size: 32px;
+  line-height: 120px;
+  font-family: PingFang SC, Lantinghei SC, Helvetica Neue, Helvetica, Arial, Microsoft YaHei, å¾®è½¯é›…é»‘, STHeitiSC-Light, simsun, å®‹ä½“, WenQuanYi Zen Hei, WenQuanYi Micro Hei, sans-serif;
+  font-size: 0.32rem;
+  line-height: 1.2rem;
+  color: #333;
+  vertical-align: top;
+  float: left;
+}
+/* line 56, ../sass/a.scss */
+.head a.img {
+  width: 2.28rem;
+  display: inline-block;
+}
+/* line 60, ../sass/a.scss */
+.head a.more {
+  color: #1296DB;
+}
+/* line 63, ../sass/a.scss */
+.head img {
+  width: 2.28rem;
+  height: 1.2rem;
+  margin-right: 0.54rem;
+}
+/* line 70, ../sass/a.scss */
+.head a.button {
+  background-color: #1296DB;
+  display: inline-block;
+  width: 1.68rem;
+  height: 0.6rem;
+  text-align: center;
+  font-family: PingFang SC, Lantinghei SC, Helvetica Neue, Helvetica, Arial, Microsoft YaHei, å¾®è½¯é›…é»‘, STHeitiSC-Light, simsun, å®‹ä½“, WenQuanYi Zen Hei, WenQuanYi Micro Hei, sans-serif;
+  font-size: 32px;
+  line-height: 60px;
+  font-family: PingFang SC, Lantinghei SC, Helvetica Neue, Helvetica, Arial, Microsoft YaHei, å¾®è½¯é›…é»‘, STHeitiSC-Light, simsun, å®‹ä½“, WenQuanYi Zen Hei, WenQuanYi Micro Hei, sans-serif;
+  font-size: 0.32rem;
+  line-height: 0.6rem;
+  color: #fff;
+  margin: 0.3rem 0;
+  border-radius: 4px;
+}
+
+/* line 83, ../sass/a.scss */
+article span {
+  font-family: PingFang SC, Lantinghei SC, Helvetica Neue, Helvetica, Arial, Microsoft YaHei, å¾®è½¯é›…é»‘, STHeitiSC-Light, simsun, å®‹ä½“, WenQuanYi Zen Hei, WenQuanYi Micro Hei, sans-serif;
+  font-size: 28px;
+  line-height: 40px;
+  font-family: PingFang SC, Lantinghei SC, Helvetica Neue, Helvetica, Arial, Microsoft YaHei, å¾®è½¯é›…é»‘, STHeitiSC-Light, simsun, å®‹ä½“, WenQuanYi Zen Hei, WenQuanYi Micro Hei, sans-serif;
+  font-size: 0.28rem;
+  line-height: 0.4rem;
+  color: #999;
+  padding: 0 0.36rem;
+  margin-top: 0.2rem;
+  display: inline-block;
+  height: auto;
+  font-weight: 300;
+  vertical-align: top;
+}
+/* line 92, ../sass/a.scss */
+article p {
+  padding: 0 0.32rem;
+  margin: 0.28rem 0;
+  text-align: justify;
+  font-family: PingFang SC, Lantinghei SC, Helvetica Neue, Helvetica, Arial, Microsoft YaHei, å¾®è½¯é›…é»‘, STHeitiSC-Light, simsun, å®‹ä½“, WenQuanYi Zen Hei, WenQuanYi Micro Hei, sans-serif;
+  font-size: 36px;
+  line-height: 64px;
+  font-family: PingFang SC, Lantinghei SC, Helvetica Neue, Helvetica, Arial, Microsoft YaHei, å¾®è½¯é›…é»‘, STHeitiSC-Light, simsun, å®‹ä½“, WenQuanYi Zen Hei, WenQuanYi Micro Hei, sans-serif;
+  font-size: 0.36rem;
+  line-height: 0.64rem;
+  color: #333;
+  font-weight: 400;
+}
+/* line 98, ../sass/a.scss */
+article p.imgs_c {
+  padding: 0;
+  margin: 0;
+  display: inline-block;
+  height: auto;
+}
+/* line 103, ../sass/a.scss */
+article p.imgs_c img {
+  width: 100%;
+  vertical-align: top;
+}
+/* line 108, ../sass/a.scss */
+article p.editor {
+  font-family: PingFang SC, Lantinghei SC, Helvetica Neue, Helvetica, Arial, Microsoft YaHei, å¾®è½¯é›…é»‘, STHeitiSC-Light, simsun, å®‹ä½“, WenQuanYi Zen Hei, WenQuanYi Micro Hei, sans-serif;
+  font-size: 28px;
+  line-height: 50px;
+  font-family: PingFang SC, Lantinghei SC, Helvetica Neue, Helvetica, Arial, Microsoft YaHei, å¾®è½¯é›…é»‘, STHeitiSC-Light, simsun, å®‹ä½“, WenQuanYi Zen Hei, WenQuanYi Micro Hei, sans-serif;
+  font-size: 0.28rem;
+  line-height: 0.5rem;
+  color: #999;
+  text-align: right;
+  font-weight: 300;
+}
+/* line 113, ../sass/a.scss */
+article p.hot {
+  padding-left: 0.25rem;
+}
+/* line 115, ../sass/a.scss */
+article p.hot a {
+  font-family: PingFang SC, Lantinghei SC, Helvetica Neue, Helvetica, Arial, Microsoft YaHei, å¾®è½¯é›…é»‘, STHeitiSC-Light, simsun, å®‹ä½“, WenQuanYi Zen Hei, WenQuanYi Micro Hei, sans-serif;
+  font-size: 28px;
+  line-height: 50px;
+  font-family: PingFang SC, Lantinghei SC, Helvetica Neue, Helvetica, Arial, Microsoft YaHei, å¾®è½¯é›…é»‘, STHeitiSC-Light, simsun, å®‹ä½“, WenQuanYi Zen Hei, WenQuanYi Micro Hei, sans-serif;
+  font-size: 0.28rem;
+  line-height: 0.5rem;
+  color: #999;
+  background-color: #f4f5f6;
+  padding: 0.05rem 0.13rem;
+  border-radius: 2px;
+  margin-right: 0.1rem;
+  font-weight: 300;
+}

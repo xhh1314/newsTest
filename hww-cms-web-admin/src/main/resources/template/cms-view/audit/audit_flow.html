@@ -1,0 +1,167 @@
+<script type="text/javascript">
+var $addFlowModal=$("#addFlowModal")
+</script>
+<div class="row">
+	<div class="col-md-5">
+		<button id="linkAddAudioFlow" type="button" class="btn btn-primary"
+			style="text-align: center;" onclick="addFlowModle()">添加审核流程</button>
+		<table class="table table-hover table-bordered" id="table_list">
+			<thead>
+				<tr class="center detail-col">
+					<th style="text-align: center;">审核流程ID</th>
+					<th style="text-align: center;">审核流程名</th>
+					<th style="text-align: center;">描述</th>
+					<th style="text-align: center;">操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<#list page.list as p>
+				<tr>
+					<td style="text-align: center;"
+						onclick="auditFlowOnClick('${p.flowId!}');">${p.flowId!}</td>
+					<td style="text-align: center;"
+						onclick="auditFlowOnClick('${p.flowId!}');">${p.flowName!}</td>
+					<td style="text-align: center;"
+						onclick="auditFlowOnClick('${p.flowId!}');">${p.remark!}</td>
+					<td style="text-align: center;"><a
+						href="javascript:editAudioFlow('${p.flowId!}','${p.flowName!}','${p.remark!}','${p.categoryId!}')"
+						class="btn btn-info btn-xs">编辑</a> <a
+						href="javascript:deleteAudioFlow('${p.flowId}')"
+						class="btn btn-danger btn-xs">删除</a> <a
+						class="btn btn-success btn-xs"
+						href="javascript:auditFlowOnClick('${p.flowId!}');">管理</a>
+					</td>
+				</tr>
+				</#list>
+			</tbody>
+		</table>
+		<#include "../common/page.html">
+	</div>
+
+	<div class="col-sm-6">
+		<div style="padding: 8px; height: 200px; border-radius: 2px;"
+			id="stepsPage"></div>
+	</div>
+
+	
+<div class="modal fade" id="editFlowModal" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel">
+	<#include "audit_flow_edit.html">
+</div>
+
+<!--  添加流程  -->
+<div class="modal fade" id="addFlowModal" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="myModalLabel">审核流程添加</h4>
+			</div>
+			<div class="modal-body">
+				<form id="flowForm" method="post" class="form-horizontal">
+
+					<div class="form-group form-group-sm">
+						<label class="col-sm-2 control-label">审核流程名</label>
+						<div class="col-sm-10">
+							<input type="text" id="flowName" name="flowName">
+						</div>
+					</div>
+					<div class="form-group form-group-sm">
+						<label class="col-sm-2 control-label">流程描述</label>
+						<div class="col-sm-10">
+							<input type="text" id="remark" name="remark">
+						</div>
+					</div>
+					<input type="hidden" name="categoryId" id="categoryId"/>
+					<input type="hidden" name="categoryName" id="categoryName"/>
+				</form>
+				
+				
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				<button type="button" class="btn btn-primary" onClick="addFlow()">添加</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+	var auditFlowListUrl = "${rc.contextPath}/contentAuditFlow/list.do";
+	var auditFlowSaveUrl = "${rc.contextPath}/contentAuditFlow/save.do";
+	var auditFlowDeleteUrl = "${rc.contextPath}/contentAuditFlow/delete.do";
+	var auditFlowStepsListUrl = "${rc.contextPath}/contentAuditFlowSteps/list.do";
+	var auditFloweditUrl = "${rc.contextPath}/contentAuditFlow/edit.do";
+	
+	function jumpNormalPage(page) {
+		var url = auditFlowListUrl + "?page=" + page;
+		$('.hk-main').load(url);
+	}
+	function editAudioFlow(flowId,flowName,remark,categoryId) {
+		var pageNo=${page.pageNo!}
+		var url=auditFloweditUrl+"?flowId="+flowId+"&flowName="+flowName+"&remark="+remark+"&categoryId="+categoryId+"&pageNo="+pageNo;
+		$("#editFlowModal").load(url);
+		$("#editFlowModal").modal('show');
+	}
+
+	function deleteAudioFlow(flowId) {
+		var url=auditFlowDeleteUrl+"?flowId="+flowId;
+		$.ajax({
+			type : "GET",
+			dataType : "json",
+			url : url,
+			success : function(data, status) {
+				var pageNo=${page.pageNo!}
+				var url = auditFlowListUrl + "?page=" + pageNo;
+				$('.hk-main').load(url);
+			}
+		});
+	}
+	
+	function addFlowModle(){
+		$addFlowModal.modal('show');
+	}
+	function addFlow(){
+		var remark = $('#remark').val();
+		var flowName = $('#flowName').val();
+		var url=auditFlowSaveUrl+"?remark="+remark+"&flowName="+flowName;
+		$.ajax({
+			type : "GET",
+			url : url,
+			dataType : "json",
+			success : function(data) {
+				if(data.result==0){
+					alert(data.message);
+				}else{
+					hideModal();
+					var pageNo=${page.pageNo!}
+					var url = auditFlowListUrl + "?page=" + pageNo;
+					$('.hk-main').load(url);
+				}
+			}
+		});
+	}
+	
+	function hideModal() {
+		  $("#addFlowModal").removeClass("in");
+		  $(".modal-backdrop").remove();
+		  $('body').removeClass('modal-open');
+		  $('body').css('padding-right', '');
+		  $("#addFlowModal").hide();
+	}
+
+	function auditFlowOnClick(flowId) {
+		
+		var pageNo=${page.pageNo!}
+		var url = auditFlowStepsListUrl + "?flowId="+flowId;
+		$("#stepsPage").load(url);
+
+	}
+	
+	
+</script>

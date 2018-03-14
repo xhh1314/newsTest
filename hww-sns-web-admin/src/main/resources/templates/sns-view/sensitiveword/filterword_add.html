@@ -1,0 +1,53 @@
+<div class="modal-dialog" role="document">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			        <h5 class="modal-title" id="myModalLabel">
+			        	<span class="glyphicon glyphicon-file"></span> 
+			        	<span id="modalTite"></span>
+			        </h5>
+			      </div>
+			      <div class="modal-body">
+			        <form id="filterword" name="senstiveword" class="form-horizontal">
+			          <input type="hidden" name="senstiveId" value="<#if editVo??>${editVo.senstiveId!''}</#if>">
+			          <!--默认1为过滤词类型  -->
+			          <input type="hidden" name="wordType" value="<#if editVo??>${editVo.wordType!'1'}<#else>1</#if>"/>
+					  <div class="form-group form-group-sm">
+					    <label for="inputEmail3" class="col-sm-2 control-label">过滤词名称</label>
+					    <div class="col-sm-10">
+					      <input type="text" name="word" value="<#if editVo??>${editVo.word!''}</#if>" class="form-control" placeholder="过滤词名称">
+					    </div>
+					  </div>
+					</form>
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-info btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 关闭</button>
+			        <@shiro.hasPermission name="/sns/senstive/save.do">  
+	
+
+			        <button type="button" id="filterSaves"  class="btn btn-info btn-sm"><span class="glyphicon glyphicon-saved"></span> 保存</button>
+			        </@shiro.hasPermission>
+			      </div>
+			    </div>
+			  </div>
+			  
+<script type="text/javascript">
+$("#filterSaves").on('click',function(){
+	console.log("提交保存");
+	//ajax提交
+	$.ajax({
+	    type:"POST",
+	    data:$("#filterword").serialize(),
+	    dataType:"text",
+	    url:"${rc.contextPath}/sns/senstive/save.do",
+	    success:function(data){
+	    	console.log(data);
+	    	if(data=='success'){
+	    		$modalInfoss.modal('hide');//手动关闭模态框
+	    	}else{
+	    		alert("请重新输入")
+	    	}
+	    }
+	});
+}); 
+</script>

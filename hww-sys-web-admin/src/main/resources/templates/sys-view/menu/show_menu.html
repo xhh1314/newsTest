@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<#include "../common_header.html">
+		<link rel="stylesheet" href="${rc.contextPath}/resources/ztree/css/zTreeStyle/zTreeStyle.css" type="text/css">
+	</head>
+
+	<body class="no-skin" style="overflow: hidden;">
+		<div class="main-container ace-save-state" id="main-container">
+			
+			<div class="main-content">
+				<div class="main-content-inner">
+					 <input type="hidden" value="<#if (parent.moduleId)??>${parent.moduleId}</#if>" id="moduleId"/> 
+
+					<div class="page-content" style="overflow: auto;height: 470px;">
+
+						
+						<div class="row">
+							<div class="col-xs-3">
+								<div class="widget-box widget-color-blue">
+									<div class="widget-header">
+										<h4 class="widget-title lighter smaller">
+											菜单
+										</h4>
+									</div>
+
+									<div class="widget-body" style="overflow: auto;bottom: 0px;">
+										<div class="widget-main">
+											<div id="treeDemo" class="ztree"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="col-xs-9">
+								<iframe id="menuList" name="menuList" src="" style="border: 0;width: 100%;height: 100%;"></iframe>
+							</div><!-- /.span -->
+						</div><!-- /.row -->
+					</div><!-- /.page-content -->
+				</div>
+			</div><!-- /.main-content -->
+			<#include "../footer.html">
+		</div><!-- /.main-container -->
+
+		<#include "../footerjs.html">
+
+		<!-- page specific plugin scripts -->
+		<script type="text/javascript" src="${rc.contextPath}/resources/ztree/js/jquery.ztree.core.js"></script>
+		<script type="text/javascript" src="${rc.contextPath}/resources/ztree/js/jquery.ztree.excheck.js"></script>
+		<script type="text/javascript" src="${rc.contextPath}/resources/ztree/js/jquery.ztree.exedit.js"></script>
+		<script src="${rc.contextPath}/resources/admin/js/treeInit.js"></script>
+		<script src="${rc.contextPath}/resources/admin/js/sidebar-menu.js"></script>
+		<script type="text/javascript">
+		
+	    $("#main-container").height($(window).height()-76);
+		$("#menuList").height($(window).height()-240);
+	
+	    $(window).resize(function(){
+			$("#main-container").height($(window).height()-76);
+			$("#menuList").height($(window).height()-240);
+	  	});
+		
+		 jQuery(function($){
+			 if($("#moduleId").val()!=null){
+			loadMenu("${rc.contextPath}/menu/allMenuJson_tree.do?moduleId="+$("#moduleId").val(), "treeDemo", setting);
+			 }else{
+				 loadMenu("${rc.contextPath}/menu/allMenuJson_tree.do", "treeDemo", setting);
+			 }
+			
+		}); 
+		
+	 var zTree;
+
+		var setting = {
+				view : {
+				addHoverDom: addHoverDom,
+				removeHoverDom: removeHoverDom
+				},
+			data : {
+				simpleData : {
+					enable:true
+				}
+			}
+			
+
+		};
+		IDMark_A = "_a";
+		function addHoverDom(treeId, treeNode) {
+			//if (treeNode.id==1) return;
+			var aObj = $("#" + treeNode.tId + IDMark_A);
+			if ($("#diyAddBtn_"+treeNode.id).length>0||$("#diyEditBtn_"+treeNode.id).length>0) return;
+			var editStr = "<span class='button add' id='diyAddBtn_" +treeNode.id+ "' title='添加菜单' onfocus='this.blur();'></span>";
+			if(treeNode.pId!=null){
+				editStr = editStr+"<span class='button edit' id='diyEditBtn_" +treeNode.id+ "' title='编辑菜单' onfocus='this.blur();'></span>";
+			
+			}
+			aObj.append(editStr);
+			var addbtn = $("#diyAddBtn_"+treeNode.id);
+			if (addbtn) addbtn.bind("click", function(){
+				target('#menuList',"${rc.contextPath}/menu/v_add.do?inOrOut=true&parentId="+treeNode.id);
+			});
+			
+			var editbtn = $("#diyEditBtn_"+treeNode.id);
+			if (editbtn) editbtn.bind("click", function(){
+				target('#menuList',"${rc.contextPath}/menu/v_edit.do?inOrOut=true&menuId="+treeNode.id);
+			});
+		}
+		function removeHoverDom(treeId, treeNode) {
+			$("#diyAddBtn_"+treeNode.id).unbind().remove();
+			$("#diyEditBtn_" +treeNode.id).unbind().remove();
+		} 
+		
+		
+		function target(id,url){
+			$(id).attr('src', url);
+		}
+		</script>
+	</body>
+</html>

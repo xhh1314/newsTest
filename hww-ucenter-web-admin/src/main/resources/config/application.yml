@@ -1,0 +1,45 @@
+
+snowFlake: 
+ datacenter_id: 1 #主键生成所属appid，注意一定不要重复 【0-31】
+ cluster_id: 1 #主键生成所在  某应用下集群id， 所属应用的集群内 注意一定不要重复【0-31】
+server:
+  port: 7908
+  session:
+    timeout: 1800
+  tomcat:
+    uri-encoding: UTF-8
+    max-threads: 800
+    max-connections: 800
+  context-path: /ucenteradmin
+  
+  
+spring:
+  profiles: 
+   active: prod
+  application: 
+    name: ucenter
+  data:
+    jpa:
+      repositories:
+        enabled: true
+
+#模板配置
+  freemarker:
+    template-loader-path:
+    - classpath:/templates
+    prefix: /ucenter-view/
+    suffix: .html
+    content-type: text/html
+    charset: UTF-8
+    request-context-attribute: rc
+    expose-request-attributes: false
+    expose-session-attributes: false
+    expose-spring-macro-helpers: true
+    
+    settings:
+      auto_import: /ftl/ucenter/index.ftl as p,/ftl/spring.ftl as s
+#日志配置
+logging:
+  file: logs/hww-ucenter-web-admin.log
+  level:
+    com.hww.ucenter: debug

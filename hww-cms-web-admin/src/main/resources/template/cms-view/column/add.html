@@ -1,0 +1,280 @@
+<script type="text/javascript">
+	var editUrl = "${rc.contextPath}/column/v_edit.do";
+	var deleteUrl = "${rc.contextPath}/column/o_delete.do";
+	var indexUrl = "${rc.contextPath}/column/v_list.do"
+</script>
+<form id="submitForm" class="form-horizontal" role="form">
+	<input type="hidden" name="parentId" value="${form.parentId}"
+		id="parentId" />
+	<div class="tabbable">
+		<ul class="nav nav-tabs padding-12 tab-color-blue background-blue"
+			id="myTab4">
+			<li class="active"><a data-toggle="tab" href="#home4">栏目信息</a></li>
+		</ul>
+		<div class="tab-content">
+			<div id="home4" class="tab-pane in active">
+				<div class="form-group">
+					<label class="col-sm-2 control-label no-padding-right">上级分类：</label>
+					<div class="col-sm-4">
+						<div class="pos-rel">
+							<input id="citySel" value="${parent.columnName}"
+								class="typeahead scrollable" type="text" readonly="readonly" /><a
+								id="menuBtn" href="#" onclick="showMenu(); return false;">选择</a>
+						</div>
+					</div>
+
+					<input type="hidden" id="categoryIds" name="categoryIds" />
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label no-padding-right">栏目名称：</label>
+					<div class="col-sm-4">
+						<div class="pos-rel">
+							<input id="columnName" name="columnName" value=""
+								class="typeahead scrollable" type="text" placeholder="栏目名称"
+								required="" />
+						</div>
+					</div>
+					
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label no-padding-right">显示顺序：</label>
+					<div class="col-sm-4">
+						<div class="pos-rel">
+							<input id="sort" name="sort" value=""
+								class="typeahead scrollable" type="text" placeholder="显示顺序" />
+						</div>
+					</div>
+					<label class="control-label col-xs-2 col-sm-2 no-padding-right"
+						for="food">是否默认：</label>
+					<div class="col-xs-4 col-sm-4">
+						<select name="isDefault" id="isDefault">
+							<option value="1" >是</option>
+							<option value="0" selected="selected">否</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label no-padding-right">外链：</label>
+					<div class="col-sm-4">
+						<div class="pos-rel">
+							<input id="link" name="link" value=""
+								class="typeahead scrollable" type="text" placeholder="外链" />
+						</div>
+					</div>
+					<label class="control-label col-xs-2 col-sm-2 no-padding-right"
+						for="food">所属站点：</label>
+					<div class="col-xs-4 col-sm-4">
+						<select name="siteId" id="siteId">
+							<option value="">--请选择--</option>
+							<#list sites as site> <#if site.siteId==form.siteId>
+							<option value="${site.siteId}" selected="selected">${site.siteName}</option>
+							<#else>
+							<option value="${site.siteId}">${site.siteName}</option></#if> </#list>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label no-padding-right">keywords：</label>
+					<div class="col-sm-4">
+						<div class="pos-rel">
+							<input id="keywords" name="keywords" value=""
+								class="typeahead scrollable" type="text" placeholder="keywords" />
+						</div>
+					</div>
+					<label class="col-sm-2 control-label no-padding-right">description：</label>
+					<div class="col-sm-4">
+						<div class="pos-rel">
+							<textarea id="columnDesc" name="columnDesc"
+								class="form-control" placeholder="description"></textarea>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="clearfix form-actions">
+		<div class="col-md-offset-3 col-md-9">
+			<button class="btn btn-info" type="button" id="submitbutton">
+				<i class="ace-icon fa fa-check bigger-110"></i> 提交
+			</button>
+
+			&nbsp; &nbsp; &nbsp;
+			<button class="btn" type="reset">
+				<i class="ace-icon fa fa-undo bigger-110"></i> 重置
+			</button>
+		</div>
+	</div>
+</form>
+
+
+<div class="modal-footer">
+	<button type="button" class="btn btn-info btn-sm" data-dismiss="modal">
+		<span class="glyphicon glyphicon-remove"></span> 关闭
+	</button>
+	<button id="btnSave" data-action="" type="button"
+		class="btn btn-info btn-sm">
+		<span class="glyphicon glyphicon-saved"></span> 保存
+	</button>
+	<div class="col-sm-3">
+		<div style="padding: 8px; height: 200px; border-radius: 2px;">
+			<ul id="treeDemoColumn" class="ztree"
+				style="margin-top: 0; width: 260px;"></ul>
+		</div>
+	</div>
+
+</div>
+
+
+
+<script type="text/javascript">
+	var zTree;
+	var setting = {
+		data : {
+			simpleData : {
+				enable : true
+			}
+		},
+		callback : {
+			onCheck : ztreeCheck
+		},
+		check : {
+			enable : true,
+			chkStyle : "checkbox",
+			chkboxType : {
+				"Y" : "p",
+				"N" : "s"
+			}
+		}
+		
+	};
+	
+	function filter(node) { //过滤器直选中2级节点累加  
+		return (node.checked == true);
+	}
+
+	function ztreeCheck(e, treeId, treeNode) { //这是将所有选中节点的名字 用,分割做拼接 用于持久化到数据库  
+		console.info("111");
+		var zTree = $.fn.zTree.getZTreeObj("treeDemoColumn").getNodesByFilter(
+				filter);
+		var choose = "";
+		for (var i = 0; i < zTree.length; i++) {
+			if (zTree[i].name != null)
+				choose += (i == (zTree.length - 1)) ? zTree[i].name
+						: zTree[i].name + ",";
+		}
+		$("#treeDemoColumn").val(choose);
+		treeIds();
+	}
+
+	function treeIds() { //这是将选中的节点的id用;分割拼接起来,用于持久化到数据库  
+		var zTreeO = $.fn.zTree.getZTreeObj("treeDemoColumn").getNodesByFilter(
+				filter);
+		var idListStr = "";
+		for (var i = 0; i < zTreeO.length; i++) {
+			if (zTreeO[i].id != null) {
+				idListStr += (i == (zTreeO.length - 1)) ? zTreeO[i].id
+						: zTreeO[i].id + ";";
+			}
+		}
+        console.info(idListStr);
+		$("#categoryIds").val(idListStr);
+    }
+
+    jQuery(function ($) {
+
+		loadMenu("${rc.contextPath}/category/allCategoryJson.do?",
+				"treeDemoColumn", setting);
+
+		$("#submitbutton").click(function() {
+			if (validateForm()) {
+				$.ajax({
+					type : 'POST',
+					url : "${rc.contextPath}/column/o_save.do",
+					data : $("#submitForm").serialize(),
+					dataType : 'json',
+					success : function(data) {
+						if (data) {
+							//artDialog({content:'提交成功', x:'right', y:'bottom', time:'1', fixed:true});
+							alert("提交成功");
+							$('.hk-main').load(indexUrl);
+						}
+					}
+				});
+			}
+		});
+    });
+
+	function validateForm() {
+		return true;
+	}
+
+
+
+	function onClick(e, treeId, treeNode) {
+		var zTree = $.fn.zTree.getZTreeObj("treeDemo"), nodes = zTree
+				.getSelectedNodes(), v = "";
+		nodes.sort(function compare(a, b) {
+			return a.id - b.id;
+		});
+		for (var i = 0, l = nodes.length; i < l; i++) {
+			v += nodes[i].name + ",";
+		}
+		if (v.length > 0)
+			v = v.substring(0, v.length - 1);
+		var cityObj = $("#citySel");
+		cityObj.attr("value", v);
+
+		v2 = "";
+		for (var i = 0, l = nodes.length; i < l; i++) {
+			v2 += nodes[i].id + ",";
+		}
+		if (v2.length > 0)
+			v2 = v2.substring(0, v2.length - 1);
+		var parentObj = $("#parentId");
+		parentObj.attr("value", v2);
+	}
+
+	function loadMenu(resourceType, treeObjId, setting) {
+		//$.fn.zTree.init($("#" + treeObjId), setting, null);
+		$.ajax({
+			type : "POST",
+			url : resourceType,
+			dataType : "json",
+			success : function(data) {
+				// 如果返回数据不为空，加载"业务模块"目录
+				if (data != null) {
+					// 将返回的数据赋给zTree
+					$.fn.zTree.init($("#" + treeObjId), setting, data);
+					//              alert(treeObj);
+					zTree = $.fn.zTree.getZTreeObj(treeObjId);
+					if (zTree) {
+						// 默认展开所有节点
+						zTree.expandAll(true);
+					}
+				}
+			}
+		});
+	}
+
+	function showMenu() {
+		var cityObj = $("#citySel");
+		var cityOffset = $("#citySel").offset();
+		$("#menuContent").css({
+			left : cityOffset.left + "px",
+			top : cityOffset.top + cityObj.outerHeight() + "px"
+		}).slideDown("fast");
+
+		$("body").bind("mousedown", onBodyDown);
+	}
+	function hideMenu() {
+		$("#menuContent").fadeOut("fast");
+		$("body").unbind("mousedown", onBodyDown);
+	}
+	function onBodyDown(event) {
+		if (!(event.target.id == "menuBtn" || event.target.id == "menuContent" || $(
+				event.target).parents("#menuContent").length > 0)) {
+			hideMenu();
+		}
+	}
+</script>

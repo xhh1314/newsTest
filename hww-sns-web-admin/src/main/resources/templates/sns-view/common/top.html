@@ -1,0 +1,181 @@
+<!-- #section:basics/navbar.dropdown -->
+				<div class="navbar-buttons navbar-header pull-right" role="navigation">
+					<ul class="nav ace-nav">
+						<li class="grey dropdown-modal">
+							<a data-toggle="dropdown" class="dropdown-toggle" href="#">
+								<i class="ace-icon glyphicon glyphicon-retweet" style="top:2px;"></i>
+								<span>系统切换</span>
+								<i class="ace-icon fa fa-caret-down"></i>
+							</a>
+						
+							<ul class="dropdown-menu-right dropdown-navbar dropdown-menu dropdown-caret dropdown-close">
+						
+								<li class="dropdown-content">
+									<ul class="dropdown-menu dropdown-navbar navbar-pink" id="module_ul">
+										<#list modules! as module>
+											<li>
+												<a href="${module.moduleUrl}" target="_blank">
+													<div class="clearfix">
+														<i class="btn btn-sm btn-success fa fa-globe"></i>
+														${module.moduleName}
+													</div>
+												</a>
+											</li>
+										</#list>
+
+<!--
+										<li>
+											<a href="http://10.1.11.48:7981/admincp/index.do" target="_blank">
+												<div class="clearfix">
+													<i class="btn btn-sm btn-warning fa fa-cogs"></i> 
+													海客通用权限系统后台
+												</div>
+											</a>
+										</li>
+						
+										<li>
+											<a href="http://10.1.11.48:7904/cmsadmin/index.do" target="_blank">
+												<i class="btn btn-sm btn-primary fa fa-folder-open"></i> 
+												海客内容管理系统后台
+											</a>
+										</li>
+						
+										<li>
+											<a href="http://10.1.11.48:7980/snsadmin/index.do" target="_blank">
+												<div class="clearfix">
+													<i class="btn btn-sm btn-success fa fa-globe"></i> 
+													海客社交网络系统后台
+												</div>
+											</a>
+										</li>
+						
+										<li>
+											<a href="http://10.1.11.48:7908/ucenteradmin/index.do" target="_blank">
+												<div class="clearfix">
+													<i class="btn btn-sm btn-info fa fa-users"></i>
+													海客用户中心管理后台
+												</div>
+											</a>
+										</li> -->
+									</ul>
+								</li>
+							</ul>
+						</li>
+						
+						<!--角色切换 -->
+						<!-- <li class="grey dropdown-modal">
+							<a data-toggle="dropdown" class="dropdown-toggle" href="#">
+								<i class="ace-icon glyphicon glyphicon-retweet" style="top:2px;"></i>
+								<span>角色切换</span>
+								<i class="ace-icon fa fa-caret-down"></i>
+							</a>
+						
+							<ul class="dropdown-menu-right dropdown-navbar dropdown-menu dropdown-caret dropdown-close">
+						
+								<li class="dropdown-content">
+									<ul class="dropdown-menu dropdown-navbar navbar-pink" id="roleList">
+
+									</ul>
+								</li>
+							</ul>
+						</li> -->
+
+						<!-- #section:basics/navbar.user_menu -->
+						<li class="light-blue dropdown-modal">
+							<a data-toggle="dropdown" href="#" class="dropdown-toggle">
+								<img class="nav-user-photo" src="${rc.contextPath}/resources/assets/avatars/user.jpg" alt="Jason's Photo" />
+								<span class="user-info">
+									<small>${login_user.username}</small>
+								</span>
+
+								<i class="ace-icon fa fa-caret-down"></i>
+							</a>
+
+							<ul class="user-menu dropdown-menu-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+								<li>
+									<a href="javascript:editUserPassword()">
+										<i class="ace-icon fa fa-key"></i>
+										修改密码
+									</a>
+								</li>
+
+								<!-- <li class="divider"></li> -->
+
+								<li>
+									<a href="${rc.contextPath}/logout.do">
+										<i class="ace-icon fa fa-power-off"></i>
+										<span>退出系统</span>
+									</a>
+								</li>
+							</ul>
+						</li>
+
+						<!-- /section:basics/navbar.user_menu -->
+					</ul>
+					<div class="modal fade" id="modalInfoUserPassword" tabindex="-1" role="dialog"
+						aria-labelledby="myModalLabel">
+						<#include "password.html">
+					</div>
+				</div>
+				
+				<script>
+				var $modalInfoUserPassword = $('#modalInfoUserPassword');//模态框
+				var $modalInfoTitle = $modalInfoUserPassword.find('#modalTite');//模态框标题
+				//bootstrap模态框实例
+				$modalInfoUserPassword.modal({
+					backdrop : 'static',//点击模态透明层不隐藏
+					keyboard : false,//键盘不控制模态框 如：esc按下模态框不消失
+					show : false
+				//实例化后默认不显示
+				});
+				
+				  function editUserPassword(){
+					  $modalInfoUserPassword.modal('show');
+				  }
+				
+					//加载该用户得所有角色
+					/* $(function() {
+						var loadRoleList='${rc.contextPath}/loadRoleList.do';
+						$.ajax({
+							type : "POST",
+							url : loadRoleList,
+							dataType : "json",
+							success : function(data) {
+								var reslut = data.roleList;
+								$.each(reslut, function(index,role){
+									var urls = "${rc.contextPath}/replaceRoleToLogin.do?roleId="+role.roleId;
+									var json='<li>'
+											+'<a href='+urls+'>'
+										+'<div class="clearfix">'
+											+'<i class="btn btn-sm btn-warning fa fa-cogs"></i>'+role.roleName
+											+'</div>'
+										+'</a></li>';
+									$("#roleList").append(json);
+								})
+
+							},error:function(data){
+								alert("错误");
+							}
+						})
+					}) */
+					
+					//加载moduleurl
+					
+					$(function() {
+						$.ajax({
+							type:"post",
+							dataType:"json",
+							url:"${rc.contextPath}/sys/module/allModule.do",
+							success:function(data){
+								console.log(data);
+								for(var i=0;i<data.length;i++){
+							 var $li="<li><a href='"+data[i].moduleUrl+"'  target='_blank'><div class='clearfix'><i class='btn btn-sm btn-warning fa fa-cogs'></i>"+ data[i].moduleName+"</div></a></li>";
+							$("#module_ul").append($li);
+							}
+							
+							}
+							
+						})
+					});
+				
+				</script>

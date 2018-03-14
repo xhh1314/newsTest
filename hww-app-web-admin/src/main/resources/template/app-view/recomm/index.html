@@ -1,0 +1,204 @@
+
+<script type="text/javascript">
+    //本页面url
+    var loadSysListUrl ="${rc.contextPath}/recomm/list.do";
+</script>
+<form method="post" id="submitForm">
+<h2>推荐专题列表：</h2>
+<table class="table table-hover table-bordered" style="text-align: center">
+	<thead>
+	<tr>
+		<th style="text-align: center; width: 80px;">类型</th>
+		<th style="text-align: center">频道名称</th>
+		<th style="text-align: center">推荐条数</th>
+		<th style="text-align: center">操作</th>
+	</tr>
+	</thead>
+	<tbody>
+	
+	 <#list page.list as recomm>
+		<tr>
+			<td><#if (recomm.type==1)>栏目
+				<#elseif (recomm.type==2)>专题
+				<#else>新鲜事
+			</#if>
+			</td>
+			<td>
+			<#if (recomm.columnName)??>${recomm.columnName}</#if>
+			</td>
+			<td>
+			<#if (recomm.recommNum)??>${recomm.recommNum}</#if>
+			</td>
+			<td>
+			  <@shiro.hasPermission name="/recomm/update.do">  
+				<input type="button" value="增加推荐数" onclick="updateRecomm('${recomm.columnId?c}')">
+				</@shiro.hasPermission> 
+				<@shiro.hasPermission name="/recomm/disabled.do">  
+				<input type="button" value="禁用" onclick="disabledRecomm('${recomm.columnId?c}')"/>
+				</@shiro.hasPermission> 
+				<!-- <input type="button" value="删除" onclick="delRecomm('${recomm.columnId?c}')" /> -->
+			</td>
+		</tr>
+	</#list> 
+	
+	
+	<div class="modal fade" id="modalInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+<div class="modal-content">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal"
+			aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+		<h5 class="modal-title" id="myModalLabel">
+			<span class="glyphicon glyphicon-file"></span> <span id="modalTite"></span>
+		</h5>
+	</div>
+	<div class="modal-body">
+		<form class="form-horizontal" id="recommForms">
+			<div class="form-group form-group-sm">
+				<label for="inputEmail3" class="col-sm-2 control-label">添加推荐条数</label>
+				<div class="col-sm-10">
+				    <input type="hidden"  id="columnId" name="columnId"/>
+					<input type="number" id="recommNum" name="recommNum"  placeholder="推荐数" >
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-info btn-sm" data-dismiss="modal">
+			<span class="glyphicon glyphicon-remove"></span> 关闭
+		</button>
+		<button id="btnSave" data-action="" type="button"
+			class="btn btn-info btn-sm">
+			<span class="glyphicon glyphicon-saved"></span> 保存
+		</button>
+	</div>
+</div>
+</div>
+	
+	
+	
+	
+	
+   </div> 
+	
+	</tbody>
+</table>
+<input type="hidden" value="${page.pageNo}" name="pageNo" id="pageNo"/>
+</form>
+<!-- <input type="button" value="添加推荐" id="addRecomm"/> -->
+
+<!-- <div class="modal fade" id="modalInfo" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel">
+	 <#include "add.html">
+</div> -->
+<#include "../common/page.html" />
+<script type="text/javascript">
+		var $modalInfo = $('#modalInfo');
+		var $modalInfoTitle = $modalInfo.find('#modalTite');
+		$modalInfo.modal({
+			backdrop:'static',
+			keyboard:false,
+			show:false
+		});		
+      function updateRecomm(columnId){
+    	  $modalInfo.modal("show");
+    	  $("#columnId").val(columnId);
+    	  $("#recommNum").val("");
+     } 
+      
+      $("#btnSave").click(function(){
+    	var  columnId=  $("#columnId").val();
+    	 var recommNum=  $("#recommNum").val();
+    	  $.ajax({
+     		 url:"${rc.contextPath}/recomm/update.do",
+     		 data:{"recommNum":recommNum,"columnId":columnId},
+     		 type:"post",
+     		 dataType:"text",
+     		 success:function(data){
+     			if(data=="success"){
+     				/*   $modalInfo.modal("hide"); */
+     				 hideModal($modalInfo);
+     				 $('.hk-main').load(loadSysListUrl);
+     			} else{
+     				alert(data);
+     			}
+     		 }
+     	 }); 	  
+      })
+function hideModal(model) {
+	model.removeClass("in");
+	$(".modal-backdrop").remove();
+	$('body').removeClass('modal-open');
+	$('body').css('padding-right', '');
+	model.hide();
+}
+		function delRecomm(columnId){
+			$.ajax({
+				url:"${rc.contextPath}/recomm/del.do",
+				data:{"columnId":columnId},
+				type:"post",
+				dataType:"text",
+				success:function(data){
+					if(data=="success"){
+						alert("删除成功");
+					}else{
+						alert(data);
+					}
+				}
+				
+			});
+		}
+
+
+     $("#addRecomm").click(function(){
+        $modalInfo.modal("show");
+      
+     })
+     
+     
+     
+     function disabledRecomm(columnId){
+    	 $.ajax({
+    		 url:"${rc.contextPath}/recomm/disabled.do",
+    		 data:{"columnId":columnId},
+    		 type:"post",
+    		 dataType:"text",
+    		 success:function(data){
+    			 alert(data);
+    			 $('.hk-main').load(loadSysListUrl);
+    		 }
+    	 })
+     }
+        
+//分页查询
+function jumpNormalPage(pageNo) {
+    $("#pageNo").val(pageNo);
+    var data = $("#submitForm").serialize();
+    $('.hk-main').load(loadSysListUrl,data);
+}
+     
+     
+     var page = {
+    			//初始化
+    			init : function() {
+    				this.eventInit();
+    			},
+    			//事件绑定
+    			eventInit : function() {
+    				//信息表单模态框
+    			
+    				//bootstrap模态框实例
+    				$modalInfo.modal({
+    					backdrop : 'static',//点击模态透明层不隐藏
+    					keyboard : false,//键盘不控制模态框 如：esc按下模态框不消失
+    					show : false
+    				//实例化后默认不显示
+    				});
+    				
+    				
+    			}
+    		} 
+     
+</script>

@@ -1,0 +1,106 @@
+<div class="modal-dialog modal-lg" role="document" style="width: 50%;">
+			    <div class="modal-content">
+			      <div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h5 class="modal-title">
+						<span class="glyphicon glyphicon-file"></span> <span>添加app版本</span>
+					</h5>
+					</div>
+			      <div class="modal-body">
+			      <form class="form-horizontal" id="addAppVersionForm">
+					<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">app名称</label>
+						<div class="col-sm-8">
+						<input type="text" class="form-control" id="appName" name="appName" placeholder="app名称" >
+					</div>
+					</div>
+					<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">版本号</label>
+						<div class="col-sm-8">
+						<input type="text" class="form-control" id="versionCode" name="versionCode" placeholder="版本名称" >
+					</div>
+					</div>
+					<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">版本名称</label>
+						<div class="col-sm-8">
+						<input type="text" class="form-control" id="versionName" name="versionName" placeholder="版本名称" >
+					</div>
+					</div>
+					 <div class="form-group form-group-sm">
+					
+						<input type="hidden" class="form-control" id="apkUrl" name="apkUrl" placeholder="apk链接" >
+					
+					</div>  
+						<div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label">上传软件</label>
+							<div class="col-sm-10">
+								<input id="modalfile_add_fileInfo" name="myfile" type="file"> 
+							</div>
+						</div>
+				</form>
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-info btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 关闭</button>
+			        <button data-action="" onclick="saveApp();" type="button" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-saved"></span> 保存</button>
+			      </div>
+			    </div>
+			  </div>
+<script>
+		
+var $countryModal = $('#countryModal');
+		//上传apk
+		$('#modalfile_add_fileInfo').fileinput({
+			language:'zh',//语言中文
+			showCaption:true,//文本框
+			showPreview:false,//预览
+			showUpload:true,//上传按钮
+			uploadAsync: false, //默认异步上传,此处改为同步
+			showClose:true,//预览框关闭按钮
+			showBrowse:true,//上传按钮
+			browseOnZoneClick:false,//点击拖拽区不上传
+			initialPreviewShowDelete:true,
+			allowedFileExtensions:['apk'],//允许文件类型
+			browseClass:'btn btn-info btn-sm', //样式
+			captionClass:'input-sm', 
+			removeClass:'btn btn-info btn-sm',
+			uploadClass:'btn btn-info btn-sm',
+			enctype: 'multipart/form-data',
+			uploadUrl:file_info_url,//视频上传路径
+		}).on("filebatchuploadsuccess", function (event, data, previewId, index) {
+			 //同步上传返回结果处理
+			if (data.response) {
+				  var obj = data.response;
+				  var urls = obj.urls;
+				 $("#apkUrl").val(urls);
+				 alert("上传成功");
+				 
+			}
+	  });
+		 function saveApp(){
+			$.ajax({
+				type : "POST",
+				data : $("#addAppVersionForm").serialize(),
+				dataType : "json",
+				url : "${rc.contextPath}/version/save.do",
+				success : function(data) {
+					  alert(data);
+					  hideModal( $countryModal);
+					  $("#addAppVersionForm").resetForm();
+					  $('.hk-main').load("${rc.contextPath}/version/list.do");
+					  
+				}
+		})
+		 }
+		 
+		 function hideModal(model) {
+			 model.removeClass("in");
+			 $(".modal-backdrop").remove();
+			 $('body').removeClass('modal-open');
+			 $('body').css('padding-right', '');
+			 model.hide();
+			 }
+
+
+</script>

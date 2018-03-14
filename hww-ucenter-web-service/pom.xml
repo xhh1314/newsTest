@@ -1,0 +1,145 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.hww.ucenter</groupId>
+    <artifactId>hww-ucenter</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../hww-ucenter/pom.xml</relativePath>
+  </parent>
+
+  <artifactId>hww-ucenter-web-service</artifactId>
+  <packaging>jar</packaging>
+
+  <name>hww-ucenter-web-service</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-eureka</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.hww.app</groupId>
+      <artifactId>hww-app-common-dto</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.hww.ucenter</groupId>
+      <artifactId>hww-ucenter-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+			<groupId>com.hww.sys</groupId>
+			<artifactId>hww-sys-common-dto</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+    <dependency>
+      <groupId>com.hww.framework</groupId>
+      <artifactId>hww-framework-web-service</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+       <dependency>
+      <groupId>com.hww.app</groupId>
+      <artifactId>hww-app-common-dto</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.hww.sns</groupId>
+      <artifactId>hww-sns-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.hww.cms</groupId>
+      <artifactId>hww-cms-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-hystrix</artifactId>
+    </dependency>
+<!--     <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.7.4</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>2.7.4</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <version>2.7.4</version>
+    </dependency> -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui -->
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger-ui</artifactId>
+      <version>2.7.0</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger2 -->
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger2</artifactId>
+      <version>2.7.0</version>
+    </dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+
+    
+     <dependency>
+      <groupId>com.hww.cms</groupId>
+      <artifactId>hww-cms-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+     <dependency>
+      <groupId>com.hww.sns</groupId>
+      <artifactId>hww-sns-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+         <dependency>
+      <groupId>com.hww.app</groupId>
+      <artifactId>hww-app-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>1.5.9.RELEASE</version>
+        <configuration>
+          <mainClass>com.hww.ucenter.UCenterWebServiceApplication</mainClass>
+          <layout>ZIP</layout>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
+
+    <finalName>hww-ucenter-web-service</finalName>
+  </build>
+</project>

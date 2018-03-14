@@ -1,0 +1,73 @@
+      <!--  <li>
+						<a href="javascript:void(0)" class="dropdown-toggle">
+							<i class="menu-icon fa fa-desktop"></i>
+							<span class="menu-text">
+								控制台
+							</span>
+							<b class="arrow fa fa-angle-down"></b>
+						</a>
+						<b class="arrow"></b>
+						<ul class="submenu">
+							<li class="active">
+								<a href="javascript:void(0)"
+								data-href="${rc.contextPath}/console.do"> <i class="menu-icon fa fa-caret-right"></i>
+									控制台
+								</a>
+								<b class="arrow"></b>
+							</li>
+						</ul>
+					</li> -->
+					<li class="active open">
+						<a href="javascript:void(0)" class="dropdown-toggle">
+							<i class="menu-icon glyphicon glyphicon-user"></i>
+							<span class="menu-text">
+								用户管理
+							</span>
+							<b class="arrow fa fa-angle-down"></b>
+						</a>
+						<b class="arrow"></b>
+						<ul class="submenu">
+							<!-- <li class="active">
+								<a href="javascript:void(0)" data-href="${rc.contextPath}/sys/query.do">
+									<i class="menu-icon fa fa-caret-right"></i>
+									后台用户管理
+								</a>
+								<b class="arrow"></b>
+							</li> -->
+							<li>
+								<a href="javascript:void(0)" data-href="${rc.contextPath}/ucenter/query.do">
+								<i class="menu-icon fa fa-caret-right"></i>
+									会员管理
+								</a>
+								<b class="arrow"></b>
+							</li>
+						</ul>
+					</li>
+	<script type="text/javascript">
+		
+		var pageMethods = {
+			init : function() {
+				$('.submenu li a').click(
+						function(event) {
+							var $allLi = $('.submenu li');
+							var $this = $(this);
+							//iframe src跳转
+							var url = $this.attr('data-href');
+							if (url) {
+								$('.hk-main').load(url);
+							}
+                            $allLi.removeClass('active');
+                            $this.parentsUntil('.submenu', 'li').addClass(
+                                'active');
+						});
+			}
+		};
+		$(function($) {
+			pageMethods.init();
+			var consoleUrl = "${rc.contextPath}/console.do";
+			$('.hk-main').load(consoleUrl);
+		});
+		function loadMain(url,data){
+			$('.hk-main').load(url,data);
+		}
+	</script>

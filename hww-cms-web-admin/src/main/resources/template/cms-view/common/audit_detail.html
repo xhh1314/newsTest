@@ -1,0 +1,65 @@
+<div class="modal-dialog" role="document">
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+				aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+			<h5 class="modal-title" id="myModalLabel">
+				<span class="glyphicon glyphicon-file"></span> <span id="modalTite">审核详情</span>
+			</h5>
+		</div>
+		<div class="modal-body">
+			<div class="timeline-container timeline-style2">
+				<div class="timeline-items">
+					<#ifaudits??>
+							<#list audits as audit>
+							
+							<div class="timeline-item clearfix">
+								<div class="timeline-info">
+									<span class="timeline-date">
+									<#if (audits?size-audit_index)==3>
+										三审
+									    <#elseif (audits?size-audit_index)==2>
+									        二审
+									    <#elseif (audits?size-audit_index)==1>
+									       一审
+									</#if>
+									</span>
+									<i class="timeline-indicator btn btn-info no-hover"></i>
+								</div>
+	
+								<div class="widget-box transparent">
+									<div class="widget-body">
+										<div class="widget-main no-padding">
+											<p><span class="strong">状态：</span>
+											<#if audit.curentstatus??>
+												<#if audit.curentstatus==0>
+													拒绝
+													<#elseif audit.curentstatus==1>
+													通过
+												</#if>
+											</#if>
+											</p>
+											<p><span class="strong">审核人：</span><#if audit.auditUser??>${audit.auditUser}</#if></p>
+											<p><span class="strong">审核时间：</span><#if audit.createTime??>${audit.createTime?string('yyyy-MM-dd HH:mm:ss')}</#if></p>
+											<p><span class="strong">备注：</span><#if audit.auditOpinion??>${audit.auditOpinion}</#if></p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</#list>
+						</#if>
+						</div>
+				<!-- /.timeline-items -->
+			</div>
+			<!-- /.timeline-container -->
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-info btn-sm"
+				data-dismiss="modal">
+				<span class="glyphicon glyphicon-remove"></span> 关闭
+			</button>
+		</div>
+	</div>
+</div>

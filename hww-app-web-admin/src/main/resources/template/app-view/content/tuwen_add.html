@@ -1,0 +1,384 @@
+<style type="text/css">
+	#allmap{height:400px;width:100%;}
+</style>
+<script type="text/javascript">
+
+</script>
+
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h5 class="modal-title">
+					<span class="glyphicon glyphicon-file"></span> <span
+						id="modalInfoTitleImgtext"></span>
+				</h5>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal" id="tuwenForm" enctype="multipart/form-data">
+					<div class="form-group form-group-sm">
+						<label class="col-sm-2 control-label">是否置顶</label>
+						<div class="col-sm-10">
+							<#if (r.top)??>
+								<#if r.top==0>
+									<input type="radio" value="1"  name="top" id="enable"/>是
+									<input type="radio" value="0" name="top" id="disable" checked="checked"/>否
+								</#if>
+								<#if r.top==1>
+									<input type="radio" value="1"  name="top" id="enable" checked="checked"/>是
+									<input type="radio" value="0" name="top" id="disable"/>否
+								</#if>
+								<#else>
+									<input type="radio" value="1"  name="top" id="enable"/>是
+									<input type="radio" value="0" name="top" id="disable" checked="checked"/>否
+							</#if>
+						</div>
+					</div>
+					<div class="form-group form-group-sm">
+						<label for="inputEmail3" class="col-sm-2 control-label">内容类型</label>
+						<div class="col-sm-10">
+							<p class="form-control-static">图文类型</p>
+						</div>
+					</div>
+					<input type="hidden" id="categoryId" name="allIDCheck"/>  
+					<input type="hidden" value="2" name="contenttypeId">  <!-- 图文 -->
+					<div class="form-group form-group-sm">
+						<label for="inputEmail3" class="col-sm-2 control-label">所属分类</label>
+						<div class="col-sm-3">
+					<div style="padding:8px; border-radius:2px;">
+			      		<ul id="treeDemo" class="ztree" style="margin-top:0; width:260px;"></ul>
+			      	</div>
+				</div>
+					</div>
+					<div class="form-group form-group-sm">
+						<label for="inputEmail3" class="col-sm-2 control-label">标题</label>
+						
+						
+						<div class="col-sm-10">
+							<input type="text" name="title" class="form-control" placeholder="标题" value="<#if r??>${r.title!}</#if>">
+						</div>
+					</div>
+					 <div class="form-group form-group-sm">
+					    <label for="inputEmail3" class="col-sm-2 control-label">封面组图</label>
+					    <div class="col-sm-10">
+							<input type="file" name="myfile" id="input-id" multiple="multiple" />
+					    </div>
+					  </div>
+					  <input type="hidden" name="thumbUrl" id="thumbUrl">
+					<div class="form-group form-group-sm">
+						<label for="inputEmail3" class="col-sm-2 control-label">关键词</label>
+						<div class="col-sm-10">
+							<input type="text" name="keywordIds" class="form-control" placeholder="关键词" value="<#if r??>${r.keywordIds!}</#if>">
+						</div>
+					</div>
+					<div class="form-group form-group-sm">
+						<label for="inputEmail3" class="col-sm-2 control-label">来源</label>
+						<div class="col-sm-10">
+							<input type="text" name="origin_url" value="<#if contentData??><#if contentData.origin??>${contentData.origin.originUrl!}</#if></#if>" 
+							class="form-control" placeholder="来源" >
+						</div>
+					</div>
+						
+					<div class="form-group form-group-sm">
+						<label for="inputEmail3" class="col-sm-2 control-label">选择位置</label>
+						<div class="col-sm-10" >
+							<div class="form-group form-group-sm">
+						    	<div class="col-sm-10">
+						    		地址: <input id="cityName" name="location" type="text" style="width:100px; margin-right:10px;" />
+									<input type="button" value="查询" onclick="theLocation()" />
+				                	经度:<input type="text" name="longitude" id="jd" value="<#if r??>${r.longitude!}</#if>" />
+				                	纬度<input type="text" name="latitude" id="wd" value="<#if r??>${r.latitude!}</#if>"/>
+						    	</div>
+						    </div>
+							<div
+								style="height: 200px;" id="allmap">
+							</div>
+						</div>
+					</div>
+					<div class="form-group form-group-sm">
+						<label for="inputEmail3" class="col-sm-2 control-label">摘要</label>
+						<div class="col-sm-10">
+							<textarea  class="form-control" placeholder="摘要" cols="30"
+								rows="5" ><#if r??>${r.summary!}</#if></textarea>
+						</div>
+					</div>
+					<textarea id="text1" style="display: none" name="content"></textarea>
+					<div class="form-group form-group-sm">
+						<label for="inputEmail3" class="col-sm-2 control-label">内容</label>
+						<div class="col-sm-10">
+							<div id="editor" >
+						        <#if contentData??>
+						        	${contentData.content}
+						        </#if>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-info btn-sm"
+					data-dismiss="modal">
+					<span class="glyphicon glyphicon-remove"></span> 关闭
+				</button>
+
+	
+
+				<button id="btnSaveTuwen" data-action="" type="button"
+					class="btn btn-info btn-sm">
+					<span class="glyphicon glyphicon-saved"></span> 保存
+				</button>
+				  
+			</div>
+		</div>
+	</div>
+
+<script type="text/javascript">
+var tuwen_add_tree;
+var tuwen_add_page={
+		//表单校验
+		formValidate:function (){
+			var nodeIds = tuwen_add_tree.getCheckedNodes(true);
+			if(nodeIds==null||nodeIds.length==0){
+				alert("至少选择一个所属分类!");
+				return false;
+			}
+			return true;
+		}
+}
+
+function fileInputInit(){
+	//如果是编辑
+	var initialPreviewArray = new Array();
+	<#if r??>
+	<#if r.thumbUrl??>
+		var logoUrls = '${r.thumbUrl!}';
+		var logos = new Array(logoUrls);
+		if(logoUrls.indexOf(",")>0){
+			logos = logoUrls.split(",");
+		}
+		for(var i=0;i<logos.length;i++){
+			var imgUrl = logos[i]||'';
+			if(imgUrl!=''){
+				if(imgUrl.indexOf('http')==0){
+					initialPreviewArray.push(imgUrl);
+				}else{
+					initialPreviewArray.push(file_show_prefix+imgUrl);
+				}
+			}
+		}
+	</#if>
+	</#if>
+	var $inputfile = $('#input-id');
+	$inputfile.fileinput({
+		language:'zh',//语言中文
+		showCaption:true,//文本框
+		showPreview:true,//预览
+		showUpload:true,//上传按钮
+		showClose:true,//预览框关闭按钮
+		showBrowse:true,//上传按钮
+		browseOnZoneClick:false,//点击拖拽区不上传
+		initialPreviewShowDelete:true,
+		allowedFileExtensions:['jpg','png','gif','jpeg'],//允许文件类型
+		browseClass:'btn btn-info btn-sm', //样式
+		captionClass:'input-sm', 
+		removeClass:'btn btn-info btn-sm',
+		uploadClass:'btn btn-info btn-sm',
+		enctype: 'multipart/form-data',
+		uploadUrl:img_upload_url,//服务器端图片接收处理路径
+		initialPreviewAsData: true, // 特别重要
+		initialPreviewFileType: 'image',
+		//初始化图片显示
+		initialPreview: initialPreviewArray
+	}).on("fileuploaded", function(event, data, previewId, index) {
+		if (data.response) {
+			  var obj = data.response;
+		         var urls=obj.urls
+		         var old=$("#thumbUrl").val();
+		         var newUrl=null
+		         if (old==null || old=="") {
+		        	 newUrl=urls;
+				}else{
+					 newUrl=old+","+urls;
+				}
+		         
+		         $("#thumbUrl").val(newUrl)
+		}
+		
+	}).on("filesuccessremove", function(event, index) {
+		
+	});
+}
+//wangEditor 控件实例演示
+function wangEditorInit(){
+    var editor = new wangEditor('#editor');
+    editor.customConfig.uploadFileName = 'myfile'
+	    editor.customConfig.uploadImgServer = img_upload_url;//图片服务器上传路径
+	    var $text1 = $('#text1')
+	    editor.customConfig.onchange = function (html) {
+	        // 监控变化，同步更新到 textarea
+	        $text1.val(html)
+	    }
+	    editor.customConfig.uploadImgHooks = {
+	    		success: function (xhr, editor, result) {
+	    	        // 图片上传并返回结果，图片插入成功之后触发
+	    	    },
+	    	    // （但是，服务器端返回的必须是一个 JSON 格式字符串！！！否则会报错）
+	    	    customInsert: function (insertImg, result, editor) {
+	    	    	if(result){
+	    	    		 var url = result.urls;
+			    	     url = file_show_prefix+url;
+			    	     insertImg(url)
+	    	    	}
+	    	    }
+	    }
+    editor.create();
+}
+
+var local;
+var setting = {
+		check: {
+			enable: true,
+			chkStyle: "checkbox",
+			chkboxType: { "Y": "", "N": "" }
+		},
+		callback: {  
+	        onCheck: ztreeCheck  
+		},
+		
+		data : {
+			simpleData: {
+				enable: true,
+				idKey: "id",
+				pIdKey: "pId",
+				rootPId: 0
+			}
+		}
+	};
+
+
+
+function theLocation(){
+	var city = document.getElementById("cityName").value;
+	if(city != ""){
+		alert(city)
+		local.search(city);
+	}
+}
+	
+	function loadMenu(resourceType, treeObjId,setting) {
+		$.ajax({
+			type : "POST",
+			url : resourceType,
+			dataType : "json",
+			success : function(data) {
+				// 如果返回数据不为空，加载"业务模块"目录
+				if (data != null) {
+					// 将返回的数据赋给zTree
+					tuwen_add_tree = $.fn.zTree.init($("#" + treeObjId), setting, data);
+					if (tuwen_add_tree) {
+						// 默认展开所有节点
+						tuwen_add_tree.expandAll(true);
+						//如果是编辑，选中节点
+						var treeNodeId = '<#if r??>${r.categoryId!}</#if>';
+						if(treeNodeId!=''){
+							var nodes = tuwen_add_tree.getNodesByParam("id",treeNodeId, null);
+							if(nodes.length>0){
+								for(var i=0;i<nodes.length;i++){
+									nodes[i].checked = true;
+									tuwen_add_tree.updateNode(nodes[i]); //重要
+								}
+							}
+						}
+					}
+				}
+			}
+		});
+	}
+	
+	
+	function filter(node) {   //过滤器直选中2级节点累加  
+	    return (node.checked == true);  
+	}  
+	
+	function ztreeCheck(e, treeId, treeNode){  //这是将所有选中节点的名字 用,分割做拼接 用于持久化到数据库  
+	     var zTree = $.fn.zTree.getZTreeObj("treeDemo").getNodesByFilter(filter);  
+	     var choose = "";  
+	     for (var i=0;i<zTree.length;i++) {  
+	         if(zTree[i].name !=null)  
+	     choose +=(i == (zTree.length-1))?zTree[i].name:zTree[i].name+",";  
+	     }  
+	     $("#treeDemo").val(choose);  
+	     treeIds();  
+	}  
+	
+	
+	
+	function treeIds(){                      //这是将选中的节点的id用;分割拼接起来,用于持久化到数据库  
+		   var zTreeO =  $.fn.zTree.getZTreeObj("treeDemo").getNodesByFilter(filter);  
+		   var idListStr = "";  
+		   for (var i = 0; i < zTreeO.length; i++) {  
+		      if (zTreeO[i].id != null) {  
+		     idListStr+= (i == (zTreeO.length-1))?zTreeO[i].id:zTreeO[i].id+";";  
+		      }  
+		   };
+		   $("#categoryId").val(idListStr);  
+	};  
+		
+	$(function() {
+			//初始化树
+			loadMenu("${rc.contextPath}/category/allCategoryJson.do", "treeDemo", setting);
+			wangEditorInit()
+			fileInputInit()
+			var map = new BMap.Map("allmap");
+			var point = new BMap.Point(116.331398,39.897445);
+			map.centerAndZoom(point,14);
+			map.addEventListener("click",function(e){
+			        var input =  document.getElementById('wd');
+			        var input2 =  document.getElementById('jd');
+			        input.value = e.point.lng;
+			        input2.value= e.point.lat;
+			});  
+			        
+			map.enableScrollWheelZoom();
+
+			map.addControl(new BMap.NavigationControl());    
+
+			local = new BMap.LocalSearch(map, {
+			       renderOptions:{map: map}
+			});
+		});		
+	
+	// 图文添加
+	$("#btnSaveTuwen").on('click', function() {
+		
+		var validated = tuwen_add_page.formValidate();
+		if(validated==false){
+			return false;
+		}
+		//ajax提交
+		var contentId = $("#contentId").val()
+
+		var url = null;
+		if (contentId == null || contentId == "") {
+			url = saveUrl;
+		} else {
+			url = updateUrl;
+		}
+		
+		$.ajax({
+			type : "POST",
+			data : $("#tuwenForm").serialize(),
+			url : url,
+			 dataType:"text",
+			success : function(data, status) {
+				if (status == 'success' && data == 'true') {
+					$modalInfoImgtext.modal('hide');//手动关闭模态框
+				}
+			}
+		});
+	});
+
+</script>

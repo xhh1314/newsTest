@@ -1,0 +1,163 @@
+
+<script type="text/javascript">
+	//获取关联新闻分类树
+	var relatedCategoryTreeUrl = "${rc.contextPath}/category/allCategoryJson.do";
+</script>
+<script src="${rc.contextPath}/admin/js/treeInit.js"></script>
+<div class="modal-dialog" role="document">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			        <h5 class="modal-title">
+			        	<span class="glyphicon glyphicon-file"></span> 
+			        	<span>专题详情</span>
+			        </h5>
+			      </div>
+			      <div class="modal-body">
+			        <form id="specialDetail" name="specialDetail" class="form-horizontal">
+					  <div class="form-group form-group-sm">
+					    <label class="col-sm-2 control-label">专题标题</label>
+					    <div class="col-sm-10">
+					      	<p class="form-control-static"><#if special??>${special.categoryName!''}</#if></p>
+					    </div>
+					  </div>
+					  <div class="form-group form-group-sm">
+					    <label class="col-sm-2 control-label">封面组图</label>
+					    <div class="col-sm-10">
+					      	<div class="hk-imgset">
+					      		<div class="imgs">
+					      		<#if special.logoUrls??>
+					      			<#list special.logoUrls as logoUrl>
+					      				<img src="${logoUrl}" alt="" />
+					      			</#list>
+					      		</#if>
+					      		</div>
+					      	</div>
+					    </div>
+					  </div>
+					  <div class="form-group form-group-sm">
+					    <label class="col-sm-2 control-label">摘要</label>
+					    <div class="col-sm-10">
+					      	<p class="form-control-static"><#if special.summary??>${special.summary}</#if></p>
+					    </div>
+					  </div>
+					  <div class="form-group form-group-sm">
+					    <label class="col-sm-2 control-label">内容</label>
+					    <div class="col-sm-10">
+					      	<div id="topicColumn" class="hk-fm-topiccolumn">
+					    <#if special.cmsCategoryVos??>
+					      	<#list special.cmsCategoryVos as specialContent>
+								<div class="item">
+									<span class="item-close glyphicon glyphicon-remove"></span>
+									<div class="form-group form-group-sm">
+									    <label class="col-sm-12 control-label align-left">栏目标题</label>
+									    <div class="col-sm-12">
+									      <p class="form-control-static"><#if specialContent.columnTitle??>${specialContent.columnTitle}</#if></p>
+									    </div>
+									</div>
+									<div class="form-group form-group-sm">
+									    <label class="col-sm-12 control-label align-left">关联新闻分类</label>
+									    <div class="col-sm-12">
+									      <!-- 此处为新闻分类树 不可编辑 -->
+									      <ul id="treeDemo${specialContent_index+1}" 
+									      value="<#if specialContent.relatedCategoryId??>${specialContent.relatedCategoryId}</#if>" class="ztree"></ul>
+									    </div>
+									</div>
+								</div>
+							</#list>
+						</#if>	
+							</div>
+					    </div>
+					  </div>
+					  <div class="form-group form-group-sm">
+					    <label class="col-sm-2 control-label">发布时间</label>
+					    <div class="col-sm-10">
+					      	<p class="form-control-static">
+					      	<#if special.auditStatus??>
+					      		<#if special.auditStatus==1>
+					      			<#if special.lastModifyTime??>${special.lastModifyTime}</#if>
+					      		</#if>
+							</#if>
+					      	</p>
+					    </div>
+					  </div>
+					  <div class="form-group form-group-sm">
+					    <label class="col-sm-2 control-label">发布人</label>
+					    <div class="col-sm-10">
+					      	<p class="form-control-static"><#if special.creator??>${special.creator}</#if></p>
+					    </div>
+					  </div>
+					</form>
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-info btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 关闭</button>
+			      </div>
+			    </div>
+			    
+			    
+<script>
+var setting = {
+		data : {
+			simpleData : {
+				enable: true,
+				idKey: "id",
+				pIdKey: "pId",
+				rootPId: 0,
+				showLine : true,                  //是否显示节点间的连线  
+		        checkable : true                  //每个节点上是否显示 CheckBox  
+			}
+		}
+	};
+	
+	function getCategoryTree(){
+		var treeJson = '';
+		$.ajax({
+			type : "POST",
+			async: false, //同步
+			url : relatedCategoryTreeUrl,
+			dataType : "json",
+			success : function(data) {
+				if (data != null) {
+					treeJson = data;
+				}
+			}
+		});
+		return treeJson;
+	}
+	
+	$(function(){
+		var treeJson = getCategoryTree();
+		var ztrees = $(".ztree");
+		if(ztrees.length>0){
+			for(var i=0;i<ztrees.length;i++){
+				var treeDemoId = $(ztrees[i]).attr("id");
+				//设置新闻分类树
+				loadMenuByJsonStr(treeJson, treeDemoId, setting);
+				//选中节点
+				var selectedIds = $(ztrees[i]).attr("value");
+				var arr= new Array(selectedIds);
+				if(selectedIds.indexOf(",")>0){
+					arr = selectedIds.split(",");
+				}
+				var treeObj = $.fn.zTree.getZTreeObj(treeDemoId);
+				for(var j=0;j<arr.length;j++){
+					var node = treeObj.getNodeByParam("id", arr[j], null);
+					if(node!=null){
+						treeObj.selectNode(node);
+					}
+				}
+				/**禁用所有节点checkbox*/
+				//var nodes = treeObj.transformToArray(treeObj.getNodes());
+				//for(var i = 0; i < nodes.length; i++){
+					//nodes[i].chkDisabled = true;
+				//}
+				
+			}
+		}
+	});
+	
+	/**菜单跳转**/
+	function target(id,url){
+		$(id).attr('src', url);
+	}
+</script>

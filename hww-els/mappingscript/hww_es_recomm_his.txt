@@ -1,0 +1,31 @@
+PUT  /es_hww/_mapping/hww_es_recomm_his
+{
+"properties": {
+      "hisid": {
+        "type": "text"
+      },
+      "memberId":{
+        "type": "long"
+      },
+        "type":{
+        "type": "text"
+      },
+      
+    "imei":{
+        "type": "text"
+      },
+      "contentId":{
+        "type":"long"
+      },
+       "plateType":{
+        "type": "integer"
+      },
+      "createTime":{
+        "type":"date",
+        "format": "yyyy-MM-dd HH:mm:ss"
+      },
+       "recommTimeStamp":{
+        "type":"long"
+      }
+}
+}

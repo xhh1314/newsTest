@@ -1,0 +1,98 @@
+<div class="modal-dialog modal-lg" role="document" style="width: 50%;">
+			    <div class="modal-content">
+			      <div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h5 class="modal-title">
+						<span class="glyphicon glyphicon-file"></span> <span>添加国家</span>
+					</h5>
+					</div>
+			      <div class="modal-body">
+			      <form class="form-horizontal">
+					<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">国家名称</label>
+						<div class="col-sm-8">
+						<input type="text" class="form-control" id="country_add_name" placeholder="国家名称" >
+					</div>
+					</div>
+				</form>
+				<form class="form-horizontal">
+					<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">经度</label>
+						<div class="col-sm-8">
+						<input type="text" class="form-control" id="country_add_longitude" placeholder="经度" >
+					</div>
+					</div>
+				</form>
+				<form class="form-horizontal">
+					<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">纬度</label>
+						<div class="col-sm-8">
+						<input type="text" class="form-control" id="country_add_latitude" placeholder="纬度" >
+					</div>
+					</div>
+				</form>
+				<form class="form-horizontal" id="contenttypeForm">
+					<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">半径</label>
+						<div class="col-sm-8">
+						<input type="text" class="form-control" id="country_add_radius" placeholder="经度" >
+					</div>
+					</div>
+				</form>
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-info btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 关闭</button>
+			        <button data-action="" onclick="countrySaveOrUpdate();" type="button" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-saved"></span> 保存</button>
+			      </div>
+			    </div>
+			  </div>
+<script type="text/javascript">
+	function countrySaveOrUpdate(){
+		var countryAddName = $("#country_add_name").val();
+		console.log(countryAddName);
+		var countryAddLongitude = $("#country_add_longitude").val();
+		console.log(countryAddLongitude);
+        var countryAddLatitude = $("#country_add_latitude").val();
+    	console.log(countryAddLatitude);
+        var countryAddRadius = $("#country_add_radius").val();
+    	console.log(countryAddRadius);
+		if(!countryAddName){
+			alert("请填写国家名");
+			return false;
+		}
+		if (!countryAddLongitude) {
+            alert("经度不能为空！");
+            return false;
+        }
+        if (!countryAddLatitude) {
+            alert("纬度不能为空！");
+            return false;
+        }
+        if (!countryAddRadius) {
+            alert("半径不能为空！");
+            return false;
+        }
+		
+			$.ajax({
+		    type:"POST",
+		    data:{"countryName":countryAddName,
+		    	"longitude":countryAddLongitude,
+		    	"latitude":countryAddLatitude,
+		    	"radius":countryAddRadius},
+		    dataType:"json",
+		    url: "${rc.contextPath}/country/v_saveOrUpdate.do",
+		    success:function(data){
+		    	alert(data.message);
+		    	hideModal($countryModal);
+		    	var dateCur={"countryId":curCountryId,"provinceId":curProvinceId};
+		    	$(".hk-main").load(countryUrl,dateCur);
+		    }
+		});
+			
+		
+	
+	}
+</script>
+		

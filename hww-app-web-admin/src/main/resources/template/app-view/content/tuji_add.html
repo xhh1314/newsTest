@@ -1,0 +1,525 @@
+<script type="text/javascript">
+	
+	var addPicCollectContentUrl = "${rc.contextPath}/content/saveOrUpdatePicCollect.do";
+</script>
+
+<div class="modal-dialog modal-lg" role="document">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+			        <h5 class="modal-title">
+			        	<span class="glyphicon glyphicon-file"></span> 
+			        	<span>添加数据</span>
+			        </h5>
+			      </div>
+			      <div class="modal-body">
+			        <form name="tujiform" id="tujiform" class="form-horizontal">
+						<div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label">是否置顶</label>
+							<div class="col-sm-10">
+								<#if (r.top)??>
+									<#if r.top==0>
+										<input type="radio" value="1"  name="top" id="enable"/>是
+										<input type="radio" value="0" name="top" id="disable" checked="checked"/>否
+									</#if>
+									<#if r.top==1>
+										<input type="radio" value="1"  name="top" id="enable" checked="checked"/>是
+										<input type="radio" value="0" name="top" id="disable"/>否
+									</#if>
+									<#else>
+										<input type="radio" value="1"  name="top" id="enable"/>是
+										<input type="radio" value="0" name="top" id="disable" checked="checked"/>否
+								</#if>
+							</div>
+						</div>
+			          <div class="form-group form-group-sm">
+					    <label class="col-sm-2 control-label">内容类型</label>
+					    <div class="col-sm-10">
+					      <p class="form-control-static">图集类型</p>
+					    </div>
+					  </div>
+					  <div class="form-group form-group-sm">
+					    <label class="col-sm-2 control-label">所属分类</label>
+					    <input type="hidden" id="categoryIds" name="categoryIds"/>  
+					    <div class="col-sm-10">
+					      <div style="padding:8px;border-radius:2px;">
+			      				<ul id="tujitreeDemo" class="ztree" style="margin-top:0; width:260px;"></ul>
+			      			</div>
+					    </div>
+					  </div>
+					  <div class="form-group form-group-sm">
+					    <label class="col-sm-2 control-label">标题</label>
+					    <div class="col-sm-10">
+					      <input type="text" name="title" value="<#if r??>${r.title!}</#if>" class="form-control" placeholder="标题">
+					    </div>
+					  </div>
+					  <div class="form-group form-group-sm">
+					    <label class="col-sm-2 control-label">封面组图</label>
+					    <div class="col-sm-10">
+							<input type="file" name="myfile" id="tujifaceId" multiple="multiple" />
+							<input type="hidden" name="thumbUrl" id="tujithumbUrl"/>
+					    </div>
+					  </div>
+					  <div class="form-group form-group-sm">
+					    <label class="col-sm-2 control-label">摘要</label>
+					    <div class="col-sm-10">
+					      <textarea class="form-control" placeholder="摘要" cols="30" rows="5"></textarea>
+					    </div>
+					  </div>
+					  <div class="form-group form-group-sm">
+					    <label class="col-sm-2 control-label">图集上传</label>
+					    <div class="col-sm-10">
+							<div id="imgset" class="hk-fm-imgset">
+							
+							</div>
+							<button id="btnAddImgsetItem" type="button" class="btn btn-info btn-sm" title="继续添加图片">
+								<i class="glyphicon glyphicon-plus"></i>
+								添加图集子项
+							</button>
+					    </div>
+					    <input type="hidden" name="picIds" id="picIds">
+					     <input type="hidden" name="picDesc" id="picDesc">
+					  </div>
+					  <div class="form-group form-group-sm">
+					    <label class="col-sm-2 control-label">关键词</label>
+					    <div class="col-sm-10">
+					      <input type="text" name="keywordIds" value="<#if r??>${r.keywordIds!}</#if>" class="form-control" placeholder="关键词">
+					    </div>
+					  </div>
+					  <div class="form-group form-group-sm">
+					    <label class="col-sm-2 control-label">来源</label>
+					    <div class="col-sm-10">
+					      <input type="text" name="origin_url" value="<#if contentData??><#if contentData.origin??>${contentData.origin.originUrl!}</#if></#if>" 
+					      class="form-control" placeholder="来源">
+					    </div>
+					  </div>
+					  
+					<div class="form-group form-group-sm">
+						<label for="inputEmail3" class="col-sm-2 control-label">选择位置</label>
+						<div class="col-sm-10" >
+							<div class="form-group form-group-sm">
+						    	<div class="col-sm-10">
+						    		地址: <input id="tujicityName" type="text" style="width:100px; margin-right:10px;" />
+									<input type="button" value="查询" onclick="tujiMapSearch()" />
+				                	经度:<input type="text" name="longitude" id="tujijd" value="<#if r??>${r.longitude!}</#if>" />
+				                	纬度<input type="text" name="latitude" id="tujiwd" value="<#if r??>${r.latitude!}</#if>"/>
+						    	</div>
+						    </div>
+							<div
+								style="height: 200px; " id="tujimap">
+							</div>
+						</div>
+					</div>
+					</form>
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-info btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 关闭</button>
+			        <button id="btnSavetuji" data-action="" type="button" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-saved"></span> 保存</button>
+			      </div>
+			    </div>
+			  </div>
+<script type="text/javascript">
+var tuji_add_page={
+		loadMenu:function (resourceType, treeObjId,setting) {
+			//$.fn.zTree.init($("#" + treeObjId), setting, null);
+			$.ajax({
+				type : "POST",
+				url : resourceType,
+				dataType : "json",
+				success : function(data) {
+					// 如果返回数据不为空，加载"业务模块"目录
+					if (data != null) {
+						// 将返回的数据赋给zTree
+						zTree = $.fn.zTree.init($("#" + treeObjId), setting, data);
+						if (zTree) {
+							// 默认展开所有节点
+							zTree.expandAll(true);
+							//如果是编辑，选中节点
+							var treeNodeId = '<#if r??>${r.categoryId!}</#if>';
+							if(treeNodeId!=''){
+								var nodes = zTree.getNodesByParam("id",treeNodeId, null);
+								if(nodes.length>0){
+									for(var i=0;i<nodes.length;i++){
+										nodes[i].checked = true;
+										zTree.updateNode(nodes[i]); //重要
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+		},
+		//封面组图初始化
+		faceImgInputInit:function(){
+			var initialPreviewArray = new Array();
+			//如果是编辑
+			<#if r??>
+			<#if r.thumbUrl??>
+				var logoUrls = '${r.thumbUrl!}';
+				var logos = new Array(logoUrls);
+				if(logoUrls.indexOf(",")>0){
+					logos = logoUrls.split(",");
+				}
+				for(var i=0;i<logos.length;i++){
+					var imgUrl = logos[i]||'';
+					if(imgUrl!=''){
+						if(imgUrl.indexOf('http')==0){
+							initialPreviewArray.push(imgUrl);
+						}else{
+							initialPreviewArray.push(file_show_prefix+imgUrl);
+						}
+					}
+				}
+			</#if>
+			</#if>
+			var $inputfile = $('#tujifaceId');
+			$inputfile.fileinput({
+				language:'zh',//语言中文
+				showCaption:true,//文本框
+				showPreview:true,//预览
+				showUpload:true,//上传按钮
+				showClose:true,//预览框关闭按钮
+				showBrowse:true,//上传按钮
+				browseOnZoneClick:false,//点击拖拽区不上传
+				initialPreviewShowDelete:true,
+				allowedFileExtensions:['jpg','png','gif','jpeg'],//允许文件类型
+				browseClass:'btn btn-info btn-sm', //样式
+				captionClass:'input-sm', 
+				removeClass:'btn btn-info btn-sm',
+				uploadClass:'btn btn-info btn-sm',
+				enctype: 'multipart/form-data',
+				uploadUrl:img_upload_url,//服务器端图片接收处理路径
+				initialPreviewAsData: true, // 特别重要
+				initialPreviewFileType: 'image',
+				//初始化图片显示
+				initialPreview: initialPreviewArray
+			}).on("fileuploaded", function(event, data, previewId, index) {
+				if (data.response) {
+					  var obj = data.response;
+				         var urls=obj.urls
+				         var old=$("#tujithumbUrl").val();
+				         var newUrl=null
+				         if (old==null || old=="") {
+				        	 newUrl=urls;
+						}else{
+							 newUrl=old+","+urls;
+						}
+				         
+				         $("#tujithumbUrl").val(newUrl)
+				}
+				
+			}).on("filesuccessremove", function(event, index) {
+				
+			});
+		},
+		//图集内容初始化
+		tujiContentInit:function(){
+			<#if tujiContent??>
+			<#list tujiContent?eval as tuji>
+	  			//如果是编辑
+				var initialPreviewArray = new Array();
+				var logoUrls = '${tuji.imgUrl!}';
+				var logos = new Array(logoUrls);
+				if(logoUrls.indexOf(",")>0){
+					logos = logoUrls.split(",");
+				}
+				for(var i=0;i<logos.length;i++){
+					var imgUrl = logos[i]||'';
+					if(imgUrl!=''){
+						if(imgUrl.indexOf('http')==0){
+							initialPreviewArray.push(imgUrl);
+						}else{
+							initialPreviewArray.push(file_show_prefix+imgUrl);
+						}
+					}
+				}
+				addtujiContentInit($("#btnAddImgsetItem"),'${tuji.fileId!}','${tuji.fileDesc!}',initialPreviewArray);
+	  		</#list>
+	  		</#if>
+	  		//图片id
+	  		<#if r??>
+	  			<#if r.attachmentIds??>
+	  			picIds = ${r.attachmentIds};
+	  			</#if>
+	  		</#if>
+		}
+}
+
+
+
+function filter(node) {   //过滤器直选中2级节点累加  
+    return (node.checked == true);  
+}  
+
+function ztreeCheck(e, treeId, treeNode){  //这是将所有选中节点的名字 用,分割做拼接 用于持久化到数据库  
+     //console.info(treeNode.tId + ", " + treeNode.name + "," + treeNode.checked);
+	var zTreeObj = $.fn.zTree.getZTreeObj(treeId);
+     var zTree = zTreeObj.getNodesByFilter(filter);  
+     var choose = "";  
+     var idListStr="";
+     for (var i=0;i<zTree.length;i++) {  
+         if(zTree[i].name !=null){
+        	 choose +=(i == (zTree.length-1))?zTree[i].name:zTree[i].name+",";
+         }  
+         if (zTree[i].id != null) {  
+    	     idListStr+= (i == (zTree.length-1))?zTree[i].id:zTree[i].id+",";  
+    	  }  
+     
+     }  
+     $("#"+treeId).val(choose);
+     $("#categoryIds").val(idListStr); 
+} 
+	
+	var setting = {
+			check: {
+				enable: true,
+				chkStyle: "checkbox",
+				chkboxType: { "Y": "", "N": "" }
+			},
+			callback: {  
+		        onCheck: ztreeCheck  
+			},
+			
+			data : {
+				simpleData: {
+					enable: true,
+					idKey: "id",
+					pIdKey: "pId",
+					rootPId: 0
+				}
+			}
+		};
+	/*********新闻分类树end***********/
+var tujilocal;
+$(function() {
+	tuji_add_page.loadMenu("${rc.contextPath}/category/allCategoryJson.do", "tujitreeDemo", setting);
+	//初始化封面
+	tuji_add_page.faceImgInputInit();
+	//初始化图集
+	tuji_add_page.tujiContentInit();
+	
+	var map = new BMap.Map("tujimap");
+	var point = new BMap.Point(116.331398,39.897445);
+	map.centerAndZoom(point,11);
+	map.addEventListener("click",function(e){
+		$("#tujiwd").attr("value",e.point.lng);
+		$("#tujijd").attr("value",e.point.lat);
+	});  
+	map.enableScrollWheelZoom();
+	map.addControl(new BMap.NavigationControl());
+	tujilocal = new BMap.LocalSearch(map, {
+	       renderOptions:{map: map}
+	});
+});
+
+
+function tujiMapSearch(){
+	var city = $("#tujicityName").val();
+	if(city != ""){
+		tujilocal.search(city);
+	}
+}
+
+function getExtraData() {
+	var obj={};
+	obj.desc = $("#picDesc").val();
+	return obj;
+};
+
+//图集表单中添加图集子项相关
+/**
+ * extraData {}
+ */
+var fileInputIndex = 1;
+var picIds='';
+$('#btnAddImgsetItem').click(function(){
+	if(fileInputIndex>1){
+		//判断上一个图集图片不能为空
+		if($('#fileinput'+(fileInputIndex-1)).fileinput("getFilesCount")<=0){          //获取文件个数  
+	        alert("请至少上传一张图片!");  
+	        return;  
+	    } 
+	}
+	var $inputfiles = $('#imgset').find('.item input[type="file"]');
+	if($inputfiles&&$inputfiles.length>0){
+		fileInputIndex=$inputfiles.length+1;
+	}
+	addtujiContentInit($(this));
+	
+});
+function addtujiContentInit($this,fileId,fileDesc,initialPreviewArray){
+	console.info(fileInputIndex);
+	//图集子项
+	var imgsetItemHtml = '<div class="item">'
+		+'<span class="item-close" title="删除此图集子项">'
+			+'<i class="glyphicon glyphicon-trash"></i>'
+		+'</span>'
+		+'<input type="file" name="myfile" id="fileinput'+fileInputIndex+ '" multiple="multiple" />'
+		+'<input type="hidden" name="fileId" id="fileId'+fileInputIndex + '" value="'+fileId+'" />';
+	if(fileDesc||''!=''){
+		imgsetItemHtml = imgsetItemHtml+'<textarea class="form-control" id="desc'+fileInputIndex +'" name="desc'+fileInputIndex +'" placeholder="图片摘要" rows="4">'+fileDesc+'</textarea>'
+	}else{
+		imgsetItemHtml = imgsetItemHtml+'<textarea class="form-control" id="desc'+fileInputIndex +'" name="desc'+fileInputIndex +'" placeholder="图片摘要" rows="4"></textarea>'
+	}
+	imgsetItemHtml = imgsetItemHtml+'</div>';
+	var $imgset = $this.parent().find('#imgset').append(imgsetItemHtml);
+	
+	fileInputIndex++;//为后续添加初始化值
+	
+	var $inputfile = $imgset.find('.item:last-child input[type="file"]');
+	$inputfile.fileinput({
+		language:'zh',//语言中文
+		showCaption:true,//文本框
+		uploadAsync: false, //默认异步上传,此处改为同步
+		showPreview:true,//预览
+		showUpload:false,//上传按钮
+		showClose:true,//预览框关闭按钮
+		showBrowse:true,//上传按钮
+		browseOnZoneClick:false,//点击拖拽区不上传
+		initialPreviewShowDelete:true,
+		allowedFileExtensions:['jpg','png','gif','jpeg'],//允许文件类型
+		browseClass:'btn btn-info btn-sm', //样式
+		captionClass:'input-sm', 
+		removeClass:'btn btn-info btn-sm',
+		uploadClass:'btn btn-info btn-sm',
+		enctype: 'multipart/form-data',
+		//自定义按钮
+		//otherActionButtons:'<button type="button" class="kv-file-down btn btn-xs btn-default" {dataKey} title="修改图片描述"><i class="fa fa-cloud-download"></i></button>',
+		uploadUrl:img_collect_upload_url,//服务器端图片接收处理路径
+		uploadExtraData: function(previewId, index) {   //额外参数的关键点
+            return getExtraData();
+        },
+     	//初始化图片显示
+     	overwriteInitial: false, //不覆盖已存在的图片  
+        //下面几个就是初始化预览图片的配置      
+        initialPreviewAsData: true,  
+        initialPreviewFileType: 'image',
+		initialPreview: initialPreviewArray //要显示的图片的路径 
+	}).on("filesuccessremove", function(event, index) {
+		
+	}).on("filebatchuploadsuccess", function (event, data, previewId, index) {
+		 //同步上传返回结果处理
+		if (data.response) {
+			var obj = data.response;
+			if(obj||''!=''){
+				if((obj.ids)||''!=''){
+					//上传成功
+					if(picIds!=''){
+						picIds = picIds +","+obj.ids;
+					}else{
+						picIds = obj.ids;;
+					}
+					$("#picIds").val(picIds);
+				}
+			}
+		}
+   }).on('filepreupload', function(event, data, previewId, index) {
+	 //上传前
+	   var form = data.form, files = data.files, extra = data.extra,
+	   response = data.response, reader = data.reader;
+	   console.log('File pre upload triggered');
+	  });;
+	
+}
+//图集子项删除按钮
+$(document).on('click','#modalInfoImgset #imgset .item-close,#modalInfoImgset_edit #imgset .item-close',function(){
+	$(this).parent().fadeOut(200,function(){
+		console.info($(this));
+		$(this).remove();
+		//编辑时更新删除此图
+		console.info(picIds);
+	})
+});
+
+//获取选中的新闻分类ids
+function getSelectedNodes(zTreeObj){
+	var cidArray= new Array();
+	if(zTreeObj!=null){
+		//var nodes = zTreeObj.getSelectedNodes();
+		var nodes = zTreeObj.getCheckedNodes(true);
+		if(nodes!=null){
+			var cidArray = new Array();
+			for(var j=0;j<nodes.length;j++){
+				var node = nodes[j];
+				cidArray.push(node.id);
+			}
+		}
+	}
+	return cidArray;
+}
+//表单校验
+function formValidate(){
+	var zTreeO =  $.fn.zTree.getZTreeObj("tujitreeDemo");
+	var nodeIds = zTreeO.getCheckedNodes(true);
+	if(nodeIds==null||nodeIds.length==0){
+		alert("至少选择一个所属分类!");
+		return false;
+	}
+	return true;
+}
+//上传封面组图
+function uploadNewsImg(){
+    var formData = new FormData($( "#tujiform" )[0]);  
+    formData.append("file",$("#tujifaceId")[0]);//input type=“file”的id
+    formData.append("name","myfile");
+    $.ajax({
+        url:img_upload_url,
+        type:"POST",
+        dataType:"json",
+        data:formData,
+        async: false,
+        contentType: false,
+        processData: false,
+        success:function(data) {
+        	var urls = data.urls||'';
+            if(urls !=''){
+                $("#tujithumbUrl").val(urls);
+            }
+          //最后上传表单
+        	// 上传设置  
+            var options = {    
+            		type: "post", 
+                    url: addPicCollectContentUrl,
+                    // 服务器响应的数据类型  
+                    dataType: "text",
+                    async: false, //同步
+                    // 请求成功时执行的回调函数  
+                    success: function(data, status, xhr) {
+                    	if(status=='success'&&data=='success'){
+            				$modalInfoImgset.modal('hide');//手动关闭模态框
+        		    	} 
+                    }  
+            };
+            $("#tujiform").ajaxSubmit(options); 
+        }
+    });
+  
+}
+//表单提交
+$("#btnSavetuji").on('click', function() {	
+	
+	var validated = formValidate();
+	if(validated==false){
+		return false;
+	}
+	//先触发插件开始上传图集
+	var $imgset = $('#imgset');
+	var $inputfiles = $imgset.find('.item input[type="file"]');
+	if($inputfiles&&$inputfiles.length>0){
+		for(var i=0;i<$inputfiles.length;i++){
+			var $inputfile = $inputfiles[i];
+			var $fileinput = $('#'+$inputfile.id);
+			var index = i+1;
+			var descValue = $("#desc"+index).val();
+			//添加图片摘要
+			$("#picDesc").val(descValue);
+			$fileinput.fileinput('upload');
+		}
+		//再单独上传封面组图
+		setTimeout("uploadNewsImg()",2000);
+		
+	}
+});
+</script>	
+

@@ -1,0 +1,264 @@
+
+<script type="text/javascript">
+	var editUrl = "${rc.contextPath}/contentType/v_edit.do";
+	var deleteUrl = "${rc.contextPath}/contentType/o_delete.do";
+	var indexUrl = "${rc.contextPath}/contentType/v_list.do";
+</script>
+  <!--<button onclick="ceshi();">123</button> -->
+<form class="form-inline hk-search">
+<@shiro.hasPermission name="/contentType/v_list.do">  
+	<div class="row">
+		<div class="col-sm-2 col-xs-6">
+			<input type="text" class="form-control input-sm" placeholder="类型名称" id="contentNameSearch" value='${form.contentTypeName!}'>
+		</div>
+		<div class="col-sm-2  col-xs-6" >
+			<button type="button" class="btn btn-info btn-sm" onclick="search()">
+				<span class="glyphicon glyphicon-search"></span> <span>搜索</span>
+			</button>
+		</div>
+	</div>
+	</@shiro.hasPermission>  
+</form>
+<div class="hk-toolbar">
+	<div class="btn-group btn-group-sm">
+		<button type="button" class="btn btn-default">
+			<span class="glyphicon glyphicon-th-list"></span> 操作
+		</button>
+		<button type="button" class="btn btn-default dropdown-toggle"
+			data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu">
+		<@shiro.hasPermission name="/contentType/o_save.do"> 
+			<li><a id="linkAddItem" href="javascript:void(0)"> <span
+					class="glyphicon glyphicon-plus"></span> 添加
+			</a></li>
+			</@shiro.hasPermission> 
+			<@shiro.hasPermission name="/contentType/o_delete.do"> 
+			<!-- <li><a id="linkEditItem" href="javascript:void(0)"> <span
+					class="glyphicon glyphicon-edit"></span> 编辑
+			</a></li> -->
+			<li><a id="linkDelItems" href="javascript:void(0)"><span
+					class="glyphicon glyphicon-remove"></span> 删除</a></li>
+					</@shiro.hasPermission> 
+		</ul>
+	</div>
+</div>
+<div class="col-sm-12 " id="table_div" style="height:600px;overflow: auto">
+<table class="table table-hover table-bordered">
+	<thead>
+		<tr>
+			<th style="width:5%"><input type="checkbox"></th>
+			
+			<th style="width:10%">ID</th>
+			<th style="width:15%">类型名称</th>
+			<th style="width:15%">录入时间</th>
+			<th style="width:15%">修改时间</th>
+			<th style="width:15%">操作</th>
+		</tr>
+	</thead>
+	<tbody>
+		<#list page.list as type>
+		<tr>
+			<td><input type="checkbox" id="code" value="${type.contentTypeId}"></td>
+			<td>${type.contentTypeId!}</td>
+			<td>${type.contentTypeName!}</td>
+			<td>${type.createTime!}</td>
+			<td>${type.lastModifyTime!}</td>
+			<td>
+				<@shiro.hasPermission name="/contentType/v_edit.do"> 
+				<#if type.contentTypeId!=2 && type.contentTypeId!=5 && type.contentTypeId!=6>
+					<a href="javascript:editItem('${type.contentTypeId}')"
+					class="btn btn-info btn-xs" id="linkEditItem">编辑</a> 
+				</#if>
+				</@shiro.hasPermission> 
+				<@shiro.hasPermission name="/contentType/o_delete.do">
+				<#if type.contentTypeId!=2 && type.contentTypeId!=5 && type.contentTypeId!=6>
+					<a href="javascript:deleteItem('${type.contentTypeId}')"
+					class="btn btn-danger btn-xs">删除</a>
+				</#if>
+				<#if type.contentTypeId==2 || type.contentTypeId==5 || type.contentTypeId==6>
+					不可更改
+				</#if>
+				</@shiro.hasPermission> 
+				</td>
+		</tr>
+		</#list>
+	</tbody>
+</table>
+<#include "../common/page.html"> 
+</div>
+<!-- Modal -->
+<div class="modal fade" id="modalInfo" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel">
+	<#include "add.html">
+</div>
+</div>
+<!-- 区块：主内容区域 end --> <script type="text/javascript">
+	//此页面
+
+	var length = $("tbody tr").length;
+	//var begin = (${page.pageNo}-1)*length+1;
+	for (var i = 0; i < length; i++) {
+		$("tbody tr:eq(" + i + ") td[data-field='index']").text(i + 1);
+	}
+
+	var contenttype_list_page = {
+		//初始化
+		init : function() {
+			this.eventInit();
+		},
+		//事件绑定
+		eventInit : function() {
+			//信息表单模态框
+			var $modalInfo = $('#modalInfo');//模态框
+			var $modalInfoTitle = $modalInfo.find('#modalTite');//模态框标题
+			//bootstrap模态框实例
+			$modalInfo.modal({
+				backdrop : 'static',//点击模态透明层不隐藏
+				keyboard : false,//键盘不控制模态框 如：esc按下模态框不消失
+				show : false
+			//实例化后默认不显示
+			});
+			
+			//添加一条数据
+			$('#linkAddItem').click(function() {
+				$modalInfoTitle.html('添加数据');
+				$modalInfo.modal('show');//模态框显示
+			});
+			//编辑一条数据
+			$('#linkEditItem').click(function() {
+				$modalInfoTitle.html('编辑数据');
+				$modalInfo.modal('show');
+			});
+
+			//分页查询
+			function jumpNormalPage(pageNo) {
+				$("#pageNo").val(pageNo);
+				$("#submitForm").submit();
+			}
+		}
+    };
+
+	//在当前行编辑
+	function editItem(categoryId) {
+
+		var url = editUrl + "?contentTypeId=" + categoryId;
+		//先加载页面
+		$modalInfo.load(url);
+		$modalInfoTitle.html('编辑数据');
+		$modalInfo.modal('show');
+    }
+
+    //删除一条数据
+	function deleteItem(categoryId) {
+		var c = confirm("确定删除" + categoryId + "么?");
+		if (c == true) {
+			var url = deleteUrl + "?contentTypeId=" + categoryId;
+			$.ajax({
+				type : "POST",
+				dataType : "json",
+				url : url,
+				success : function(data) {
+					if(data.status==200){
+		           		$('.hk-main').load(indexUrl);
+		           		alert(data.message);
+			    	}else{
+			    		alert(data.message);
+			    	}
+				}
+			});
+		}
+	}
+	$("#linkDelItems").click(function(){
+		var categoryIds="";
+		var countflag=0;
+        $("input[id^='code']:checked").each(function(){
+        	if($(this).val()!=2 && $(this).val()!=5 && $(this).val()!=6){
+		       	 categoryIds+=$(this).val()+",";
+        	}else{
+        		countflag++;
+        	}
+        });
+        if (!categoryIds) {
+        	if(countflag==0){
+	            alert("请勾选要删除的记录！");
+        	}else{
+        		alert("图文、图集、视频不可删除！");
+        	}
+            return;
+        }
+        $.ajax({
+            type: 'POST',
+            url: "${rc.contextPath}/contentType/o_delete.do",
+            data: "allIDCheck="+categoryIds,
+            dataType:'json',
+            success: function(data) {
+           	if(data.status==200){
+           		$('.hk-main').load(indexUrl);
+	    		alert(data.message);
+	    	}else{
+	    		alert(data.message);
+	    	}
+            }
+	});
+});
+	function search(){
+        var typeName = $("#contentNameSearch").val();
+		$('.hk-main').load(indexUrl + "?contentTypeName=" + typeName);
+		
+	}
+	
+	$modalInfo.on('hidden.bs.modal', function () {
+		var checkid = null;
+		var typeName=$("#contentNameSearch").val();
+		var pageNo = ${page.pageNo};
+		if (typeName!=null && typeName!="") {
+			$('.hk-main').load(indexUrl + "?pageNo=" + pageNo+"&contentTypeName="+typeName);
+		}else{
+			$('.hk-main').load(indexUrl + "?pageNo=" + pageNo);
+		} 
+	});
+
+	function jumpNormalPage(page) {
+		var checkid = null;
+		var typeName=$("#contentNameSearch").val();
+		
+		if (typeName!=null && typeName!="") {
+			$('.hk-main').load(indexUrl + "?pageNo=" + page+"&contentTypeName="+typeName);
+		}else{
+			$('.hk-main').load(indexUrl + "?pageNo=" + page);
+		} 	
+		
+	}
+
+	
+	
+	function boxheight(height,div){ //函数：获取尺寸
+	    //获取浏览器窗口高度
+	    var winHeight=height;
+	    if (window.innerHeight)
+	        winHeight =  height/917*window.innerHeight;
+	    else if ((document.body) && (document.body.clientHeight))
+	        winHeight = height/917*document.body.clientHeight;
+	    //通过Document对body进行检测，获取浏览器可视化高度
+	    if (document.documentElement && document.documentElement.clientHeight)
+	        winHeight = height/917*document.documentElement.clientHeight;
+	    //DIV高度为浏览器窗口高度
+	    document.getElementById(div).style.height= winHeight +"px";
+	}
+	$(function() {
+		contenttype_list_page.init();
+		boxheight(500,"table_div");
+	})
+	function ceshi(){
+	$.ajax({
+		type : "POST",
+		data:{"contentId":"10567274624847872"},
+		url : "/cmsadmin/content/saveESContentByContentId.do",
+		dataType : "json",
+		success : function(data) {
+		}
+	});
+}
+</script>

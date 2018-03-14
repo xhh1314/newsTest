@@ -1,0 +1,118 @@
+<script type="text/javascript">
+	var listCategorytreeUrl = "${rc.contextPath}/sns/category/list_tree.do";
+	var saveForumUrl= "${rc.contextPath}/sns/forum/save.do";
+</script>
+<div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h5 class="modal-title" id="myModalLabel">
+		        	<span class="glyphicon glyphicon-file"></span> 
+		        	<span id="modalTite"></span>
+		        </h5>
+		      </div>
+		      <div class="modal-body">
+		        <form id="forumform" method="post" class="form-horizontal">
+		        	<input type="hidden" name="forumId" value="<#if forum??>${forum.forumId!}</#if>" id="forumId">
+		        	
+				  <div class="form-group form-group-sm">
+				    <label for="inputEmail3" class="col-sm-2 control-label">板块名称</label>
+				    <div class="col-sm-10">
+				    <input type="hidden" id="forumId" value="<#if forum??>${forum.forumId!}</#if>"/>
+				    <input type="hidden" name="parentId" value="<#if forum??>${forum.parentId!}</#if>" id="parentId"/>
+				      <input type="text" id="forumName" name="forumName" value="<#if forum??>${forum.forumName!}</#if>"  class="form-control" placeholder="板块名称">
+				    </div>
+				  </div>
+				  <div class="form-group form-group-sm">
+				   <label for="inputEmail3" class="col-sm-2 control-label">发布状态</label>
+				    <div class="col-sm-10">
+				      <select name="auditFlow">
+				      <#if forum??>
+				            <#if forum.auditFlow==0>
+				      		<option value="0" selected="selected">先发后审</option>
+				      		<option value="1">先审后发</option>
+				      		<#else>
+				      		<option value="0" >先发后审</option>
+				      		<option value="1" selected="selected">先审后发</option>
+				      		</#if>
+				      		</#if>
+				      </select>
+				      
+				  	</div>
+				  
+				  </div>
+				  
+				</form>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-info btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 关闭</button>
+		        <@shiro.hasPermission name="/sns/forum/save.do">  
+	
+
+		        <button type="button" id="forumSave" data-action=""  class="btn btn-info btn-sm"><span class="glyphicon glyphicon-saved"></span> 保存</button>
+		        </@shiro.hasPermission>
+		      </div>
+		    </div>
+		  </div>
+		  
+<script type="text/javascript">	
+	//信息表单模态框
+	var $modalInfo = $('#modalInfo');
+	var $modalInfoTitle = $modalInfo.find('#modalTite');
+	
+	$modalInfo.modal({
+		backdrop:'static',
+		keyboard:false,
+		show:false
+	});
+	
+   
+  
+   
+    function formValidate(){
+    	var forumName = $("#forumName").val()||'';
+    	if(forumName===''){
+    		alert("版块名称不能为空!");
+    		return false;
+    	}
+    	return true;
+    }
+    $("#forumSave").on('click',function(){
+    	//设置选中的分类id
+    	
+		//ajax提交
+		$.ajax({
+		    type:"POST",
+		    data:$("#forumform").serialize(),
+		    dataType:"text",
+		    url:saveForumUrl,
+		    success:function(data,status){
+		    	if(status=='success'&&data=='success'){
+		    		$modalInfo.modal('hide');//手动关闭模态框
+		    		loadlistMenu("${rc.contextPath}/sns/forum/allMenuJsonForum.do?", "treeDemo",setting);
+		    	}else{
+		    		alert(data);
+		    	}
+		    },
+		    error:function(){
+		    	alert("保存失败!");
+		    }
+		});
+	});
+    
+   
+    
+    $(function() {
+		if($("#forumId").val()==0){
+    		$("#forumName").css("disabled","disabled");
+    	}
+	});
+    
+    
+    
+ 
+    
+    
+    
+    
+  </script>

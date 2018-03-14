@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta charset="utf-8" />
+		<title>海客用户中心管理后台</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+		<script type="text/javascript">
+			/* 页面全局url */
+			var loadNewsFollowUrl = "${rc.contextPath}/sns/news/follow/news_follow_list.do";
+		</script>
+		<script src="${rc.contextPath}/resources/My97DatePicker/WdatePicker.js"></script>
+		<#setting number_format="#">
+	</head>
+
+	<body class="page-content">
+		<!-- 区块：主内容区域 begin-->
+		<div class="news-resports-main">
+			<form name="searchform" id="searchform" class="form-inline hk-search">
+				<div class="row">
+					<div class="col-sm-2 col-xs-6">
+			  			<input type="text" name="beginTime" id="beginTime" class="form-control input-sm" 
+						onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss', readOnly: true ,maxDate:'#F{$dp.$D(\'endTime\')}'});" 
+						format="yyyy-MM-dd HH:mm:ss"  placeholder="时间区间开始">
+					</div>
+					<div class="col-sm-2 col-xs-6">
+			  			<input type="text" name="endTime" id="endTime" class="form-control input-sm" 
+						onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss', readOnly: true ,minDate:'#F{$dp.$D(\'beginTime\')}'});" 
+						format="yyyy-MM-dd HH:mm:ss"  placeholder="时间区间结束">
+					</div>
+					<div class="col-sm-2  col-xs-6">
+			  			<button type="button" class="btn btn-info btn-sm" onclick="tosearch()">
+				  			<span class="glyphicon glyphicon-search"></span> 
+				  			<span>搜索</span>
+				  		</button>
+					</div>
+				</div>
+			</form>
+			<table class="table table-hover table-bordered">
+			    <thead>
+			        <tr>
+			            <th>新闻类型</th>
+			            <th>不感兴趣</th>
+			            <th>点赞</th>
+			            <th>评论</th>
+			            <th>收藏</th>
+			            <th>分享</th>
+			            <th>查看</th>
+			        </tr>
+			    </thead>
+			    <tbody>
+			    <#if page??>
+			    	<#list page.list as newsfollow>
+			        <tr>
+			            <td>
+			            <#if newsfollow.newsType==0>
+			               国内
+			               <#elseif newsfollow.newsType==1 >
+			               国外
+			               <#elseif newsfollow.newsType==2 >
+			               经济
+			               <#elseif newsfollow.newsType==3 >
+			               政治
+			            </#if>
+			            </td>
+			            <td id="notinterestedNum"><#if newsfollow.notinterestedNum??>${newsfollow.notinterestedNum}</#if></td>
+			            <td id="upNum"><#if newsfollow.upNum??>${newsfollow.upNum}</#if></td>
+			            <td id="commentNum"><#if newsfollow.commentNum??>${newsfollow.commentNum}</#if></td>
+			            <td id="collectNum"><#if newsfollow.collectNum??>${newsfollow.collectNum}</#if></td>
+			            <td id="shareNum"><#if newsfollow.shareNum??>${newsfollow.shareNum}</#if></td>
+			            <td id="viewNum"><#if newsfollow.viewNum??>${newsfollow.viewNum}</#if></td>
+			        </tr>
+			       </#list>
+			    </#if>
+			    </tbody>
+			</table>
+		  	<#include "../common/page.html"/>
+		</div>
+		<!-- 区块：主内容区域 end -->
+		<script type="text/javascript">
+			/**搜素**/
+			function tosearch(){
+				var data = $("#searchform").serialize();
+				$('.hk-main').load(loadNewsFollowUrl,data);
+				
+			}
+			
+			/** 分页普通跳转 **/
+			function jumpNormalPage(page){
+				var checkid = null;
+				if(page>0&&page<=${page.totalPage}){
+					$('.hk-main').load(loadNewsFollowUrl+"?pageNo="+page);
+				}
+			}	
+		</script>
+	</body>
+</html>

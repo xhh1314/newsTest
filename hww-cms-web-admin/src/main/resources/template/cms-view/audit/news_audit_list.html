@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta charset="utf-8" />
+		<title>新闻审核列表</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+		<script type="text/javascript">
+			//新闻内容详情
+			var getNewsDetailUrl = "${rc.contextPath}/content/detail.do";
+			//获取新闻内容审核详情
+			var auditDetailUrl = "${rc.contextPath}/audit/news_audit_detail.do";
+			//保存审核请求url
+			var toAuditUrl = "${rc.contextPath}/audit/save.do";
+			//批量审核请求url
+			var batchAuditUrl = "${rc.contextPath}/audit/batch_save.do";
+			//新闻内容审核列表页(本页面)
+			var newsAuditListUrl = "${rc.contextPath}/content/audit_list.do?pageNo="+${page.pageNo};
+			//新闻内容类型下拉列表
+			var contentTypeListUrl = "${rc.contextPath}/contentType/getAll.do";
+		</script>
+		<#setting number_format="#">
+	</head>
+
+	<body class="page-content">
+		<!-- 区块：主内容区域 begin-->
+		<div class="news_audit_list-main">
+			<form name="searchform" id="searchform" class="form-inline hk-search">
+				<div class="row">
+					<div class="col-sm-2 col-xs-6">
+		  				<input type="text" name="specialName" value="<#if searchVo.specialName??>${searchVo.specialName}</#if>"
+		  				class="form-control input-sm" placeholder="标题">
+					</div>
+					<div class="col-sm-2 col-xs-6">
+		  				<input type="text" name="specialName" value="<#if searchVo.specialName??>${searchVo.specialName}</#if>"
+		  				class="form-control input-sm" placeholder="摘要">
+					</div>
+					<div class="col-sm-2 col-xs-6">
+		  				<input type="text" name="specialName" value="<#if searchVo.specialName??>${searchVo.specialName}</#if>"
+		  				class="form-control input-sm" placeholder="内容">
+					</div>
+					<div class="col-sm-2  col-xs-6">
+						<div class="input-group input-group-sm">
+						  <span class="input-group-addon">新闻类型</span>
+						  <select id="contenttypeId" name="contenttypeId" class="form-control">
+							  <option value="">全部</option>
+							  <!-- js初始化 -->
+						  </select>
+						</div>
+					</div>
+					<div class="col-sm-2  col-xs-6">
+			  			<button id="btnSearch" type="button" class="btn btn-info btn-sm">
+				  			<span class="glyphicon glyphicon-search"></span> 
+				  			<span>搜索</span>
+				  		</button>
+					</div>
+				</div>
+			</form>
+			<div class="hk-toolbar">
+			<@shiro.hasPermission name="/audit/batch_save.do">  
+				<div class="btn-group btn-group-sm">
+				  	<button type="button" class="btn btn-default">
+				  		<span class="glyphicon glyphicon-th-list"></span> 
+				  		操作
+				  	</button>
+				  	<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				    	<span class="caret"></span>
+				 	</button>
+				  	<ul class="dropdown-menu">
+				    	<li>
+				    		<a id="linkYesItems" href="javascript:void(0)">
+				    			<span class="glyphicon glyphicon-edit"></span> 
+				    			批量审核通过
+				    		</a>
+				    	</li>
+				    
+				    	
+				    	<li>
+				    		<a id="linkYesItemsAndMark" href="javascript:void(0)">
+				    			<span class="glyphicon glyphicon-edit"></span> 
+				    			审核通过并加备注
+				    		</a>
+				    	</li>
+				    		
+				    	<li>
+				    		<a id="linkNoItems" href="#">
+				    			<span class="glyphicon glyphicon-remove"></span> 
+					    		审核不通过
+					    	</a>
+					    </li>
+				  	</ul>
+				</div>
+				</@shiro.hasPermission>
+			</div>
+			<table class="table table-hover table-bordered">
+			    <thead>
+			        <tr>
+			            <th><input type="checkbox" id="checkall" onclick="selectAll()"></th>
+			            <th style="width:35%;">标题</th>
+			            <th>内容类型</th>
+			            <th>摘要</th>
+			            <th>审核状态</th>
+			            <th>审核详情</th>
+			            <th>创建时间</th>
+			            <th>操作</th>
+			        </tr>
+			    </thead>
+			    <tbody>
+			    	<#list page.list as p>
+						<tr>
+							<td><input type="checkbox" name="newsCheckbox" value="${p.contentId}"></td>
+							<td><#if p.title??>${p.title}</#if></td>
+							<td><#if p.contentType??>${p.contentType.contentTypeName}</#if></td>
+							<td><#if p.description??>${p.description}</#if></td>
+							<td>
+								<#if p.auditStatus??>
+				            		<#if p.auditStatus == 0>新提交
+				            		<#elseif p.auditStatus == 1>审核通过
+									</#if>
+			            		</#if>
+							</td>
+							<td>
+							<a href="javascript:linkTimeLine(${p.contentId})" class="btn btn-info btn-xs linkTimeLine">详情</a>
+			            	</td>
+							<td><#if p.createTime??>${p.createTime?string('yyyy-MM-dd HH:mm:ss')}</#if></td>
+							
+							<td>
+							
+							<@shiro.hasPermission name="/audit/save.do">  
+			            	<a href="javascript:newsAuditPassOrDeny('${p.contentId}','${p.categoryId}',1)" class="btn btn-info btn-xs">审核通过</a>
+							<a href="javascript:newsAuditPassOrDeny('${p.contentId}','${p.categoryId}',0)" class="btn btn-info btn-xs">审核不通过</a>
+							</@shiro.hasPermission>   
+							<@shiro.hasPermission name="/content/detail.do">  
+							<a href="javascript:linkNewsDetail('${p.contentId}',<#if p.categoryId??>'${p.categoryId}'</#if>)" 
+							class="btn btn-info btn-xs linkNewDetail">详情</a>
+							</@shiro.hasPermission>  
+			           	 	</td>
+						</tr>
+					</#list>
+			    </tbody>
+			</table>
+		  	<#include "../common/page.html" />
+			
+			<div class="modal fade" id="modalNewDetail" tabindex="-1" role="dialog">
+			
+			</div>
+
+			<!-- Modal 审核备注 -->
+			<div class="modal fade" id="modalMark" tabindex="-1" role="dialog">
+			  <div class="modal-dialog" role="document">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			        <h5 class="modal-title" id="myModalLabel">
+			        	<span class="glyphicon glyphicon-file"></span> 
+			        	<span>审核备注</span>
+			        </h5>
+			      </div>
+			      <div class="modal-body">
+			        <form class="form-horizontal">
+			        	<input type="hidden" id="curentstatus" name="curentstatus" value="1"  /><!-- 默认为1审核通过 -->
+					  <div class="form-group form-group-sm">
+					    <label class="col-sm-2 control-label">备注</label>
+					    <div class="col-sm-10">
+					      	<textarea id="auditopinion" name="auditopinion"class="form-control" rows="5"></textarea>
+					    </div>
+					  </div>
+					</form>
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-info btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 关闭</button>
+			        <button type="button" class="btn btn-info btn-sm" data-dismiss="modal"
+			        onclick="batchAudit($('#curentstatus').val(),$('#auditopinion').val())"><span class="glyphicon glyphicon-ok"></span> 确定</button>
+			      </div>
+			    </div>
+			  </div>
+			</div>
+		</div>
+		<!-- 区块：主内容区域 end -->
+		
+		<script type="text/javascript">
+		//审核详情模态框
+		var $modalTimeLine = $('#modalTimeLine');
+		//新闻详情模态框-图文
+		var $modalNewDetailImgtext = $('#modalNewDetailImgtext');
+		//新闻详情模态框-图集
+		var $modalNewDetailImgset = $('#modalNewDetailImgset');
+		//新闻详情模态框-视频
+		var $modalNewDetailVideo = $('#modalNewDetailVideo');
+		//新闻详情模态框
+		var $modalNewDetail = $('#modalNewDetail');
+		
+		//查看审核详细
+		function linkTimeLine(contentId){
+			var data = {"contentId":contentId};
+			$modalTimeLine.load(auditDetailUrl,data);
+			$modalTimeLine.modal('show');
+		}
+
+		//查看新闻内容详细 
+		function linkNewsDetail(contentId,categoryId){
+			var data = {"contentId":contentId,"categoryId":categoryId};
+			//根据新闻内容类型展示
+			$modalNewDetail.load(getNewsDetailUrl,data);
+			$modalNewDetail.modal('show');
+		}
+		
+		
+		var topicType=0;
+		var searchData = $("#searchform").serialize();
+		/**
+		单条审核通过或不通过
+		topicType=0为新闻内容
+		topicType=1为专题
+		**/
+		function newsAuditPassOrDeny(topicId,categoryId,curentstatus){
+			var data = JSON.stringify({"topicId":topicId,"categoryId":categoryId,"curentstatus":curentstatus,"topicType":topicType});
+			$.ajax({
+			    type:"POST",
+			    dataType:"text",
+			    contentType: "application/json; charset=utf-8",
+			    url:toAuditUrl,
+			    data:data,
+			    success:function(data,status){
+			    	if(status='success'){
+			    		if(data=='success'){
+			    			alert('审核成功!');
+			    			loadMain(newsAuditListUrl,searchData);
+			    		}else{
+			    			alert('审核操作失败:'+data);
+			    		}
+			    	}
+			    },
+			    error:function(data){
+			    	alert("审核操作失败!");
+			    }
+			});
+		}
+		
+		function getCheckedTopicId(){
+            var ids = [];
+			var i=0;
+			$("input:checkbox[name='newsCheckbox']:checked").each(function() {
+				var data = {"topicId":$(this).val()};
+				ids.push(data); // 每一个被选中项的值
+			});
+			if(ids=="") {
+				alert("请至少选择一条记录");
+				return false;
+			}
+			return ids;
+		}
+			
+
+			//此页面
+			var news_audit_list_page = {
+				//初始化
+				init:function(){
+					this.eventInit();
+				},
+				//事件绑定
+				eventInit:function(){
+					
+					$modalTimeLine.modal({
+						backdrop:'static',
+						keyboard:false,
+						show:false
+					});
+
+					
+					$modalNewDetailImgtext.modal({
+						backdrop:'static',
+						keyboard:false,
+						show:false
+					});
+
+					
+					$modalNewDetailImgset.modal({
+						backdrop:'static',
+						keyboard:false,
+						show:false
+					});
+
+					
+					$modalNewDetailVideo.modal({
+						backdrop:'static',
+						keyboard:false,
+						show:false
+					});
+
+					//审核备注模态框
+					var $modalMark = $('#modalMark');
+					$modalMark.modal({
+						backdrop:'static',
+						keyboard:false,
+						show:false
+					});
+					
+					//模态框完全关闭后重新load
+					$modalMark.on('hidden.bs.modal', function () {
+						loadMain(newsAuditListUrl,searchData);
+					});
+					
+					//审核通过并加备注
+					$('#linkYesItemsAndMark').click(function(){
+						var ids = getCheckedTopicId();
+						if(ids){
+							$modalMark.modal('show');
+							$("#curentstatus").val(1);
+						}
+					});
+					
+					//审核不通过并加备注
+					$('#linkNoItems').click(function(){
+						var ids = getCheckedTopicId();
+						if(ids){
+							$modalMark.modal('show');
+							$("#curentstatus").val(0);
+						}
+					});
+					
+					
+					
+					
+					//批量审核通过
+					$('#linkYesItems').on('click',function(){
+                        var ids = [];
+						var i=0;
+						$("input:checkbox[name='newsCheckbox']:checked").each(function() {
+							var data = {"topicId":$(this).val(),"curentstatus":1,"topicType":topicType};
+							ids.push(data); // 每一个被选中项的值
+						});
+						if(ids=="") {
+							alert("请至少选择一条记录");
+							return false;
+						}
+						//添加确认提示
+						var msg = "确定将选择的"+ids.length+"条信息批量审核通过吗？";
+						if (confirm(msg)==true){
+							$.ajax({
+							    type:"POST",
+							    dataType:"text",
+							    contentType: "application/json; charset=utf-8",
+							    url:batchAuditUrl,
+							    data:JSON.stringify(ids),
+							    success:function(data,status){
+							    	if(status='success'&&data=='success'){
+							    		loadMain(newsAuditListUrl,searchData);
+							    	}
+							    },
+							    error:function(data){
+							    	alert(data);
+							    }
+							});
+						}
+					});
+				}
+            };
+			
+			
+			$(function(){
+				news_audit_list_page.init();
+				//初始化页面新闻类型下拉框
+				$.ajax({
+	 					type:"POST",
+	 					dataType:"json",
+	 					url:contentTypeListUrl,
+	 					success:function(data,status){
+	 					   if(status='success'){
+	 						   var array = eval(data);
+	 						   for(var i=0;i<array.length;i++){
+	 							   var contentType = array[i];
+	 							  var option = '<option value="'+contentType.contentTypeId+'">'+contentType.contentTypeName+'</option>';
+	 							  <#if searchVo.contenttypeId??>
+	 							  	<#if searchVo.contenttypeId==contentType.contentTypeId>
+	 							  		option = '<option value="'+contentType.contentTypeId+'" selected="selected">'+contentType.contentTypeName+'</option>';
+	 							  	</#if>
+                                   < /#if>;
+	 							 $("#contenttypeId").append(option);
+	 						   }
+	 						}
+	 				},
+	 				error:function(data){
+	 					alert("获取新闻类型下拉列表失败!");
+	 				}
+	 			});
+			});
+			
+			//批量审核
+			function batchAudit(curentstatus,auditopinion){
+				if(curentstatus==null){
+					curentstatus = 1;
+				}
+				var ids = getCheckedTopicId();
+				if(ids&&ids.length>0){
+					//添加确认提示
+					var msg = "确定将选择的"+ids.length+"条信息批量"; 
+					if(curentstatus==0){
+						msg = msg+"审核不通过吗？";
+					}else if(curentstatus==1){
+						msg = msg+"审核通过吗？";
+					}
+	 				if (confirm(msg)==true){
+	 					for(var i=0;i<ids.length;i++){
+	 						var data = ids[i];
+	 						data['curentstatus'] = curentstatus;
+	 						data['topicType'] = topicType;
+	 						data['auditOpinion'] = auditopinion;
+	 					}
+	 					$.ajax({
+	 					    type:"POST",
+	 					    dataType:"text",
+	 					    contentType: "application/json; charset=utf-8",
+	 					    url:batchAuditUrl,
+	 					    data:JSON.stringify(ids),
+	 					    success:function(data,status){
+	 					    	if(status='success'&&data=='success'){
+	 					    		//关闭模态框,触发模态框关闭事件重新加载页面
+	 					    		
+	 					    	}
+	 					    },
+	 					    error:function(data){
+	 					    	alert(data);
+	 					    }
+	 					});
+	 				}
+					
+				}
+			}
+			
+			/** 分页普通跳转 **/
+			function jumpNormalPage(page){
+				var checkid = null;
+				var domain = newsAuditListUrl.substring(0,newsAuditListUrl.lastIndexOf("?"));
+				$('.hk-main').load(domain+"?pageNo="+page,searchData);
+			}	
+			//全选全不选，列表所有选中复选框选中，否则不选中
+			function selectAll() {
+				if($("#checkall").is(":checked")){
+					$("input[name='newsCheckbox']").each(function(){  
+			             $(this).prop("checked", true);  
+			         });  
+			    }else{  
+			    	$("input[name='newsCheckbox']").each(function(){  
+			             $(this).removeAttr("checked");  
+			         });  
+			    }  
+			}
+		</script>
+	</body>
+</html>

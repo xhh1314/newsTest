@@ -1,0 +1,125 @@
+@charset "utf-8";
+@import "haiwai","compass/css3";
+body{
+  width: 100%;
+  top:0;
+  left:0;
+  padding:0;
+  margin:0;
+}
+.main{
+  width: 100%;
+  height: auto;
+  overflow:hidden;
+}
+a{
+  text-decoration: none;
+}
+h1{
+  @include font($f-yahei, 40, 60, #333);
+  width:rem(600);
+  margin:rem(50) auto rem(20) auto;
+  text-align: center;
+}
+h2{
+  @include font($f-yahei, 28, 60, #333);
+  width:rem(600);
+  margin:rem(20) auto;
+  text-align: center;
+  address,time{
+    display: inline-block;
+    margin-right:rem(15);
+  }
+  time{
+    color:#999;
+  }
+}
+.head{
+  width:100%;
+  height:rem(120);
+  overflow:hidden;
+  border-bottom:1px solid #b6b6b6;
+  display: flex; 
+  flex-direction: row;
+  flex-wrap: wrap;
+  box-sizing:border-box;
+  -moz-box-sizing:border-box;
+  -webkit-box-sizing:border-box;
+  justify-content: space-between;
+  padding:0 rem(30);
+  a{
+    @include font($f-yahei, 32, 120, #333);
+    
+    vertical-align: top;
+    float:left;
+  }
+  a.img{
+    width:rem(228);
+    display:inline-block;
+  }
+  a.more{
+    color:#1296DB;
+  }
+  img{
+    width:rem(228);
+    height:rem(120);
+    margin-right:rem(54);
+
+  }
+  
+  a.button{
+    background-color:#1296DB;
+    display:inline-block;
+    width:rem(168);
+    height:rem(60);
+    text-align:center;
+    @include font($f-yahei, 32, 60, #fff);
+    margin:rem(30) 0;
+    border-radius:4px;
+    
+  }
+}
+article{
+  span{
+    @include font($f-yahei, 28, 40, #999);
+    padding: 0 rem(36);
+    margin-top:rem(20);
+    display: inline-block;
+    height:auto;
+    font-weight: 300;
+    vertical-align: top;
+  }
+  p{
+    padding:0 rem(32);
+    margin:rem(28) 0;
+    text-align:justify;
+    @include font($f-yahei, 36, 64, #333);
+    font-weight: 400;
+    &.imgs_c{
+      padding:0;
+      margin:0;
+      display: inline-block;
+      height:auto;
+      img{
+        width:100%;
+        vertical-align: top;
+      }
+    }
+    &.editor{
+      @include font($f-yahei, 28, 50, #999);
+      text-align: right;
+      font-weight: 300;
+    }
+    &.hot{
+      padding-left:rem(25);
+      a{
+         @include font($f-yahei, 28, 50, #999);
+         background-color:#f4f5f6;
+         padding:rem(5) rem(13);
+         border-radius:2px;
+         margin-right:rem(10);
+         font-weight: 300;
+      }
+    }
+  }
+}

@@ -1,0 +1,64 @@
+fileservice: 
+  domain: http://127.0.0.1/api-file/
+spring:
+  profiles: dev
+  application:
+    name: hww-app-web-admin
+
+         
+#jpa
+  jpa:
+    open-in-view: true
+    show-sql: true
+    generate-ddl: false
+    database: mysql
+    hibernate:
+      ddl-auto: validate
+      naming:
+        strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    properties:
+      hibernate:  
+        dialect : org.hibernate.dialect.MySQLInnoDBDialect
+      
+#数据源    
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/hww_dev4?characterEncoding=UTF-8
+    username: root
+    password: root
+    druid:
+      initial-size: 5
+      max-active: 20
+      min-idle: 1
+      max-wait: 60000
+      pool-prepared-statements: false
+      max-pool-prepared-statement-per-connection-size: 20
+#      validation-query:
+#      validation-query-timeout:
+      #validationQuery:
+      test-on-borrow: false
+      test-on-return: false
+      test-while-idle: true
+#      time-between-eviction-runs-millis:
+      min-evictable-idle-time-millis: 60000
+      max-evictable-idle-time-millis: 300000
+      filter:
+         # 配置StatFilter
+        stat:
+          db-type: h2
+          log-slow-sql: true
+          slow-sql-millis: 2000
+         # 配置WallFilter
+        wall:
+          enabled: true
+          db-type: h2
+          delete-allow: false
+          drop-table-allow: false
+
+
+#日志配置
+logging:
+  file: logs/hww-app-web-admin.log
+  level:
+    com.hww.app: debug

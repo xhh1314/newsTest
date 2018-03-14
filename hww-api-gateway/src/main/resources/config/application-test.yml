@@ -1,0 +1,9 @@
+spring:
+  profiles:
+    active: test
+  application:
+    name: api-gateway
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://49.4.21.190:8761/eureka/

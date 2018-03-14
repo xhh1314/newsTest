@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<#include "../common_header.html">
+	</head>
+
+	<body class="no-skin" style= "height: 700px; overflow:auto; overflow-y:hidden;">
+
+		<#include "../top.html">
+
+		<div class="main-container ace-save-state" id="main-container">
+			<script type="text/javascript">
+				try{ace.settings.loadState('main-container')}catch(e){}
+			</script>
+
+			<#include "../access/sys_menu.html">
+
+			<div class="main-content">
+				<div class="main-content-inner">
+					<div class="breadcrumbs ace-save-state" id="breadcrumbs">
+						<ul class="breadcrumb">
+							<li>
+								<i class="ace-icon fa fa-home home-icon"></i>
+								<a href="#">首页</a>
+							</li>
+							<li class="">系统设置</li>
+							<li class="">站点管理</li>
+						</ul><!-- /.breadcrumb -->
+
+						<#include "../search.html">
+					</div>
+
+					<div class="page-content">
+
+						<#include "../ace_setting.html">
+
+						<!-- <div class="page-header">
+							<div class="row">
+								<div class="col-xs-12">
+									当前栏目：
+								</div>/.span
+							</div>/.row
+						</div>/.page-header -->
+						
+						<div class="row">
+							<div class="col-xs-12">
+								<!-- PAGE CONTENT BEGINS -->
+								
+								<iframe id="contentList" name="contentList" src="${rc.contextPath}/site/v_list.do" style="border: 0;width: 100%;overflow:auto;" scrolling="yes"></iframe>
+									
+							</div><!-- /.span -->
+						</div><!-- /.row -->
+					</div><!-- /.page-content -->
+				</div>
+			</div><!-- /.main-content -->
+
+			<#include "../footer.html">
+
+		</div><!-- /.main-container -->
+
+		<#include "../footerjs.html">
+
+		<!-- page specific plugin scripts -->
+		<script src="${rc.contextPath}/admin/js/sidebar-menu.js"></script>
+				
+		<!-- inline scripts related to this page -->
+		<script type="text/javascript">
+		//初始化宽度、高度    
+	    $("#main-container").height($(window).height()-176);
+		$("#contentList").height($(window).height()-240);
+		//当文档窗口发生改变时 触发  
+	    $(window).resize(function(){
+			$("#main-container").height($(window).height()-176);
+			$("#contentList").height($(window).height()-240);
+			//$(".sidebar").height($(window).height()-99);
+			
+			//var thisHeight = $("#nav_list").height($(window).outerHeight()-173);
+			//$(".submenu").height();
+			//$("#nav_list").children(".submenu").css("height",thisHeight);
+	  	});
+		</script>
+	</body>
+</html>

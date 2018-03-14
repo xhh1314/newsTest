@@ -1,0 +1,51 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hww.sys</groupId>
+		<artifactId>hww-sys</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../hww-sys/pom.xml</relativePath>
+	</parent>
+
+	<artifactId>hww-sys-common</artifactId>
+	<packaging>jar</packaging>
+
+    <name>hww-sys-common</name>
+	<dependencies>
+		<dependency>
+			<groupId>com.hww.sys</groupId>
+			<artifactId>hww-sys-common-dto</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hww.framework</groupId>
+			<artifactId>hww-framework-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<!-- servlet start -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+		</dependency>
+		<!-- servlet end -->
+	</dependencies>
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.hbm.xml</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.xml</include>
+					<include>**/*.properties</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
+</project>

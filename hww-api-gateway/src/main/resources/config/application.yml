@@ -1,0 +1,60 @@
+spring:
+  profiles:
+    active: prod
+  application:
+    name: api-gateway
+
+server:
+  port: 80
+  tomcat:
+    uri-encoding: UTF-8
+    max-threads: 800
+  connection-timeout: 30000
+
+logging:
+  file: logs/hww-api-gateway.log
+ribbon:
+  ReadTimeout: 6000000
+  ConnectTimeout: 6000000
+hystrix:
+  command: 
+    default:
+      execution:
+        timeout:
+          enabled: true
+        isolation:
+          thread:
+            timeoutInMilliseconds: 600000
+zuul:
+  host: 
+    socket-timeout-millis: 6000000
+    connect-timeout-millis: 6000000
+  routes:
+   file:
+     path: /api-file/**
+     strip-prefix: true
+     service-id: hww-file-web-service-consumer
+   sns:
+     path: /api-sns/**
+     strip-prefix: true
+     service-id: hww-sns-web-service-consumer
+   cms: 
+     path: /api-cms/**
+     strip-prefix: true
+     service-id: hww-cms-web-service-consumer
+   ucenter: 
+     path: /api-ucenter/**
+     strip-prefix: true
+     service-id: hww-ucenter-web-service-consumer
+   app:
+     path: /api-app/**
+     strip-prefix: true
+     service-id: hww-app-web-service-consumer
+   els:
+     path: /api-els/**
+     strip-prefix: true
+     service-id: hww-els-web-service-consumer
+   sys:
+     path: /api-sys/**
+     strip-prefix: true
+     service-id: hww-sys-web-service-consumer

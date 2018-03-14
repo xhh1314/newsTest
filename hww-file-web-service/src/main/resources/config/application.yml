@@ -1,0 +1,36 @@
+server_ip: 127.0.0.1:7810
+spring:
+  profiles:
+    active: test
+  application:
+    name: hww-file-web-service-consumer
+
+snowFlake: 
+ datacenter_id: 1 #主键生成所属appid，注意一定不要重复 【0-31】---运行环境中不要做修改
+ cluster_id: 1 #主键生成所在  某应用下集群id， 所属应用的集群内 注意一定不要重复【0-31】  运行环境中集群节点增加即可
+ 
+server:
+  port: 7810
+  session:
+    timeout: 1800
+  tomcat:
+    uri-encoding: UTF-8
+    max-threads: 800
+    max-connections: 800
+
+ribbon:
+  ReadTimeout: 6000000
+  ConnectTimeout: 6000000
+hystrix:
+  command: 
+    default:
+      execution:
+        timeout:
+          enabled: true
+        isolation:
+          thread:
+            timeoutInMilliseconds: 600000    
+logging:
+  file: logs/hww-file-web-service-consumer.log
+  level:
+    com.hww.file: debug

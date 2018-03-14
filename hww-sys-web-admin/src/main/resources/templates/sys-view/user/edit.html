@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<#include "../common_header.html">
+	</head>				
+	<body class="no-skin">
+		<div class="main-container ace-save-state" id="main-container">
+			<script type="text/javascript">
+				try{ace.settings.loadState('main-container')}catch(e){}
+			</script>
+			
+			<div class="main-content">
+				<div class="main-content-inner">
+					<!-- <div class="page-content"> -->
+						<div class="row">
+							<div class="col-xs-12">
+								<!-- PAGE CONTENT BEGINS -->
+								<form id="submitForm" class="form-horizontal" role="form">
+								<input type="hidden" name="userId" value="${entity.userId}" id="userId"/>
+									<div class="form-group">
+										<label class="col-sm-3 control-label no-padding-right">用户名：</label>
+
+										<div class="col-sm-9">
+											<div class="pos-rel">
+												<input id="username" name="username"  value="${entity.username!}" class="typeahead scrollable" type="text" placeholder="用户名" required=""/>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-3 control-label no-padding-right">email：</label>
+
+										<div class="col-sm-9">
+											<div class="pos-rel">
+												<input id="email" name="email"  value="${entity.email!}" class="typeahead scrollable" type="text" placeholder="email" />
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-3 control-label no-padding-right">分配角色：</label>
+										<div class="col-sm-9">
+											<div class="pos-rel">
+												<select class="col-sm-2" id="defaultRole" name="defaultRole" value="${entity.defaultRole!}">
+													<option value="0">请选择角色</option>
+												</select>
+											</div>
+										</div>
+									</div>
+<!-- 									<div class="form-group">
+										<label class="col-sm-3 control-label no-padding-right">初始化密码：</label>
+
+										<div class="col-sm-9">
+											<div class="pos-rel">
+												<input id="password" name="password"  value="${entity.password!}" class="typeahead scrollable" type="text" placeholder="初始化密码" />
+											</div>
+										</div>
+									</div> -->
+									<div class="form-group">
+										<label class="col-sm-2 control-label no-padding-right">是只管理自己？</label>
+										<div class="col-sm-4">
+											<div class="pos-rel">
+												<label>
+													<input id="isSelfAdmin" name="isSelfAdmin" value="1" <#if entity.isSelfAdmin==1>checked="checked"</#if> class="ace ace-switch ace-switch-2" type="checkbox" />
+													<span class="lbl"></span>
+												</label>
+											</div>
+										</div>
+										<label class="col-sm-2 control-label no-padding-right">所有栏目权限？</label>
+										<div class="col-sm-4">
+											<div class="pos-rel">
+												<label>
+													<input id="isAllCategory" name="isAllCategory" value="1" <#if entity.isAllCategory==1>checked="checked"</#if> class="ace ace-switch ace-switch-2" type="checkbox" />
+													<span class="lbl"></span>
+												</label>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label no-padding-right">是管理员？</label>
+										<div class="col-sm-4">
+											<div class="pos-rel">
+												<label>
+													<input id="isAdmin" name="isAdmin" value="1" <#if entity.isAdmin==1>checked="checked"</#if> class="ace ace-switch ace-switch-2" type="checkbox" />
+													<span class="lbl"></span>
+												</label>
+											</div>
+										</div>
+										<label class="control-label col-xs-2 col-sm-2 no-padding-right" for="food">状态：</label>
+										<div class="col-xs-4 col-sm-4">
+											<@p.select value="${entity.status!}" name="status" id="status" />
+										</div>
+									</div>
+									<div class="clearfix form-actions">
+										<div class="col-md-offset-3 col-md-9">
+											<button class="btn btn-info" type="button" id="submitbutton">
+												<i class="ace-icon fa fa-check bigger-110"></i>
+												提交
+											</button>
+
+											&nbsp; &nbsp; &nbsp;
+											<button class="btn" type="reset">
+												<i class="ace-icon fa fa-undo bigger-110"></i>
+												重置
+											</button>
+										</div>
+									</div>
+								</form>
+							</div>
+							
+						</div>
+					<!-- </div> -->
+				</div>
+			</div>
+		</div>
+		<#include "../footerjs.html">
+		<!-- page specific plugin scripts -->
+		<script src="${rc.contextPath}/admin/js/form.js"></script>
+		
+		<!-- inline scripts related to this page -->
+		<script type="text/javascript">
+		jQuery(function($) {
+			
+			//加载角色
+			//loadRole();
+			$.ajax({
+				type: 'POST',
+				url: "${rc.contextPath}/role/v_all_list.do",
+				dataType:'json',
+				success: function(data) {
+					console.log(data);
+					var list= data;
+					$("#defaultRole").empty();
+					$(list).each(function(index,role){
+						$("#defaultRole").append('<option value="'+role.roleId+'" >'+role.roleName+'</option>');
+						var defaultRole = ${entity.defaultRole}
+						$("#defaultRole").val(defaultRole);
+					})
+					
+				}
+			});
+			
+			$("#submitbutton").click(function() {
+				if(validateForm()){
+					$.ajax({
+						type: 'POST',
+						url: "${rc.contextPath}/user/o_update.do",
+						data: $("#submitForm").serialize(),
+						dataType:'json',
+						success: function(data) {
+						if(data) {
+							//artDialog({content:'提交成功', x:'right', y:'bottom', time:'1', fixed:true});
+							alert("提交成功");
+							window.parent.location.href="${rc.contextPath}/user/index.do"
+						}
+						}
+					});
+				}
+	
+			});
+			
+		})
+		
+		function validateForm(){
+			var defaultRole = $("#defaultRole").val();
+			if(defaultRole = 0){
+				alert("请选择角色");
+				return false;
+			}
+				return true;
+		}
+			
+		</script>							
+	</body>
+</html>

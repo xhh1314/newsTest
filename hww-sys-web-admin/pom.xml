@@ -1,0 +1,153 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hww.sys</groupId>
+		<artifactId>hww-sys</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../hww-sys/pom.xml</relativePath>
+	</parent>
+
+	<artifactId>hww-sys-web-admin</artifactId>
+	<packaging>jar</packaging>
+
+	<name>hww-sys-web-admin</name>
+	<description />
+
+	<dependencies>
+	
+		
+	
+	<dependency>
+    			<groupId>org.springframework</groupId>
+    			<artifactId>spring-context</artifactId>
+    			<version>4.3.13.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.12</version>
+		</dependency>
+	
+		<dependency>
+			<groupId>com.hww.sys</groupId>
+			<artifactId>hww-sys-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hww.framework</groupId>
+			<artifactId>hww-framework-web-admin</artifactId>
+			<version>${project.version}</version>
+			<!-- <exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+				</exclusion>
+			</exclusions> -->
+		</dependency>
+		<dependency>
+			<groupId>com.hww.framework</groupId>
+			<artifactId>hww-framework-web-service</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+	    <groupId>com.alibaba</groupId>
+	    <artifactId>fastjson</artifactId>
+	    <version>1.2.44</version>
+	</dependency>
+		<dependency>
+    <groupId>net.mingsoft</groupId>
+    <artifactId>shiro-freemarker-tags</artifactId>
+    <version>0.1</version>
+    </dependency>
+<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+<dependency>
+    <groupId>com.google.guava</groupId>
+    <artifactId>guava</artifactId>
+    <version>18.0</version>
+</dependency>
+    
+      <dependency>
+      <groupId>com.hww.ucenter</groupId>
+      <artifactId>hww-ucenter-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+    
+
+	</dependencies>
+	<!-- <build>
+	
+			<resources>
+	            <resource>
+	                <directory>${basedir}/src/main/webapp</directory>
+                    注意此次必须要放在此目录下才能被访问到
+	                <targetPath>META-INF/resources</targetPath> 
+	                <includes>
+	                    <include>**/**</include>
+	                </includes>
+	            </resource>
+	            <resource>
+	                <directory>${basedir}/src/main/resources</directory>
+	                <includes>
+	                    <include>**/**</include>
+	                </includes>
+	            </resource>
+	    </resources>
+	
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>3.2.0</version>
+				<configuration>
+					<warSourceExcludes>src/main/resources/**</warSourceExcludes>
+					<warName>myweb</warName>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>1.5.9.RELEASE</version>
+				<configuration>
+					<mainClass>com.hww.SysWebAdminApplication</mainClass>
+					<layout>ZIP</layout>
+					<project></project>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+
+		<finalName>hww-sys-web-admin</finalName>
+	</build> -->
+	<build>
+		<plugins>
+
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>1.5.9.RELEASE</version>
+				<configuration>
+					<mainClass>com.hww.SysWebAdminApplication</mainClass>
+					<layout>ZIP</layout>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<finalName>hww-sys-web-admin</finalName>
+	</build>
+</project>

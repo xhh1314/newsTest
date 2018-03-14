@@ -1,0 +1,9 @@
+{
+  "@class" : "org.apereo.cas.services.RegexRegisteredService",
+  "serviceId" : "^(http|https|imaps)://.*",
+  "name" : "hwwaceadmin",
+  "theme" : "hwwaceadmin",
+  "id" : 1000,
+  "description" : "hwwaceadmin",
+  "evaluationOrder" : 1
+}

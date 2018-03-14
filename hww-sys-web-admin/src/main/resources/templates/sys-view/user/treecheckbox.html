@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<#include "../common_header.html">
+		<link rel="stylesheet" href="${rc.contextPath}/ztree/css/zTreeStyle/zTreeStyle.css" type="text/css">
+	</head>				
+	<body class="no-skin">
+		<div class="main-container ace-save-state" id="main-container">
+			<script type="text/javascript">
+				try{ace.settings.loadState('main-container')}catch(e){}
+			</script>
+			
+			<div class="main-content">
+				<div class="main-content-inner">
+					<!-- <div class="page-content"> -->
+						<div class="row">
+							<div class="col-xs-12">
+								<!-- PAGE CONTENT BEGINS -->
+								<div class="row">
+									<div class="col-xs-3">
+										<div class="widget-box widget-color-blue">
+											<div class="widget-header">
+												<h4 class="widget-title lighter smaller">
+													权限
+												</h4>
+											</div>
+
+											<div class="widget-body" style="overflow: auto;height: 525px;">
+												<div class="widget-main">
+													<ul id="treeDemo" class="ztree sub"></ul>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="col-xs-9">
+										<form id="submitForm" class="form-horizontal" role="form">
+											<input type="hidden" name="menuIds" id="menuIds"/>
+											<input type="hidden" name="roleId" id="roleId" value="${form.roleId}"/>
+											<div class="clearfix form-actions">
+												<div class="col-md-offset-3 col-md-9">
+													<button class="btn btn-info" type="button" id="submitbutton">
+														<i class="ace-icon fa fa-check bigger-110"></i>
+														提交
+													</button>
+		
+													&nbsp; &nbsp; &nbsp;
+													<button class="btn" type="reset">
+														<i class="ace-icon fa fa-undo bigger-110"></i>
+														重置
+													</button>
+												</div>
+											</div>
+										</form>
+									
+									</div><!-- /.span -->
+								</div><!-- /.row -->
+							</div>
+							
+						</div>
+					<!-- </div> -->
+				</div>
+			</div>
+		</div>
+		<#include "../footerjs.html">
+		<!-- page specific plugin scripts -->
+		<script type="text/javascript" src="${rc.contextPath}/ztree/js/jquery.ztree.core.js"></script>
+		<script type="text/javascript" src="${rc.contextPath}/ztree/js/jquery.ztree.excheck.js"></script>
+		<script src="${rc.contextPath}/admin/js/treeInit.js"></script>
+		<script src="${rc.contextPath}/admin/js/form.js"></script>
+		
+		<!-- inline scripts related to this page -->
+		<script type="text/javascript">
+		jQuery(function($) {
+		
+			loadMenu("${rc.contextPath}/menu/allMenuJson.do?cMenuIds=${menuIds}", "treeDemo", setting);
+			
+			$("#submitbutton").click(function() {
+				GetValue();
+				if(validateForm()){
+					$.ajax({
+						type: 'POST',
+						url: "${rc.contextPath}/role/o_update_per.do",
+						data: $("#submitForm").serialize(),
+						dataType:'json',
+						success: function(data) {
+						if(data) {
+							//artDialog({content:'提交成功', x:'right', y:'bottom', time:'1', fixed:true});
+							alert("提交成功");
+							//window.location.href='${rc.contextPath}/role/index.do';
+							window.location.href='${rc.contextPath}/role/v_list.do';
+
+						}
+						}
+					});
+				}
+	
+			});
+			
+		})
+		function validateForm(){
+				return true;
+		}
+		function GetValue() {
+			var menuIds = "";//用户ID，用户保存数据库
+			var zTree = $.fn.zTree.getZTreeObj("treeDemo").getCheckedNodes(true);//获取所有选中状态的节点
+			for ( var i = 0; i < zTree.length; i++) {
+				menuIds += zTree[i].id;
+				if(i<zTree.length-1){
+					menuIds+=",";
+				}
+			}
+			//var Origins = artDialog.open.origin;//这里表示父窗体 
+			//Origins.document.getElementById('menuIds').value = menuIds;//赋值父窗体“RUserID”为父窗体对象
+			document.getElementById('menuIds').value = menuIds;
+		}
+		
+		
+		/* zTree插件加载目录的处理  */
+		var zTree;
+		var setting = {
+			view : {
+				dblClickExpand : false
+			},
+			check : {
+				enable : true
+			},
+			data : {
+				simpleData : {
+					enable : true
+				}
+			}
+		};
+			
+		</script>							
+	</body>
+</html>

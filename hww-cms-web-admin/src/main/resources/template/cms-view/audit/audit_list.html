@@ -1,0 +1,278 @@
+
+<script type="text/javascript">
+	var editUrl = "${rc.contextPath}/contentType/v_edit.do";
+	var deleteUrl = "${rc.contextPath}/contentType/o_delete.do";
+	var indexUrl = "${rc.contextPath}/contentType/v_list.do"
+</script>
+<div class="col-sm-2"  >
+	<div id="treeWrap_v" class="tree-wrap hk-scrollbar" id="treeWrap_v_div" style= "height: 700px; overflow:auto">
+		<ul id="treeDemo_v" class="ztree" ></ul>
+	</div>
+</div>
+<div class="col-sm-10">	
+<div class="hk-toolbar">
+	<div class="btn-group btn-group-sm">
+		<button type="button" class="btn btn-default">
+			<span class="glyphicon glyphicon-th-list"></span> 批量审核
+		</button>
+		<button type="button" class="btn btn-default dropdown-toggle"
+			data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu">
+			<!--  <li role="separator" class="divider"></li> -->
+			<li><a id="linkPassItems" href="javascript:auditAll(1)"><span class="glyphicon glyphicon-plus"></span> 审核通过</a></li>
+			<li><a id="linkDisPassItems" href="javascript:auditAll(0)"><span class="glyphicon glyphicon-remove"></span> 审核不通过</a></li>
+		</ul>
+	</div>
+</div>
+
+<div id="table_div"  style="height:600px; overflow:auto">
+<table class="table table-hover table-bordered">
+	<thead>
+		<tr>
+		 	<th style="width:1%;"><input type="checkbox" id="checkall" onclick="selectAll()"></th>
+			<th style="width:5%;">ID</th>
+			<th style="width:20%;">新闻标题</th>
+			<th style="width:15%;">短标题</th>
+			<th style="width:5%;">作者</th>
+			<th style="width:15%;">外部链接地址</th>
+			<th style="width:5%">权重值 </th>
+			<!-- <th style="width:20%;">摘要</th> -->
+			<th style="width:5%;">创建时间</th>
+			<th style="width:5%;">责任编辑</th>
+			<th style="width:10%;">操作</th>
+			
+			<!--<th>contentId</th>
+			<th>categoryId</th>
+			<th>auditStatus</th>
+			<th>auditStep</th>
+			<th>auditStepResult</th>
+			<th>auditFlowId</th>
+			<th>auditHisRecord</th>
+			<th>操作</th> -->
+		</tr>
+	</thead>
+	<tbody>
+		<#list page.list as content>
+		<tr>
+			<!-- 
+			<td><#if (content.contentId)??>${content.contentId}</#if></td>
+			<td><#if (content.categoryId)??>${content.categoryId}</#if></td>
+			<td><#if (content.auditStatus)??>${content.auditStatus}</#if></td>
+			<td><#if (content.auditStep)??>${content.auditStep}</#if></td>
+			<td><#if (content.auditStepResult)??>${content.auditStepResult}</#if></td>
+			<td><#if (content.auditFlowId)??>${content.auditFlowId}</#if></td>
+			<td><#if (content.auditHisRecord)??>${content.auditHisRecord}</#if></td> -->
+			<td style="vertical-align: middle"><input type="checkbox" name="checkItem" value="${content.contentId}"></td>
+			<td style="vertical-align: middle"><#if (content.contentId)??>${content.contentId}</#if></td>
+			<td style="vertical-align: middle"><#if (content.title)??>${content.title}</#if></td>
+			<td style="vertical-align: middle"><#if (content.shortTitle)??>${content.shortTitle}</#if></td>
+			<td style="vertical-align: middle"><#if (content.author)??>${content.author}</#if></td>
+			<td style="vertical-align: middle"><#if (content.linkUrl)??>${content.linkUrl}</#if></td>
+			<td style="vertical-align: middle"><#if (content.priority)??>${content.priority}</#if></td>
+		<!-- 	<td><#if (content.summary)??>${content.summary}</#if></td> -->
+			<td style="vertical-align: middle"><#if (content.createTime)??>${content.createTime}</#if></td>
+			<td style="vertical-align: middle"><#if (content.editor)??>${content.editor}</#if></td>
+			<td style="vertical-align: middle"><button onclick="javascript:detailItem('${content.contentId}')"
+					class="btn btn-info btn-xs">详细</button>
+				<button id="pass_'${content.contentId}'"
+					class="btn btn-success btn-xs"
+					onclick="freshnewsAuditPassOrDeny('${content.contentId}',1)">通过</button>
+				<button id="dispass_'${content.contentId}'"
+					class="btn btn-danger btn-xs"
+					onclick="freshnewsAuditPassOrDeny('${content.contentId}',0)">不通过</button>
+			</td>
+		</tr>
+		</#list>
+	</tbody>
+</table>
+</div>
+</div>
+<#include "../common/page.html"> 
+<div class="modal fade" id="modalContent" tabindex="-1" role="dialog"
+					aria-labelledby="myModalLabel">
+					<#include "content_detail.html" />
+</div>
+
+<script type="text/javascript">
+	var auditContentUrl = "${rc.contextPath}/contentAudit/audit_list.do";
+	var auditContentResultUrl = "${rc.contextPath}/contentAudit/content_audit_result.do";
+	var auditContentAllUrl = "${rc.contextPath}/contentAudit/content_all_audit.do";
+	var contentDetailUrl="${rc.contextPath}/contentAudit/content_information.do";
+	var $modalContent = $('#modalContent');
+	function auditAll(result){
+		
+		var count=0;
+		var contentIds="";
+		$("input[name='checkItem']").each(function(){  
+			if($(this).is(":checked")){
+				contentIds=contentIds+$(this).val()+",";
+				count=count+1;
+			}
+        });
+		if(contentIds==""){
+			alert("至少选择一条新闻！");
+		}else{
+			contentIds=contentIds.substring(0,contentIds.length-1);
+			var c;
+			if(result==1){
+				c=confirm("确定所有选择的新闻通过审核吗？");
+			}else{
+				c=confirm("确定所有选择的新闻不通过审核吗？");
+			}
+			if(c==true){
+				var url = auditContentAllUrl + "?contentIds=" + contentIds + "&result=" + result;
+				$.ajax({
+					type : "GET",
+					dataType : "json",
+					url : url,
+					success : function(data, status) {
+						var no = ${page.pageNo};
+						if(count>=10){
+							no=no-1;
+						}
+						jumpNormalPage(no,null);
+					}
+				});
+				
+			}
+		}
+		
+	}
+	
+	function jumpNormalPage(page,categoryId) {
+	
+		if(categoryId!=null){
+			var url = auditContentUrl + "?pageNo=" + page+"&categoryId="+categoryId;
+		}else{
+		var url = auditContentUrl + "?pageNo=" + page;
+		}
+		$('.hk-main').load(url);
+	}
+	
+	
+	function detailItem(contentId){
+		var url=contentDetailUrl+ "?contentId=" + contentId;
+		$modalContent.load(url);
+		$modalContent.modal('show');
+	}
+	
+
+	function freshnewsAuditPassOrDeny(contentId, aduitResult) {
+		var url = auditContentResultUrl + "?contentId=" + contentId
+				+ "&auditStepResult=" + aduitResult;
+		var c = false;
+		if (aduitResult == 0) {
+			c = confirm("确定不同意审核吗?");
+		} else if (aduitResult == 1) {
+			c = confirm("确定同意审核吗?");
+		}
+		if (c = true) {
+			$.ajax({
+				type : "GET",
+				dataType : "json",
+				url : url,
+				success : function(data, status) {
+					var no = ${page.pageNo};
+					jumpNormalPage(no,null);
+				},
+				error:function(data){
+					alert("网络异常");
+				}
+			});
+		}
+	}
+	
+	function selectAll() {
+		if($("#checkall").is(":checked")){
+			$("input[name='checkItem']").each(function(){  
+	             $(this).prop("checked", true);  
+	         });  
+	    }else{  
+	    	$("input[name='checkItem']").each(function(){  
+	             $(this).removeAttr("checked");  
+	         });  
+	    }  
+	}
+	
+	
+	function boxheight(height,div){ //函数：获取尺寸
+	    //获取浏览器窗口高度
+	    var winHeight=height;
+	    if (window.innerHeight)
+	        winHeight =  height/917*window.innerHeight;
+	    else if ((document.body) && (document.body.clientHeight))
+	        winHeight = height/917*document.body.clientHeight;
+	    //通过Document对body进行检测，获取浏览器可视化高度
+	    if (document.documentElement && document.documentElement.clientHeight)
+	        winHeight = height/917*document.documentElement.clientHeight;
+	    //DIV高度为浏览器窗口高度
+	    document.getElementById(div).style.height= winHeight +"px";
+	    
+	    //窗口或框架被调整大小时执行
+	}
+	
+	$(function() {
+		 loadlistMenu("${rc.contextPath}/category/allCategoryJson.do?status=1", "treeDemo_v");
+		 boxheight(550,"table_div");
+		
+		
+	});
+	
+	
+	
+
+	function loadlistMenu(resourceType, treeObjId,setting) {
+		//$.fn.zTree.init($("#" + treeObjId), setting, null);
+		$.ajax({
+			type : "POST",
+			url : resourceType,
+			dataType : "json",
+			success : function(data) {
+				// 如果返回数据不为空，加载"业务模块"目录
+				if (data != null) {
+					// 将返回的数据赋给zTree
+					initTree(data);
+				}
+			}
+		});
+	}
+	
+	function initTree(data){
+		var setting = {
+				callback: {
+					onClick: function(event, treeId, treeNode){
+					 console.log(treeNode.id)
+					jumpNormalPage(${page.pageNo},treeNode.id);	
+					}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+				},
+			data : {
+				simpleData: {
+					enable: true,
+					idKey: "id",
+					pIdKey: "pId",
+					rootPId: 0
+				}
+			},
+		};
+		zTree =$.fn.zTree.init($("#treeDemo_v"), setting, data);
+		//zTree = $.fn.zTree.getZTreeObj(treeObjId);
+		if (zTree) {
+			// 默认展开所有节点
+			zTree.expandAll(true);
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</script>

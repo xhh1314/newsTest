@@ -1,0 +1,169 @@
+<!-- <div class="modal-dialog bs-example-modal-lg" role="document">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			        <h5 class="modal-title" id="myModalLabel">
+			        	<span class="glyphicon glyphicon-file"></span> 
+			        	<span id="modalTite">详情</span>
+			        </h5>
+			      </div>
+			     <form id="submitFormNews" method="post" >
+			      <div class="modal-body">
+			      	<div class="timeline-container timeline-style2">
+						<div class="timeline-items">
+						<ul><#if topic??>
+							<li><p>标题：<input type="text" value="<#if topic.title??>${topic.title}</#if>"></p></li>
+							<li><p>内容：<input type="text" value="<#if topic.content??>${topic.content}</#if>"></p></li>
+							</#if>
+							<li>新闻类型:图文</li>
+						</ul>
+						</div>
+					</div>
+			      </div>
+							
+			      <div class="form-group">
+					<label class="control-label col-xs-2 col-sm-2 no-padding-right"
+						for="food">与新闻分类关联：</label>
+					<div class="col-sm-8" style="height:300px; overflow:auto">
+						<div id="cmsCategoryTree_add" class="tree-wrap hk-scrollbar">
+							<ul id="cmsCategoryTree_add_demo" class="ztree"></ul>
+							<input id="cmsCategoryIds" name="cmsCategoryIds" value="" type="hidden" />
+						</div>
+					</div>
+				</div>
+				</form>
+			      
+			    </div>
+			    <div class="modal-footer">
+			        <button type="button" class="btn btn-info btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 关闭</button>
+			      <button class="btn btn-info" type="button" id="submitbutton_news">
+								<i class="ace-icon fa fa-check bigger-110">提交</i> </button>
+			      </div>
+			  </div>
+			  
+<script type="text/javascript">
+ var loadCmsCategoryTreeUrl="${rc.contextPath}/sns/topic/tramCms.do";
+var cms_category_add_page = {
+		onClick:function(e, treeId, treeNode) {
+			var zTree = $.fn.zTree.getZTreeObj("cmsCategoryTree_add_demo"),
+			nodes = zTree.getSelectedNodes(),
+			v = "";
+			nodes.sort(function compare(a,b){return a.id-b.id;});
+			for (var i=0, l=nodes.length; i<l; i++) {
+				v += nodes[i].name + ",";
+			}
+			if (v.length > 0 ) v = v.substring(0, v.length-1);
+			var cityObj = $("#citySel");
+			cityObj.attr("value", v);
+			
+			v2 = "";
+			for (var i=0, l=nodes.length; i<l; i++) {
+				v2 += nodes[i].id + ",";
+			}
+			if (v2.length > 0 ) v2 = v2.substring(0, v2.length-1);
+			var parentObj = $("#parentId");
+			parentObj.attr("value", v2);
+		}
+};
+
+var cms_category_add_setting = {
+		view: {
+			dblClickExpand: false
+		},
+		data: {
+			simpleData: {
+				enable: true
+			}
+		},
+		callback: {
+			onClick: cms_category_add_page.onClick
+		},
+		check: {
+			enable: true,   //true / false 分别表示 显示 / 不显示 复选框或单选框
+		　　autoCheckTrigger: true,   //true / false 分别表示 触发 / 不触发 事件回调函数
+		　　chkStyle: "checkbox",   //勾选框类型(checkbox 或 radio）
+		　　chkboxType: { "Y": "s", "N": "s" }   //勾选 checkbox 对于父子节点的关联关系
+		}
+	};
+
+jQuery(function($) {
+	
+	loadMenu(loadCmsCategoryTreeUrl, "cmsCategoryTree_add_demo",cms_category_add_setting);
+	$("#submitbutton_news").click(function() {
+
+		if (validateForm()) {
+			
+			var data = $("#submitFormNews").serialize();
+
+			if (document.getElementById("status").checked == false) {
+				data = data + "&status=" + 0;
+			}
+			if (document.getElementById("isCustom").checked == false) {
+				data = data + "&isCustom=" + 0;
+			}
+			if (document.getElementById("isDefault").checked == false) {
+				data = data + "&isDefault=" + 0;
+			}
+			$.ajax({
+				type : 'POST',
+				url : "",
+				data : data,
+				dataType : 'json',
+				success : function(data) {
+					if (data) {
+						//artDialog({content:'提交成功', x:'right', y:'bottom', time:'1', fixed:true});
+						alert("提交成功");
+						$('.hk-main').load(indexUrl);
+					}
+				}
+			});
+		}
+	});
+})
+
+function loadMenu(resourceType, treeObjId,setting) {
+		//$.fn.zTree.init($("#" + treeObjId), setting, null);
+		$.ajax({
+			type : "POST",
+			url : resourceType,
+			dataType : "json",
+			success : function(data) {
+				// 如果返回数据不为空，加载"业务模块"目录
+				if (data != null) {
+					// 将返回的数据赋给zTree
+					$.fn.zTree.init($("#" + treeObjId), setting, data);
+					//              alert(treeObj);
+					zTree = $.fn.zTree.getZTreeObj(treeObjId);
+					if (zTree) {
+						// 默认展开所有节点
+						zTree.expandAll(true);
+					}
+				}
+			}
+		});
+	}
+
+
+var treeJson;
+function getCategoryTree(){
+	var url = loadCmsCategoryTreeUrl;
+	$.ajax({
+		type : "POST",
+		async: false,
+		url : url,
+		dataType : "json",
+		success : function(data) {
+			if (data != null) {
+				treeJson = data;
+			}
+		}
+	});
+	return treeJson;
+}
+
+
+
+
+
+
+</script> -->

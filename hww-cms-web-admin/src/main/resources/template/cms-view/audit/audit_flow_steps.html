@@ -1,0 +1,149 @@
+<div class="col-md-10">
+	<div class="hk-toolbar">
+		<div class="btn-group btn-group-sm">
+			<button type="button" class="btn btn-primary btn-lg"
+				data-toggle="modal" data-target="#myModal" onclick="addLastSteps();">给"流程${flowId!}"添加审核步骤</button>
+		</div>
+	</div>
+	<table id="simple-table" class="table  table-bordered table-hover">
+		<thead>
+			<tr>
+				<th class="center detail-col">审核顺序</th>
+				<th class="center detail-col">角色</th>
+				<th class="center detail-col">审核描述</th>
+				<th class="center detail-col">操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<#list page.list as p>
+			<tr>
+				<td class="center detail-col">${p.stepIndex!}</td>
+				<td class="center detail-col">${p.stepAuditRole!}</td>
+				<td class="center detail-col">${p.sepDesc!}</td>
+				<td class="center detail-col">
+				 <a class="btn btn-danger btn-xs"
+					href="javascript:deleteStep('${p.auditFlowStepsId!}');">删除</a> <a
+					class="btn btn-success btn-xs"
+					href="javascript:addLast(${p.stepIndex!});">在上一行添加</a> <a
+					class="btn btn-success btn-xs"
+					href="javascript:addNext(${p.stepIndex!});">在下一行添加</a></td>
+			</tr>
+			</#list>
+		</tbody>
+	</table>
+</div>
+</div>
+
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="myModalLabel">审核步骤添加</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal">
+					<div class="form-group form-group-sm">
+						<label class="col-sm-2 control-label">审核角色</label>
+						<div class="col-sm-10">
+							<select id="select_role" name=select_role>
+							</select>
+						</div>
+					</div>
+					<div class="form-group form-group-sm">
+						<label class="col-sm-2 control-label">描述</label>
+						<div class="col-sm-10">
+							<input type="text" id="sepDesc" name="sepDesc">
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				<button type="button" class="btn btn-primary" onclick="addSteps()">添加</button>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+var auditFlowStepsUrl = "${rc.contextPath}/contentAuditFlowSteps/save.do";
+var deleteStepsUrl = "${rc.contextPath}/contentAuditFlowSteps/delete.do";
+var auditFlowStepsListUrl = "${rc.contextPath}/contentAuditFlowSteps/list.do";
+var allRoleListListUrl = "${rc.contextPath}/contentAuditFlowSteps/all_role_list.do";
+
+var curStepIndex = 1;
+
+function addLastSteps() {
+	var tab = document.getElementById("simple-table");
+	var rows = tab.rows.length;
+	curStepIndex = rows;
+}
+
+function addSteps() {
+	var flowId = '${flowId}';
+	var sepDesc = $('#sepDesc').val();
+	var checkValue=$("#select_role").val();
+	var checkText=$("#select_role").find("option:selected").text(); 
+	var url = auditFlowStepsUrl + "?flowId=" + flowId + "&stepIndex="
+			+ curStepIndex + "&sepDesc=" + sepDesc+"&roleId="+checkValue +"&stepAuditRole="+checkText;
+	$.ajax({
+		type : "GET",
+		dataType : "json",
+		url : url,
+		success : function(data, status) {
+			hideModal2();
+			$('#stepsPage').load(
+					auditFlowStepsListUrl + "?flowId=" + flowId);
+		}
+	});
+}
+
+function addLast(stepIndex) {
+	$("#myModal").modal('show');
+	curStepIndex = stepIndex;
+}
+function addNext(stepIndex) {
+	$("#myModal").modal('show');
+	curStepIndex = stepIndex + 1;
+}
+function deleteStep(stepId) {
+	var flowId = '${flowId}';
+	var url = deleteStepsUrl + "?auditFlowStepsId=" + stepId;
+	$.ajax({
+		type : "GET",
+		dataType : "json",
+		url : url,
+		success : function(data, status) {
+			$('#stepsPage').load(
+					auditFlowStepsListUrl + "?flowId=" + flowId);
+		}
+	});
+}
+
+function hideModal2() {
+	$("#myModal").removeClass("in");
+	$(".modal-backdrop").remove();
+	$('body').removeClass('modal-open');
+	$('body').css('padding-right', '');
+	$("#myModal").hide();
+}
+$(function() {// 初始化内容
+	$.ajax({
+		type : "POST",
+		dataType : "json",
+		url : allRoleListListUrl,
+		success : function(data, status) {
+			var list = data;
+			for(var i=0;i<data.length;i++){
+				$("#select_role").append("<option value='"+list[i].roleId+"'>"+list[i].roleName+"</option>");
+			}
+		}
+	});
+});
+</script>
+

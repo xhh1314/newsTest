@@ -1,0 +1,566 @@
+
+<script type="text/javascript">
+    //本页面url
+    var loadSysListUrl ="${rc.contextPath}/hotword/list.do";
+</script>
+<form class="form-inline hk-search" id="searchForm" action="list.do" method="post">
+	<div class="row">
+		<div class="col-sm-2 col-xs-6" style="width: 125px;">
+			<#if (form.hotId)??>
+				<input id="hotId" name="hotId" type="text" value="${form.hotId?c}" class="form-control input-sm" placeholder="热词ID">
+				<#else>
+					<input id="hotId" name="hotId" type="text" class="form-control input-sm" placeholder="热词ID">
+			</#if>
+		</div>
+		<div class="col-sm-2  col-xs-6" style="width: 125px;">
+			<#if (form.hotWord)??>
+				<input id="hotWord" name="hotWord" type="text" value="${form.hotWord}" class="form-control input-sm" placeholder="热词">
+				<#else>
+					<input id="hotWord" name="hotWord" type="text" class="form-control input-sm" placeholder="热词">
+			</#if>
+		</div>
+		<div class="col-sm-2  col-xs-6" style="width: 125px;">
+			<div class="input-group input-group-sm">
+				<span class="input-group-addon" id="basic-addon3">类型</span>
+				<#if (form.type)??>
+					<#if form.type==1>
+						<select class="form-control" id="typess" name="type">
+							<option value="">全部</option>
+							<option value="1" selected="selected">综合</option>
+							<option value="2">爆料</option>
+							<option value="3">视频</option>
+							<option value="4">新鲜事</option>
+							<option value="5">用户</option>
+							<option value="6">附近</option>
+						</select>
+					</#if>
+					<#if form.type==2>
+						<select class="form-control" id="typess" name="type">
+							<option value="">全部</option>
+							<option value="1">综合</option>
+							<option value="2" selected="selected">爆料</option>
+							<option value="3">视频</option>
+							<option value="4">新鲜事</option>
+							<option value="5">用户</option>
+							<option value="6">附近</option>
+						</select>
+					</#if>
+					<#if form.type==3>
+						<select class="form-control" id="typess" name="type">
+							<option value="">全部</option>
+							<option value="1">综合</option>
+							<option value="2">爆料</option>
+							<option value="3" selected="selected">视频</option>
+							<option value="4">新鲜事</option>
+							<option value="5">用户</option>
+							<option value="6">附近</option>
+						</select>
+					</#if>
+					<#if form.type==4>
+						<select class="form-control" id="typess" name="type">
+							<option value="">全部</option>
+							<option value="1">综合</option>
+							<option value="2">爆料</option>
+							<option value="3">视频</option>
+							<option value="4" selected="selected">新鲜事</option>
+							<option value="5">用户</option>
+							<option value="6">附近</option>
+						</select>
+					</#if>
+					<#if form.type==5>
+						<select class="form-control" id="typess" name="type">
+							<option value="">全部</option>
+							<option value="1">综合</option>
+							<option value="2">爆料</option>
+							<option value="3">视频</option>
+							<option value="4">新鲜事</option>
+							<option value="5" selected="selected">用户</option>
+							<option value="6">附近</option>
+						</select>
+					</#if>
+					<#if form.type==6>
+						<select class="form-control" id="typess" name="type">
+							<option value="">全部</option>
+							<option value="1">综合</option>
+							<option value="2">爆料</option>
+							<option value="3">视频</option>
+							<option value="4">新鲜事</option>
+							<option value="5">用户</option>
+							<option value="6" selected="selected">附近</option>
+						</select>
+					</#if>
+					<#else>
+						<select class="form-control" id="typess" name="type">
+							<option value="" selected="selected">全部</option>
+							<option value="1">综合</option>
+							<option value="2">爆料</option>
+							<option value="3">视频</option>
+							<option value="4">新鲜事</option>
+							<option value="5">用户</option>
+							<option value="6">附近</option>
+						</select>
+				</#if>
+			</div>
+		</div>
+		<div class="col-sm-2  col-xs-6">
+			<button id="btnSearch" type="button" class="btn btn-info btn-sm" onclick="search()">
+				<span class="glyphicon glyphicon-search"></span>
+				<span>搜索</span>
+			</button>
+		</div>
+	</div>
+</form>
+<div class="hk-toolbar">
+	<div class="btn-group btn-group-sm">
+		<button type="button" class="btn btn-default">
+			<span class="glyphicon glyphicon-th-list"></span>
+			操作
+		</button>
+		<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu">
+			<li>
+				<a id="linkAddItems" href="javascript:toAdd()">
+					<span class="glyphicon glyphicon-plus"></span>
+					添加
+				</a>
+			</li>
+			<li>
+				<a href="javascript:someHandleStatu(0)">
+					<span class="glyphicon glyphicon-floppy-remove"></span>
+					冻结
+				</a>
+			</li>
+			<li>
+				<a href="javascript:someHandleStatu(1)">
+					<span class="glyphicon glyphicon-floppy-saved"></span>
+					解冻
+				</a>
+			</li>
+			<li>
+				<a id="linkDelItems" href="javascript:deleteItem()">
+					<span class="glyphicon glyphicon-remove"></span>
+					删除
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<div style="overflow-x: hidden; overflow-y: auto; height:450px; width:auto;">
+	<table id="simple-table" class="table  table-bordered table-hover">
+		<thead>
+		<tr>
+			<th class="center detail-col">
+				<label class="pos-rel">
+					<input type="checkbox" class="ace" id="all" onclick="selectAll()"/>
+					<span class="lbl"></span>
+				</label>
+			</th>
+			<th class="hidden-300">热词ID</th>
+			<th class="hidden-300">站点ID</th>
+			<th class="detail-col">热词名称</th>
+			<th class="detail-col">热词类型</th>
+			<th class="detail-col">状态</th>
+			<th class="detail-col">审核状态</th>
+			<th class="detail-col">创建时间</th>
+			<th class="detail-col">最后修改时间</th>
+			<th class="detail-col"><i class="ace-icon fa fa-clock-o bigger-110 hidden-300"></i>操作</th>
+		</tr>
+		</thead>
+		<tbody id="tblBody">
+		<#list page.list as hotword>
+			<tr>
+				<td class="center detail-col">
+					<label class="pos-rel">
+						<input name="IDCheck" id="code" value="${hotword.hotId?c}" type="checkbox" class="ace" />
+						<span class="lbl"></span>
+					</label>
+				</td>
+				<td><#if (hotword.hotId)??>${hotword.hotId?c}<#else></#if></td>
+				<td><#if (hotword.siteId)??>${hotword.siteId}<#else></#if></td>
+				<td><#if (hotword.hotWord)??>${hotword.hotWord}<#else></#if></td>
+				<td>
+					<#if (hotword.type)??>
+						<#if hotword.type==1>综合</#if>
+						<#if hotword.type==2>爆料</#if>
+						<#if hotword.type==3>视频</#if>
+						<#if hotword.type==4>新鲜事</#if>
+						<#if hotword.type==5>用户</#if>
+						<#if hotword.type==6>附近</#if>
+					</#if>
+				</td>
+				<td><#if (hotword.status==0)>冻结<#else>正常</#if></td>
+				<td><#if (hotword.auditStatus==0)>未审核<#else>已审核</#if></td>
+				<td><#if (hotword.createTime)??>${hotword.createTime}<#else></#if></td>
+				<td><#if (hotword.lastModifyTime)??>${hotword.lastModifyTime}<#else></#if></td>
+				<td>
+					<button type="button" class="btn btn-xs btn-warning" onclick="handleStatus(0,${hotword.hotId?c})">冻结</button>
+					<button type="button" class="btn btn-xs btn-warning" onclick="handleStatus(1,${hotword.hotId?c})">解冻</button>
+					<button type="button" class="btn-eidt btn btn-xs btn-info" onclick="toEdit(${hotword.hotId?c})">编辑</button>
+					<button type="button" class="btn btn-xs btn-danger" onclick="removeUser(${hotword.hotId?c})">删除</button>
+				</td>
+			</tr>
+		</#list>
+		</tbody>
+	</table>
+</div>
+<form id="submitForm" name="submitForm" action="list.do" method="post">
+	<#if (form.hotId)??>
+		<input type="hidden" name="hotId" id="hotId" value="${form.hotId?c}"/>
+		<#else>
+			<input type="hidden" name="hotId" id="hotId"/>
+	</#if>
+	<#if (form.hotWord)??>
+		<input type="hidden" name="hotWord" id="hotWord" value="${form.hotWord}"/>
+		<#else>
+			<input type="hidden" name="hotWord" id="hotWord"/>
+	</#if>
+	<#if (form.status)??>
+		<input type="hidden" name="type" id="type" value="${form.status}"/>
+		<#else>
+			<input type="hidden" name="status" id="statuss"/>
+	</#if>
+	<input type="hidden" name="pageNo" id="pageNo" value="${page.pageNo}"/>
+</form>
+<#include "../common/page.html">
+	<div class="modal fade" id="modalInfos" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h5 class="modal-title" id="myModalLabel">
+						<span class="glyphicon glyphicon-file"></span>
+						<span id="modalTite"></span>
+					</h5>
+				</div>
+				<div class="modal-body">
+					<form id="sysForm" class="form-horizontal">
+						<input type="hidden" name="hotId" id="hotIds"/>
+						<div class="form-group form-group-sm">
+							<label for="inputEmail3" class="col-sm-2 control-label">热词内容</label>
+							<div class="col-sm-10">
+								<input type="text" name="hotWord" id="hotWords" class="form-control" placeholder="热词内容">
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label for="inputEmail3" class="col-sm-2 control-label">热词类型</label>
+							<div class="col-sm-10">
+								<select name="type" id="types">
+									<option value="1"  selected="selected">综合</option>
+									<option value="2">爆料</option>
+									<option value="3">视频</option>
+									<option value="4">新鲜事</option>
+									<option value="5">用户</option>
+									<option value="6">附近</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label for="inputEmail3" class="col-sm-2 control-label">审核状态</label>
+							<div class="col-sm-10">
+								<input type="radio" value="0"  name="auditStatus" checked="checked" id="enable"/>未审核
+								<input type="radio" value="1" name="auditStatus" id="disable"/>已审核
+							</div>
+						</div>
+						<div class="form-group form-group-sm">
+							<label for="inputEmail3" class="col-sm-2 control-label">状态</label>
+							<div class="col-sm-10">
+								<input type="radio" value="1" checked="checked"  name="status" id="enable"/>正常
+								<input type="radio" value="0" name="status" id="disable"/>冻结
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-info btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 关闭</button>
+					<button id="btnSave" data-action="" type="button" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-saved"></span> 保存</button>
+					<button id="btnUpdate" data-action="" type="button" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-saved"></span> 修改</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+        var page = {
+            init : function() {
+                this.eventInit();
+            },
+            eventInit : function() {
+                //信息表单模态框
+                var $modalInfos = $('#modalInfos');
+                var $modalInfoTitle = $modalInfo.find('#modalTite');
+                $modalInfo.modal({
+                    backdrop : 'static',
+                    keyboard : false,
+                    show : false
+                });
+                //添加一条数据
+                $('#linkAddItems').click(function() {
+                    resetForm();
+                    $modalInfoTitle.html('添加数据');
+                    $modalInfos.modal('show');
+                    $("#pwdDiv").show();
+                    $("#btnSave").show();
+                    $("#btnUpdate").hide(); 
+                });
+                //编辑一条数据
+                $('#linkEditItem').click(function() {
+                    $modalInfoTitle.html('编辑数据');
+                    $modalInfos.modal('show');
+                    $("#pwdDiv").show();
+                    $("#btnSave").hide();
+                    $("#btnUpdate").show();
+                });
+            }
+        };
+
+        jQuery(function($) {
+            page.init();
+        });
+        function toAdd() {
+            resetForm();
+            $modalInfoTitle.html('添加数据');
+            $modalInfos.modal('show');
+            $("#pwdDiv").show();
+            $("#btnSave").show();
+            $("#btnUpdate").hide();
+        }
+        //新增操作
+        $("#btnSave").click(function() {
+            if(validateForm()){
+                $.ajax({
+                    type: 'POST',
+                    url: "${rc.contextPath}/hotword/save.do",
+                    data: $("#sysForm").serialize(),
+                    dataType:'json',
+                    success: function(data) {
+                        alert(data);
+                        $(".modal-backdrop").hide();
+                        $("#pageNo").val('${page.pageNo}');
+                        var data = $("#submitForm").serialize();
+                        $('.hk-main').load(loadSysListUrl, data);
+                    }
+                });
+            }
+        });
+        //修改操作
+        $("#btnUpdate").click(function() {
+            if(validateForm()){
+                $.ajax({
+                    type: 'POST',
+                    url: "${rc.contextPath}/hotword/update.do",
+                    data: $("#sysForm").serialize(),
+                    dataType:'json',
+                    success: function(data) {
+                        alert(data);
+                        $(".modal-backdrop").hide();
+                        $("#pageNo").val('${page.pageNo}');
+                        var data = $("#submitForm").serialize();
+                        $('.hk-main').load(loadSysListUrl, data);
+                    }
+                });
+            }
+        });
+        //单个解冻与冻结操作
+        function handleStatus(status, hotId) {
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/hotword/handleStatu.do",
+                data: "hotId="+hotId + "&status="+status,
+                dataType:'json',
+                success: function(data) {
+                    alert(data);
+                    $(".modal-backdrop").hide();
+                    $("#pageNo").val('${page.pageNo}');
+                    var data = $("#submitForm").serialize();
+                    $('.hk-main').load(loadSysListUrl, data);
+                }
+            });
+        }
+        //单个删除操作
+        function removeUser(hotId) {
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/hotword/delete.do",
+                data: "hotId="+hotId,
+                dataType:'json',
+                success: function(data) {
+                    alert(data);
+                    $(".modal-backdrop").hide();
+                    $("#pageNo").val('${page.pageNo}');
+                    var data = $("#submitForm").serialize();
+                    $('.hk-main').load(loadSysListUrl, data);
+                }
+            });
+        }
+        //去修改查询单个操作
+        function toEdit(hotId) {
+            $("#pwdDiv").hide();
+            $("#btnSave").hide();
+            $("#btnUpdate").show();
+            var $modalInfos = $("#modalInfos");
+            var $modalInfoTitle = $modalInfo.find('#modalTite');
+            $modalInfo.modal({
+                backdrop : 'static',
+                keyboard : false,
+                show : false
+            });
+            $modalInfoTitle.html('编辑数据');
+            $modalInfos.modal('show');
+            resetForm();
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/hotword/edit.do",
+                data: "hotId="+hotId,
+                dataType:'json',
+                success: function(data) {
+                    $("#hotIds").val(data.hotId);
+                    $("#hotWords").val(data.hotWord);
+                    $("#types").val(data.type);
+                    if (data.auditStatus == 0) {
+                        $("#sysForm input[name='auditStatus']").get(0).checked=true;
+                    } else {
+                        $("#sysForm input[name='auditStatus']").get(1).checked=true;
+                    }
+                    if (data.status == 0) {
+                        $("#sysForm input[name='status']").get(1).checked=true;
+                    } else {
+                        $("#sysForm input[name='status']").get(0).checked=true;
+                    }
+                }
+            });
+        }
+        //重置表单
+        function resetForm() {
+            $("#hotWords").val("");
+            $("#types").val("1");
+            $("#sysForm input[name='auditStatus']").get(0).checked=true;
+            $("#sysForm input[name='status']").get(0).checked=true;
+        }
+        //验证表单
+        function validateForm() {
+            var hotWord = $("#hotWords").val();
+            if (!hotWord) {
+                alert("热词内容不能为空！");
+                return false;
+            }
+            return true;
+        }
+
+        //批量解冻与冻结操作
+        function someHandleStatu(status) {
+            var hotIds="";
+            $("input[id^='code']:checked").each(function(){
+                hotIds+=$(this).val()+",";
+            });
+            if (!hotIds) {
+                alert("请勾选要冻结/解冻的记录！");
+                return;
+            }
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/hotword/handleStatu.do",
+                data: "allIDCheck="+hotIds+"&status="+status,
+                dataType:'json',
+                success: function(data) {
+                    alert(data);
+                    $(".modal-backdrop").hide();
+                    $("#pageNo").val('${page.pageNo}');
+                    var data = $("#submitForm").serialize();
+                    $('.hk-main').load(loadSysListUrl, data);
+                }
+            });
+        }
+        //批量删除操作
+        function deleteItem() {
+            var hotIds="";
+            $("input[id^='code']:checked").each(function(){
+                hotIds+=$(this).val()+",";
+            });
+            if (!hotIds) {
+                alert("请勾选要删除的记录！");
+                return;
+            }
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/hotword/delete.do",
+                data: "allIDCheck="+hotIds,
+                dataType:'json',
+                success: function(data) {
+                    alert(data);
+                    $(".modal-backdrop").hide();
+                    $("#pageNo").val('${page.pageNo}');
+                    var data = $("#submitForm").serialize();
+                    $('.hk-main').load(loadSysListUrl, data);
+                }
+            });
+        }
+        //分页查询
+        function jumpNormalPage(pageNo) {
+            $("#pageNo").val(pageNo);
+            //$("#submitForm").submit();
+            var data = $("#submitForm").serialize();
+            $('.hk-main').load(loadSysListUrl,data);
+        }
+        //条件查询操作
+        function search() {
+            var hotId = $("#hotId").val();
+            var hotWord = $("#hotWord").val();
+            var type = $("#type").val();
+            if(hotId != null && hotId !="") {
+                if( isNaN(parseInt(hotId))) {
+                    alert("用户ID必须是数字类型！");
+                    return false;
+                }
+            }
+            var data = $("#searchForm").serialize();
+            $('.hk-main').load(loadSysListUrl,data);
+        }
+        //批量重置密码
+        $("#linkResetPwdItem").click(function(){
+            var hotIds="";
+            $("input[id^='code']:checked").each(function(){
+                hotIds+=$(this).val()+",";
+            });
+            if (!hotIds) {
+                alert("请勾选要重置密码的记录！");
+                return false;
+            }
+            $.ajax({
+                type: 'POST',
+                url: "${rc.contextPath}/hotword/resetPassword.do",
+                data: "allIDCheck="+hotIds,
+                dataType:'json',
+                success: function(data) {
+                    alert(data);
+                    $(".modal-backdrop").hide();
+                    $("#pageNo").val('${page.pageNo}');
+                    var data = $("#submitForm").serialize();
+                    $('.hk-main').load(loadSysListUrl, data);
+                }
+            });
+        });
+        //全选全不选，列表所有选中复选框选中，否则不选中
+        function selectAll() {
+            if($("#all").is(":checked")){
+                $("input[id^='code']").each(function(){
+                    $(this).prop("checked", true);
+                });
+            }else{
+                $("input[id^='code']").each(function(){
+                    $(this).removeAttr("checked");
+                });
+            }
+        }
+        $("input[id^='code']").click(function(){
+            var all = $("#tblBody tr").size();
+            var size =$("input[id^='code']:checked").length;
+            if (all == size) {
+                $("#all").prop("checked", true);
+            } else {
+                $("#all").removeAttr("checked");
+            }
+        });
+	</script>

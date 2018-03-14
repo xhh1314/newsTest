@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta charset="utf-8" />
+		<title>爆料评论</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+		<script type="text/javascript">
+			/* 页面全局url */
+			var loadNewsbrokeCommentUrl = "${rc.contextPath}/sns/post/newsbroke_comment_list.do";
+			var auditDetailUrl = "${rc.contextPath}/sns/audit/audit_detail.do";
+		</script>
+	</head>
+
+	<body class="page-content">
+		<!-- 区块：主内容区域 begin-->
+		<div class="newsbroke-comment-list-main">
+			<form name="searchform" id="searchform" class="form-inline hk-search">
+				<div class="row">
+					<div class="col-sm-2  col-xs-6">
+						<div class="input-group input-group-sm">
+						  <span class="input-group-addon" id="basic-addon3">审核状态</span>
+						  <select id="auditStatus" name ="auditStatus" class="form-control">
+							  <option value=''>全部</option>
+							  <option value='0'>待审核</option>
+							  <option value='1'>已审核</option>
+						  </select>
+						</div>
+					</div>
+					<div class="col-sm-2 col-xs-6">
+			  			<input type="text" name="content" value="<#if searchvo.content??>${searchvo.content}</#if>" class="form-control input-sm" placeholder="评论内容">
+					</div>
+					<div class="col-sm-2 col-xs-6">
+			  			<input type="text" name="memberId" value="<#if searchvo.memberId??>${searchvo.memberId}</#if>" class="form-control input-sm" placeholder="会员账号">
+					</div>
+					<div class="col-sm-2 col-xs-6">
+						<input type="text" name="beginTime" id="beginTime" class="form-control input-sm" 
+						onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss', readOnly: true ,maxDate:'#F{$dp.$D(\'endTime\')}'});" 
+						format="yyyy-MM-dd HH:mm:ss"  placeholder="评论时间开始">
+					</div>
+					<div class="col-sm-2 col-xs-6">
+						<input type="text" name="endTime" id="endTime" class="form-control input-sm" 
+						onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss', readOnly: true ,minDate:'#F{$dp.$D(\'beginTime\')}'});" 
+						format="yyyy-MM-dd HH:mm:ss"  placeholder="评论时间结束">
+					</div>
+					<div class="col-sm-2  col-xs-6">
+			  			<button type="button" class="btn btn-info btn-sm" onclick="tosearch()">
+				  			<span class="glyphicon glyphicon-search"></span> 
+				  			<span>搜索</span>
+				  		</button>
+					</div>
+				</div>
+			</form>
+			<table class="table table-hover table-bordered">
+			    <thead>
+			        <tr>
+			            <th><input name="newsbrokeCommentCheckbox" type="checkbox" onclick="selectAll()"></th>
+			            <th data-field='index'>序号</th>
+			            <th>ID</th>
+			            <th style="width:35%;">评论内容</th>
+			            <th>会员账号</th>
+			            <th>评论时间</th>
+			            <th>审核状态</th>
+			            <th>审核详情</th>
+			            <th>发布时间</th>
+			        </tr>
+			    </thead>
+			    <tbody>
+			    	<#list page.list as comment>
+			    		<tr>
+			            <td><input name="newsbrokeCommentCheckbox" type="checkbox"></td>
+			            <td data-field='index'></td>
+			            <td>${comment.postId}</td>
+			            <td><#if comment.content??>${comment.content}</#if></td>
+			            <td><#if comment.memberId??>${comment.memberId}</#if></td>
+			            <td><#if comment.createTime??>${comment.createTime?string('yyyy-MM-dd HH:mm:ss')}</#if></td>
+			            <td>
+			            <#if comment.auditStatus??>
+			             	<#if comment.auditStatus==0>
+			             	新提交
+			             	<#elseif comment.auditStatus==1>
+			             	审核通过
+			             	</#if>
+			            </#if>
+			            </td>
+			            <td>
+			            	<a class="btn btn-info btn-xs linkTimeLine" href="javascript:toauditdetail(${comment.postId})">详情</a>
+			            </td>
+			            <td><#if comment.lastModifyTime??>${comment.lastModifyTime?string('yyyy-MM-dd HH:mm:ss')}</#if></td>
+			        </tr>
+			    	</#list>
+			    </tbody>
+			</table>
+		  	<#include "../common/page.html" />
+			<!-- Modal审核详情 -->
+			<div class="modal fade" id="modalTimeLine" tabindex="-1" role="dialog">
+			   <#include "../common/audit_detail.html" />
+			</div>
+		</div>
+		<!-- 区块：主内容区域 end -->
+		<script type="text/javascript">
+			
+			$(function(){
+				eventInit();
+				//设置序号
+				var length = $("tbody tr").length;
+				//var begin = (${page.pageNo}-1)*length+1;
+				for(var i = 0;i<length;i++){
+		            $("tbody tr:eq("+i+") td[data-field='index']").text(i+1);
+		        }
+				//设置搜素框审核状态下拉选中
+	    		<#if searchvo.auditStatus??>
+	    			$("#auditStatus").val(${searchvo.auditStatus});
+	    		</#if>
+			});
+			//审核详情模态框
+			var $modalTimeLine = $('#modalTimeLine');
+			//事件绑定
+			function eventInit(){
+				$modalTimeLine.modal({
+					backdrop:'static',
+					keyboard:false,
+					show:false
+				});
+			}
+			
+			//查看审核详情
+			function toauditdetail(postId){
+				$.ajax({
+				    type:"POST",
+				    dataType:"html",
+				    contentType: "application/json; charset=utf-8",
+				    url:auditDetailUrl,
+				    data:JSON.stringify({"topicId":postId}),
+				    success:function(data,status){
+				    	if(status='success'){
+				    		$modalTimeLine.html(data);
+							$modalTimeLine.modal('show');
+							
+				    	}
+				    },
+				    error:function(data){
+				    	alert("获取审核详情失败!");
+				    }
+				});
+			}
+			
+			/**搜素**/
+			function tosearch(){
+				var data = $("#searchform").serialize();
+				$('.hk-main').load(loadNewsbrokeCommentUrl,data);
+				
+			}
+			
+			/** 分页普通跳转 **/
+			function jumpNormalPage(page){
+				var checkid = null;
+				if(page>0&&page<=${page.totalPage}){
+					$('.hk-main').load(loadNewsbrokeCommentUrl+"?pageNo="+page);
+				}
+			}	
+			
+			//全选全不选，列表所有选中复选框选中，否则不选中
+			function selectAll() {
+				if($("#checkall").is(":checked")){  
+					$("input[name='newsbrokeCommentCheckbox']").each(function(){  
+			             $(this).prop("checked", true);  
+			         });  
+			    }else{  
+			    	$("input[name='newsbrokeCommentCheckbox']").each(function(){  
+			             $(this).removeAttr("checked");  
+			         });  
+			    }  
+			}
+		</script>
+	</body>
+</html>

@@ -1,0 +1,36 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hww</groupId>
+		<artifactId>hww-parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../hww-parent/pom.xml</relativePath>
+	</parent>
+
+	<groupId>com.hww.base</groupId>
+	<artifactId>hww-base</artifactId>
+	<packaging>pom</packaging>
+
+	<properties>
+		<hibernate-jpa.version>1.0.0.Final</hibernate-jpa.version>
+	</properties>
+
+	<modules>
+		<module>../hww-base-common</module>
+		<module>../hww-base-util</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- -->
+			<dependency>
+				<groupId>org.hibernate.javax.persistence</groupId>
+    			<artifactId>hibernate-jpa-2.1-api</artifactId>
+				<version>${hibernate-jpa.version}</version>
+				<scope>provided</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+</project>

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta charset="utf-8" />
+	<title>海外网-专题查询</title>
+
+	<meta name="description" content="" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+	<link rel="stylesheet" href="${rc.contextPath}/resources/assets/css/child-acepart.css" />
+	<link rel="stylesheet" href="${rc.contextPath}/resources/components/font-awesome/css/font-awesome.css" />
+	<link rel="stylesheet" href="${rc.contextPath}/resources/assets/css/ace-fonts.css" />	
+	<link rel="stylesheet" href="${rc.contextPath}/resources/components/bootstrap/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="${rc.contextPath}/resources/components/bootstrap-table/dist/bootstrap-table.min.css">
+	<link rel="stylesheet" href="${rc.contextPath}/resources/assets/css/sitecss-overwrite.css"/>
+</head>
+<body>
+	<!-- #section:basics/content.breadcrumbs -->
+	<ul class="breadcrumb">
+		<li class="active">
+			<i class="ace-icon fa fa-home home-icon"></i>
+			当前位置
+		</li>
+		<li class="active">专题查询</li>
+	</ul><!-- /.breadcrumb -->
+	<div class="childpage-container">
+		<form class="form-inline hk-search">
+			<div class="row">
+				<div class="col-sm-2  col-xs-6">
+					<div class="input-group input-group-sm">
+					  <span class="input-group-addon" id="basic-addon3">状态</span>
+					  <select class="form-control">
+						  <option>全部</option>
+						  <option>已发布</option>
+						  <option>未发布</option>
+					  </select>
+					</div>
+				</div>
+				<div class="col-sm-2 col-xs-6">
+		  			<input type="text" class="form-control input-sm" placeholder="标题">
+				</div>
+				<div class="col-sm-2  col-xs-6">
+		  			<input type="text" class="form-control input-sm" placeholder="发布人">
+				</div>
+				<div class="col-sm-2  col-xs-6">
+		  			<input type="text" class="form-control input-sm" placeholder="发布日期区间开始">
+				</div>
+				<div class="col-sm-2  col-xs-6">
+		  			<input type="text" class="form-control input-sm" placeholder="发布日期区间结束">
+				</div>
+				<div class="col-sm-2  col-xs-6">
+		  			<button id="btnSearch" type="button" class="btn btn-info btn-sm">
+			  			<span class="glyphicon glyphicon-search"></span> 
+			  			<span>搜索</span>
+			  		</button>
+				</div>
+			</div>
+		</form>
+		<div id="toolbar">
+			<!-- <div class="btn-group">
+			  	<button type="button" class="btn btn-default">
+			  		<span class="glyphicon glyphicon-th-list"></span> 
+			  		操作
+			  	</button>
+			  	<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			    	<span class="caret"></span>
+			 	</button>
+			  	<ul class="dropdown-menu">
+			    	<li>
+			    		<a id="linkAddItem" href="javascript:void(0)">
+			    			<span class="glyphicon glyphicon-plus"></span> 
+			    			添加
+			    		</a>
+			    	</li>
+			    	<li>
+			    		<a id="linkEditItem" href="javascript:void(0)">
+			    			<span class="glyphicon glyphicon-edit"></span> 
+			    			编辑
+			    		</a>
+			    	</li>
+			    	<li>
+			    		<a href="javascript:void(0)">
+			    			<span class="glyphicon glyphicon-floppy-remove"></span> 
+			    			冻结
+			    		</a>
+			    	</li>
+			    	<li>
+			    		<a href="javascript:void(0)">
+			    			<span class="glyphicon glyphicon-floppy-saved"></span> 
+			    			解冻
+			    		</a>
+			    	</li>
+			    	<li>
+			    		<a href="javascript:void(0)">
+			    			<span class="glyphicon glyphicon-lock"></span> 
+			    			重置密码
+			    		</a>
+			    	</li>
+			    	<li>
+			    		<a id="linkDelItems" href="#">
+			    			<span class="glyphicon glyphicon-remove"></span> 
+				    		删除
+				    	</a>
+				    </li>
+			  	</ul>
+			</div> -->
+		</div>
+
+		<table id="table">
+		    <thead>
+		        <tr>
+		            <th><input type="checkbox" name="" id=""></th>
+		            <th>序号</th>
+		            <th>ID</th>
+		            <th style="width:35%;">专题标题</th>
+		            <th>经纬度</th>
+		            <th>发布人</th>
+		            <th>录入时间</th>
+		            <th>审核状态</th>
+		            <th>审核详情</th>
+		            <th>发布时间</th>
+		            <th>操作</th>
+		        </tr>
+		    </thead>
+		    <tbody>
+		        <tr>
+		            <td><input type="checkbox" name="" id=""></td>
+		            <td>1</td>
+		            <td>13145</td>
+		            <td>
+		            	<a href="javascript:void(0)">十九大会议摘要</a>
+		            </td>
+		            <td>116°E,40°N</td>
+		            <td>admin</td>
+		            <td>2017-11-08 18:55：22</td>
+		            <td>新提交</td>
+		            <td><a class="linkTimeLine" href="javascript:void(0)">详情</a></td>
+		            <td></td>
+		            <td>
+						  <a href="javascript:void(0)">预览</a>
+		            </td>
+		        </tr>
+				<tr>
+		            <td><input type="checkbox" name="" id=""></td>
+		            <td>2</td>
+		            <td>13133</td>
+		            <td>
+		            	<a href="javascript:void(0)">共创小康社会</a>
+		            </td>
+		            <td>116°E,40°N</td>
+		            <td>admin</td>
+		            <td>2017-11-08 18:55：22</td>
+		            <td>一审通过，待二审</td>
+		            <td><a class="linkTimeLine" href="javascript:void(0)">详情</a></td>
+		            <td></td>
+		            <td>
+						  <a href="javascript:void(0)">预览</a>
+		            </td>
+		        </tr>
+		        <tr>
+		            <td><input type="checkbox" name="" id=""></td>
+		            <td>1</td>
+		            <td>13122</td>
+		            <td>
+		            	<a href="javascript:void(0)">xxx专题</a>
+		            </td>
+		            <td>116°E,40°N</td>
+		            <td>admin</td>
+		            <td>2017-11-08 18:55：22</td>
+		            <td>审核通过-发布</td>
+		            <td><a class="linkTimeLine" href="javascript:void(0)">详情</a></td>
+		            <td>2017-11-08 23:55：22</td>
+		            <td>
+						  <a href="javascript:void(0)">预览</a>
+		            </td>
+		        </tr>
+		        <tr>
+		            <td><input type="checkbox" name="" id=""></td>
+		            <td>1</td>
+		            <td>13111</td>
+		            <td>
+		            	<a href="javascript:void(0)">十九大会议摘要</a>
+		            </td>
+		            <td>116°E,40°N</td>
+		            <td>admin</td>
+		            <td>2017-11-08 18:55：22</td>
+		            <td>一审通过，待二审</td>
+		            <td><a class="linkTimeLine" href="javascript:void(0)">详情</a></td>
+		            <td></td>
+		            <td>
+						  <a href="javascript:void(0)">预览</a>
+		            </td>
+		        </tr>
+		    </tbody>
+		</table>
+		
+		<!-- Modal -->
+		<div class="modal fade" id="modalInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h5 class="modal-title" id="myModalLabel">
+		        	<span class="glyphicon glyphicon-file"></span> 
+		        	<span id="modalTite"></span>
+		        </h5>
+		      </div>
+		      <div class="modal-body">
+		        <form class="form-horizontal">
+				  <div class="form-group form-group-sm">
+				    <label for="inputEmail3" class="col-sm-2 control-label">用户名</label>
+				    <div class="col-sm-10">
+				      <input type="text" class="form-control" placeholder="用户名">
+				    </div>
+				  </div>
+				  <div class="form-group form-group-sm">
+				    <label for="inputEmail3" class="col-sm-2 control-label">密码</label>
+				    <div class="col-sm-10">
+				      <input type="text" class="form-control" placeholder="密码">
+				    </div>
+				  </div>
+				  <div class="form-group form-group-sm">
+				    <label for="inputEmail3" class="col-sm-2 control-label">姓名</label>
+				    <div class="col-sm-10">
+				      <input type="text" class="form-control" placeholder="姓名">
+				    </div>
+				  </div>
+				  <div class="form-group form-group-sm">
+				    <label for="inputPassword3" class="col-sm-2 control-label">年龄</label>
+				    <div class="col-sm-10">
+				      <input type="text" class="form-control" placeholder="年龄">
+				    </div>
+				  </div>
+				  <div class="form-group form-group-sm">
+				    <label for="inputPassword3" class="col-sm-2 control-label">联系电话</label>
+				    <div class="col-sm-10">
+				      <input type="text" class="form-control" placeholder="联系电话">
+				    </div>
+				  </div>
+				  <div class="form-group form-group-sm">
+				    <label for="inputPassword3" class="col-sm-2 control-label">地址</label>
+				    <div class="col-sm-10">
+				      <input type="text" class="form-control" placeholder="地址">
+				    </div>
+				  </div>
+				</form>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-info btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 关闭</button>
+		        <button id="btnSave" data-action="" type="button" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-saved"></span> 保存</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+		<div class="modal fade" id="modalTimeLine" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h5 class="modal-title" id="myModalLabel">
+		        	<span class="glyphicon glyphicon-file"></span> 
+		        	<span id="modalTite">审核详情</span>
+		        </h5>
+		      </div>
+		      <div class="modal-body">
+		      	<div class="timeline-container timeline-style2">
+					<span class="timeline-label">
+						<b>审核历史</b>
+					</span>
+
+					<div class="timeline-items">
+						<div class="timeline-item clearfix">
+							<div class="timeline-info">
+								<span class="timeline-date">三审</span>
+								<i class="timeline-indicator btn btn-info no-hover"></i>
+							</div>
+
+							<div class="widget-box transparent">
+								<div class="widget-body">
+									<div class="widget-main no-padding">
+										<p>状态：通过</p>
+										<p>审核人：张国清</p>
+										<p>审核时间：2017.11.06 14:23:55</p>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="timeline-item clearfix">
+							<div class="timeline-info">
+								<span class="timeline-date">二审</span>
+
+								<i class="timeline-indicator btn btn-info no-hover"></i>
+							</div>
+
+							<div class="widget-box transparent">
+								<div class="widget-body">
+									<div class="widget-main no-padding">
+										<p>状态：通过</p>
+										<p>审核人：赵猛</p>
+										<p>审核时间：2017.11.06 14:23:55</p>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="timeline-item clearfix">
+							<div class="timeline-info">
+								<span class="timeline-date">一审</span>
+
+								<i class="timeline-indicator btn btn-info no-hover"></i>
+							</div>
+
+							<div class="widget-box transparent">
+								<div class="widget-body">
+									<div class="widget-main no-padding">
+										<p>状态：通过</p>
+										<p>审核人：张国清</p>
+										<p>审核时间：2017.11.06 14:23:55</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div><!-- /.timeline-items -->
+				</div><!-- /.timeline-container -->
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-info btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 关闭</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+	</div>
+	<script src="${rc.contextPath}/resources/components/jquery/dist/jquery.js"></script>
+	<script src="${rc.contextPath}/resources/components/bootstrap/dist/js/bootstrap.js"></script>
+	<script src="${rc.contextPath}/resources/components/bootstrap-table/dist/bootstrap-table.js"></script>
+	<script src="${rc.contextPath}/resources/components/bootstrap-table/dist/locale/bootstrap-table-zh-CN.min.js"></script>
+	<script src="${rc.contextPath}/resources/components/bootbox.js/bootbox.min.js"></script>
+	<script src="${rc.contextPath}/resources/components/underscore/underscore-min.js"></script>
+	<script src="${rc.contextPath}/resources/assets/js/hk.common.js"></script>
+	<script>
+		$(function(){
+			listinfo.init();
+			childPageCommon.init();
+		});
+		/*数据表格相关*/
+		var listinfo={
+			init:function(){
+				/*table bootstrap-table 实例化*/
+				var $table = $('#table');
+				$table.bootstrapTable({
+				    classes:'table table-hover table-condensed',
+				    sortable:false,
+				    pagination:true,
+				    paginationHAlign:'left',
+				    paginationDetailHAlign:'right',
+				    paginationPreText:'上一页',
+				    paginationNextText:'下一页',
+				    paginationLoop:true,
+				    sidePagination:'server',
+				    pageNumber:1,
+				    pageSize:30,
+				    pageList:[10, 25, 50, 100, 'All'],
+				    toolbar:'#toolbar',
+				    toolbarAlign:'left',
+				    showColumns:true,
+				    minimumCountColumns:2,
+				    showRefresh:true,
+				    showToggle:true,
+				    idField:'id',
+				    uniqueId:'id',
+				    clickToSelect:true,
+				    cardView:false,
+				    onToggle:function(){
+				    	childPageCommon.setParentIframeHeight();
+				    }
+				});
+
+
+				/*相关操作 事件绑定*/
+				//公共变量
+				var $btnSearch = $('#btnSearch');
+				var $btnSave = $('#btnSave');
+				var $modalInfo = $('#modalInfo');
+				var $modalTimeLine = $('#modalTimeLine');
+				var $modalInfoTitle = $modalInfo.find('#modalTite');
+				//添加 编辑 模态框
+				$modalInfo.modal({
+					backdrop:'static',
+					keyboard:false,
+					show:false
+				});
+				//审核详情模态框
+				$modalTimeLine.modal({
+					backdrop:'static',
+					keyboard:false,
+					show:false
+				});
+
+				//搜索
+				$btnSearch.click(function(){
+					$table.bootstrapTable('refresh');
+				});
+
+				//获取选中数据
+				$('#linkGetselections').click(function(){
+					alert(JSON.stringify($table.bootstrapTable('getSelections')));
+				});
+				//添加一条数据
+				$('#linkAddItem').click(function(){
+					$btnSave.attr('data-action','add');
+					$modalInfoTitle.html('添加数据');
+					$modalInfo.modal('show');
+				});
+				//编辑一条数据
+				$('#linkEditItem').click(function(){
+					$btnSave.attr('data-action','edit');
+					$modalInfoTitle.html('编辑数据');
+					$modalInfo.modal('show');
+				});
+				//删除选中数据
+				$('#linkDelItems').click(function(){
+					var items = $table.bootstrapTable('getSelections');
+					if (items.length) {
+						var message = '您将删除以下'+items.length+'条数据：'+JSON.stringify(items);
+						hkbootbox.confirm({
+							message:message,
+			                callback: function(result) {  
+					            if(result) {
+					            	items.forEach(function(item){
+					            		$table.bootstrapTable('removeByUniqueId',item.id);
+					            	});
+					            }  
+					        }
+						});
+					}else{
+						alert('您未选中数据！')
+					}
+					
+				});
+				//保存一条数据
+				$btnSave.click(function(){
+					var action = $btnSave.attr('data-action');
+					
+					if (action === 'add') {
+						//添加
+						alert('添加成功！');
+						$modalInfo.modal('hide');
+					}
+					
+					if (action === 'edit') {
+						//编辑
+						alert('编辑成功！');
+						$modalInfo.modal('hide');
+					}
+				});
+				//查看审核详细
+				$('.linkTimeLine').click(function(){
+					$modalTimeLine.modal('show');
+				});
+			}
+		}
+	</script>
+</body>
+</html>

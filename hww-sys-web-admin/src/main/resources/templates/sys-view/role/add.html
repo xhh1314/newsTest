@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<#include "../common_header.html">
+	</head>				
+	<body class="no-skin">
+		<div class="main-container ace-save-state" id="main-container">
+			<script type="text/javascript">
+				try{ace.settings.loadState('main-container')}catch(e){}
+			</script>
+			
+			<div class="main-content">
+				<div class="main-content-inner">
+					<!-- <div class="page-content"> -->
+						<div class="row">
+							<div class="col-xs-12">
+								<!-- PAGE CONTENT BEGINS -->
+								<form id="submitForm" class="form-horizontal" role="form">
+									<div class="form-group">
+										<label class="col-sm-3 control-label no-padding-right">角色名称：</label>
+										<div class="col-sm-9">
+											<div class="pos-rel">
+												<input id="roleName" name="roleName"  value="" class="typeahead scrollable" type="text" placeholder="角色名称" required=""/>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-3 control-label no-padding-right">状态：</label>
+										<div class="col-sm-9">
+											<@p.select value="0" name="status" id="status" />
+										</div>
+									</div>
+									<div class="clearfix form-actions">
+										<div class="col-md-offset-3 col-md-9">
+											<button class="btn btn-info" type="button" id="submitbutton">
+												<i class="ace-icon fa fa-check bigger-110"></i>
+												提交
+											</button>
+											&nbsp; &nbsp; &nbsp;
+											<button class="btn" type="reset">
+												<i class="ace-icon fa fa-undo bigger-110"></i>
+												重置
+											</button>
+										</div>
+									</div>
+								</form>
+							</div>
+							
+						</div>
+					<!-- </div> -->
+				</div>
+			</div>
+		</div>
+		<#include "../footerjs.html">
+		<!-- page specific plugin scripts -->
+		<script src="${rc.contextPath}/admin/js/form.js"></script>
+		
+		<!-- inline scripts related to this page -->
+		<script type="text/javascript">
+		jQuery(function($) {
+			$("#submitbutton").click(function() {
+				if(validateForm()){
+					$.ajax({
+						type: 'POST',
+						url: "${rc.contextPath}/role/o_save.do",
+						data: $("#submitForm").serialize(),
+						dataType:'json',
+						success: function(data) {
+						if(data) {
+							//artDialog({content:'提交成功', x:'right', y:'bottom', time:'1', fixed:true});
+							alert("提交成功");
+							location.href ='${rc.contextPath}/role/v_list.do';
+						}
+						}
+					});
+				}
+	
+			});
+			
+		})
+		
+		function validateForm(){
+				return true;
+		}
+			
+		</script>							
+	</body>
+</html>

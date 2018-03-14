@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+	default-lazy-init="true">
+	
+	<!--LISTENER-->
+	<bean id="contentListener" class="com.hww.app.admin.listener.ContentModifyListener"/>
+	<bean id="categoryListener" class="com.hww.app.admin.listener.CategoryModifyListener"/>
+	
+	<!--MANAGER-->
+	<bean id="appContentMng" class="com.hww.app.admin.manager.impl.AppContentMngImpl">
+		<property name="listenerList">
+			<list>
+				<ref bean="contentListener"/>
+			</list>
+		</property>
+	</bean>
+	
+</beans>

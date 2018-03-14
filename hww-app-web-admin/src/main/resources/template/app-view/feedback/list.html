@@ -1,0 +1,81 @@
+
+
+<form class="form-inline hk-search">
+	<div class="row">
+		<div class="col-sm-2 col-xs-6">
+			<input type="text" class="form-control input-sm" placeholder="用户id" id="memberId" value='<#if form??>${form}</#if>'>
+		</div>
+		<div class="col-sm-2  col-xs-6" >
+			<button type="button" class="btn btn-info btn-sm" onclick="search()">
+				<span class="glyphicon glyphicon-search"></span> <span>搜索</span>
+			</button>
+		</div>
+	</div>
+</form> 
+<table class="table table-hover table-bordered">
+	<thead>
+		<tr>
+			<th>用户id</th>
+			<th>联系电话</th>
+			
+			<th>创建时间</th>
+			<th>内容</th>
+		</tr>
+	</thead>
+	<tbody>
+	 <#list page.list as type>
+		<tr>
+			<td>${type.memberId!}</td>
+			<td>${type.phone!}</td>
+			
+			<td>${type.createTime!}</td>
+			<td>${type.content!}</td>
+		</tr>
+		</#list> 
+	</tbody>
+</table>
+
+<#include "../common/page.html"> 
+
+
+
+<script type="text/javascript">
+
+
+
+var contenttype_list_page = {
+		//初始化
+		init : function() {
+			this.eventInit();
+		},
+		//事件绑定
+		eventInit : function() {
+
+			//分页查询
+			function jumpNormalPage(pageNo) {
+				$("#pageNo").val(pageNo);
+				$("#submitForm").submit();
+			}
+		}
+	}
+function jumpNormalPage(page) {
+	var checkid = null;
+	var typeName=$("#contentNameSearch").val();
+	
+	if (typeName!=null && typeName!="") {
+		$('.hk-main').load("${rc.contextPath}/feedback/list.do" + "?pageNo=" + page+"&contentTypeName="+typeName);
+	}else{
+		$('.hk-main').load("${rc.contextPath}/feedback/list.do" + "?pageNo=" + page);
+	} 
+	
+	
+	
+}
+
+function search(){
+	var memberId=$("#memberId").val()
+	$('.hk-main').load("${rc.contextPath}/feedback/list.do" + "?memberId=" + memberId);
+	
+}
+	
+	</script>

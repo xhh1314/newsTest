@@ -1,0 +1,816 @@
+<script type="text/javascript">
+	var editUrl = "${rc.contextPath}/content/v_edit.do";
+	var deleteUrl = "${rc.contextPath}/content/o_delete.do";
+	//本页面
+	var indexUrl = "${rc.contextPath}/content/v_list.do";
+	var saveUrl = "${rc.contextPath}/content/o_save.do";
+	var updateUrl="${rc.contextPath}/content/o_update.do";
+	//新闻审核详情
+    var newsAuditDetailUrl = "${rc.contextPath}/audit/news_audit_detail.do";
+  	//新闻内容详情
+	var getNewsDetailUrl = "${rc.contextPath}/content/detail.do";
+	var locationListUrl = "${rc.contextPath}/content/v_location_list.do";
+</script>
+
+	<link rel="stylesheet" type="text/css" href="${rc.contextPath}/easyui/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="${rc.contextPath}/easyui/themes/icon.css">
+	<script type="text/javascript" src="${rc.contextPath}/easyui/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="${rc.contextPath}/easyui/locale/easyui-lang-zh_CN.js"></script>
+
+<#setting number_format="#">
+
+	
+<div class="col-sm-2" id="treeWrap_v_div" style= "height: 700px; overflow:auto">
+	<div id="treeWrap_v" class="tree-wrap hk-scrollbar">
+		<ul id="treeDemo_v" class="ztree" style="height: 70%; "></ul>
+	</div>
+</div>
+<div class="col-sm-10">	
+<input type="hidden" id="searchLocationFlag" value="0"/>
+
+<form name="searchform" id="searchform" class="form-inline hk-search">
+	<div class="row">
+		<div class="col-sm-2 col-xs-6">
+			<input type="text" name="title" value="${form.title!}" class="form-control input-sm" placeholder="标题">
+		</div>
+		<div class="col-sm-2 col-xs-6">
+			<input type="text" name="summary" value="${form.summary!}" class="form-control input-sm" placeholder="摘要">
+		</div>
+		
+		<div class="col-sm-2  col-xs-6">
+			<div class="input-group input-group-sm">
+				<span class="input-group-addon">所属类别</span> 
+				<select id="categoryId" name="categoryId"
+					class="form-control">
+					<option value="-1">全部</option>
+					<#list categoryList as category>
+							<option value="${category.categoryId}">${category.categoryName}</option>
+					</#list>
+				</select>
+			</div>
+		</div>
+		
+		<div class="col-sm-2  col-xs-6">
+			<div class="input-group input-group-sm">
+				<span class="input-group-addon">新闻类型</span> <select id="contentTypeId" name="contenttypeId"
+					class="form-control">
+					<option value="0">全部</option>
+					<#list typeList as type>
+					<#if type.contentTypeName!='焦点'>
+						<option value="${type.contentTypeId}">${type.contentTypeName}</option>
+					</#if>
+					</#list>
+				</select>
+			</div>
+		</div>
+		<div class="col-sm-2  col-xs-6">
+			<div class="input-group input-group-sm">
+				<span class="input-group-addon" id="basic-addon3">审核状态</span> 
+				<select class="form-control" id="auditStatus" name="auditStatus">
+					<option value="" >全部</option>
+					<option value="0" >待审核</option>
+					<option value="1" >已审核</option>
+				</select>
+			</div>
+		</div>
+		<div class="col-sm-2  col-xs-6">
+			<button id="btnSearch" type="button" onclick="searchByColum()" class="btn btn-info btn-sm">
+				<span class="glyphicon glyphicon-search"></span> <span>搜索</span>
+			</button>
+		</div>
+	</div>
+</form>		      	
+<div class="hk-toolbar">
+	<div class="btn-group btn-group-sm">
+		<!-- <button type="button" class="btn btn-default">
+			<span class="glyphicon glyphicon-th-list"></span> 操作
+		</button>
+		<button type="button" class="btn btn-default dropdown-toggle"
+			data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<span class="caret"></span>
+		</button> -->
+		<button id="linkAddItemImgtext" type="button" class="btn btn-default" style="margin-left:10px">
+				  		<span
+					class="glyphicon glyphicon-list-alt"></span> 添加图文内容
+		</button>
+		<button id="linkAddItemImgset" type="button" class="btn btn-default" style="margin-left:10px">
+				  		<span
+					class="glyphicon glyphicon-picture"></span> 添加图集内容
+		</button>
+		<button id="linkAddItemVideo" type="button" class="btn btn-default" style="margin-left:10px">
+				  		<span
+					class="glyphicon glyphicon-film"></span> 添加视频内容
+		</button>
+		<button id="location_list" type="button" class="btn btn-default" style="margin-left:10px">
+				  		<span
+					class="glyphicon glyphicon-search"></span> 按位置搜索
+		</button>
+		<!-- <ul class="dropdown-menu">
+			 <li role="separator" class="divider"></li>
+			<li><a id="linkDelItems" href="#"><span
+					class="glyphicon glyphicon-remove"></span> 批量删除</a></li>
+		</ul> -->
+	</div>
+</div>
+
+<div id="table_div" style="height:550px; overflow:auto;">
+<table class="table table-hover table-bordered" id="table_list">
+	<thead>
+		<tr>
+			<th><input type="checkbox"  id="checkall" onclick="selectAll()"></th>
+			<th style="width:18%;">标题</th>
+			<th style="width:5%;">类型</th>
+			<th style="width:5%;">作者</th>
+			<th style="width:22%;">摘要</th>
+			<th style="width:6%;">审核状态</th>
+			<th style="width:8%;">是否置顶</th>
+			<th style="width:5%">权重值 </th>
+			<!-- <th>审核详情</th> -->
+			<th style="width:8%;">发布时间</th>
+			<th style="width:8%;">最后修改时间</th>
+			<th style="width:20%;">操作</th>
+		</tr>
+	</thead>
+	<tbody>
+
+		<#list page.list as p>
+		<tr>
+			<td style="vertical-align: middle"><input type="checkbox" name="newsContentCheckbox" value="${p.contentId}"></td>
+			<td onclick="linkNewsDetail('${p.contentId!}');">${p.title!}</td>
+			<td style="vertical-align: middle">
+			<#list typeList as type>
+				<#if type.contentTypeId == p.contenttypeId>
+						${type.contentTypeName}
+				</#if>
+			</#list>
+			</td>
+			<td> ${p.author!}</td>
+			<td >${p.summary!}</td>
+			<td style="vertical-align: middle">
+				<#if p.auditStatus == 0>
+					未审核
+				</#if>
+				<#if p.auditStatus == 1>
+					已审核
+				</#if>
+				<#if p.auditStatus == 2>
+					审核未通过
+				</#if>
+			</td>
+			<td style="vertical-align: middle">
+			<#if p.top??>
+			
+				<#if p.top == 1>
+					<a href="javascript:linktop('${p.contentId}',<#if p.categoryId??>'${p.categoryId}'</#if>)" 
+					class="btn btn-success btn-xs linkNewDetail">已置顶</a>
+				<#else>
+				<a href="javascript:linktop('${p.contentId}',<#if p.categoryId??>'${p.categoryId}'</#if>)" 
+					class="btn btn-info btn-xs linkNewDetail">未置顶</a> 
+				</#if>
+			</#if>
+			</td>
+			<td><#if p.priority??>${p.priority}</#if></td>
+			<!-- <td><a href="javascript:newsAuditDetail(${p.contentId})"
+				class="btn btn-info btn-xs linkTimeLine">详情</a></td> -->
+			<td style="vertical-align: middle" onclick="changeReleaseTime('${p.releaseTime!}','${p.contentId!}');">${p.releaseTime!}</td>
+			<td>${p.lastModifyTime!}</td>
+			<td style="vertical-align: middle">
+			<a href="javascript:linkNewsDetail('${p.contentId!}')" 
+			class="btn btn-info btn-xs linkNewDetail">详情</a>
+			<a href="javascript:editItem('${p.contentId!}','${p.categoryId!}','${p.contenttypeId!}')"  
+				class="btn btn-primary btn-xs" >编辑</a> 
+			<a href="javascript:deleteItem('${p.contentId!}','${p.categoryId}')" 
+				class="btn btn-danger btn-xs">删除</a>
+			<a href="javascript:jpush('${p.contentId!}','${p.categoryId!}',${p.auditStatus!},'${p.title!}')" 
+				class="btn btn-success btn-xs">推送</a>
+			</td>
+		</tr>
+		</#list>
+	</tbody>
+</table>
+</div>
+<#include "../common/page.html">  
+<!-- Modal 图文内容-->
+<div class="modal fade" id="modalInfoImgtext" tabindex="-1"
+	role="dialog" aria-labelledby="myModalLabel" >
+	<#include "tuwen_add.html">
+</div>
+
+<!-- Modal 图集内容-->
+<div class="modal fade" id="modalInfoImgset" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel">
+	<#include "tuji_add.html">
+</div>
+
+<!-- Modal 视频内容-->
+<div class="modal fade" id="modalInfoVideo" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel">
+	<#include "video_add.html">
+</div>
+
+<!-- Modal新闻详情-视频 -->
+<div class="modal fade" id="modalTuwenEdit" tabindex="-1" 
+	role="dialog">
+	<#include "tuwen_edit.html">
+</div>
+<div class="modal fade" id="modalTujiEdit" tabindex="-1" 
+	role="dialog">
+	<#include "tuji_edit.html">
+</div>
+
+<div class="modal fade" id="modalVideoEdit" tabindex="-1" 
+	role="dialog">
+	<#include "video_edit.html">
+</div>
+
+<!-- Modal审核详情 -->
+<div class="modal fade" id="modalTimeLine" tabindex="-1" role="dialog">
+</div>
+<!-- Modal 视频内容-->
+<div class="modal fade" id="modalInfolocationlist" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel">
+	<#include "location_add.html">
+</div>
+<div class="modal fade" id="modalContent" tabindex="-1" role="dialog"
+					aria-labelledby="myModalLabel">
+	<#include "detail.html" />
+</div>
+
+
+
+<div class="modal fade" id="modaljpushContent" tabindex="-1" role="dialog"
+					aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+				aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+			<h5 class="modal-title">
+				<span class="glyphicon glyphicon-file"></span> <span>推送标题</span>
+			</h5>
+		</div>
+		<div class="modal-body">
+	             <input type="hidden" id="contentId_jpush" />
+					<span class="col-sm-2 control-label">新闻标题</span>
+						<!-- 	<input type="text"  id="jpush_content_name"/> -->
+						<textarea rows="2" cols="40" id="jpush_content_name"></textarea>
+		</div>
+		<div class="modal-footer">
+			<@shiro.hasPermission name='/content/updateReleaseTime.do'>
+			<button id="butnSave_jpush_content_save" onclick="jpushClick()" data-action="" type="button"
+				class="btn btn-info btn-sm">
+				<span class="glyphicon glyphicon-saved"></span> 保存
+			</button>
+		</@shiro.hasPermission>
+			<button type="button" class="btn btn-info btn-sm"
+				data-dismiss="modal">
+				<span class="glyphicon glyphicon-remove"></span> 关闭
+			</button>
+			
+		</div>
+	</div>
+</div>
+	
+</div>
+
+
+
+
+
+<div class="modal fade" id="modalreleaseTime" tabindex="-1" role="dialog"
+					aria-labelledby="myModalLabel">
+					
+	<div class="modal-dialog" role="document">
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+				aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+			<h5 class="modal-title">
+				<span class="glyphicon glyphicon-file"></span> <span>发布时间修改</span>
+			</h5>
+		</div>
+		<div class="modal-body">
+	             <input type="hidden" id="contentId_releaseTime" />
+					<span class="col-sm-2 control-label">发布时间</span>
+						<!-- 	<input type="text"  id="jpush_content_name"/> -->
+						
+						<input class="easyui-datetimebox" id="modalreleaseTimes" name="releaseTime" style="width:200px;">
+						<!-- <input type="text" class="dateTime" name="releaseTime" id="modalreleaseTimes"> -->
+		</div>
+		<div class="modal-footer">
+
+			<button id="butnSave_releaseTime_save" onclick="releaseTimeClick()" data-action="" type="button"
+				class="btn btn-info btn-sm">
+				<span class="glyphicon glyphicon-saved"></span> 保存
+			</button>
+			<button type="button" class="btn btn-info btn-sm"
+				data-dismiss="modal">
+				<span class="glyphicon glyphicon-remove"></span> 关闭
+			</button>
+			
+		</div>
+	</div>
+</div>
+	
+</div>
+</div>
+
+<!-- 区块：主内容区域 end --> 
+<script type="text/javascript">
+	var $modalContent= $('#modalContent');
+	function linkNewsDetail(contentId){
+		var url=getNewsDetailUrl+ "?contentId=" + contentId;
+		$modalContent.load(url);
+		$modalContent.modal('show');
+	}
+
+	function jpushClick(){
+	var contentId= $("#contentId_jpush").val();
+		var title=$("#jpush_content_name").val();
+		var url="${rc.contextPath}/cms/jPush/jPush.do";
+		var auditStatus=$("#").val();
+		if(auditStatus==0){
+			alert("未审核的新闻，不可推送！");
+			return;
+		}
+		$.ajax({
+			type : "POST",
+			dataType : "json",
+			data:{"contentId":contentId,"title":title},
+			url :url ,
+			success : function(data) {
+				if(data.status==200){
+					alert(data.message);
+					$modaljpushContent.modal('hide');
+				}else{
+					alert(data.message);
+				}
+			}
+		});
+	}
+
+	function jpush(contentId,categoryId,auditStatus,title){
+		console.log(title+"......"+contentId+"auditStatus:"+auditStatus);
+		if(auditStatus!=1){
+			alert("新闻内容未审核！");
+		}else{
+		$("#contentId_jpush").val(contentId);
+		$("#jpush_content_name").val(title);
+		$modaljpushContent.modal('show');
+		}
+		
+	}
+
+	var length = $("tbody tr").length;
+	//var begin = (${page.pageNo}-1)*length+1;
+	for (var i = 0; i < length; i++) {
+		$("tbody tr:eq(" + i + ") td[data-field='index']").text(i + 1);
+	}
+	var $modaljpushContent=$("#modaljpushContent");
+	
+	//新闻详情模态框-视频
+	var $modalTuwenEdit = $('#modalTuwenEdit');
+	var $modalVideoEdit = $('#modalVideoEdit');
+	var $modalTujiEdit = $('#modalTujiEdit');
+	
+	$modalTuwenEdit.on('hidden.bs.modal', function () {
+		var currentSearchData = content_list_page.getCurrentSearchData();
+		loadMain(indexUrl,currentSearchData);
+	});
+	$modalVideoEdit.on('hidden.bs.modal', function () {
+		var currentSearchData = content_list_page.getCurrentSearchData();
+		loadMain(indexUrl,currentSearchData);
+	});
+	$modalTujiEdit.on('hidden.bs.modal', function () {
+		var currentSearchData = content_list_page.getCurrentSearchData();
+		loadMain(indexUrl,currentSearchData);
+	});
+	
+	var $modalTimeLine = $('#modalTimeLine');
+	
+	//选择经纬度
+	var $modalInfolocationlist=$('#modalInfolocationlist');
+	//图文内容模态框相关
+	var $modalInfoImgtext = $('#modalInfoImgtext');
+	$modalInfoImgtext.on('hidden.bs.modal', function () {
+		var currentSearchData = content_list_page.getCurrentSearchData();
+		loadMain(indexUrl,currentSearchData);
+	});
+	
+ 
+	//图集内容模态框添加
+	var $modalInfoImgset = $('#modalInfoImgset');
+	$modalInfoImgset.on('hidden.bs.modal', function () {
+		var currentSearchData = content_list_page.getCurrentSearchData();
+		loadMain(indexUrl,currentSearchData);
+	});
+	//视频内容模态框相关
+	var $modalInfoVideo = $('#modalInfoVideo');
+	$modalInfoVideo.on('hidden.bs.modal', function () {
+		var currentSearchData = content_list_page.getCurrentSearchData();
+		loadMain(indexUrl,currentSearchData);
+	});
+	
+	var $modalreleaseTime = $('#modalreleaseTime');
+	$modalreleaseTime.on('hidden.bs.modal', function () {
+		var currentSearchData = content_list_page.getCurrentSearchData();
+		loadMain(indexUrl,currentSearchData);
+	});
+	
+	
+	//此页面
+	var content_list_page = {
+		//事件绑定
+		eventInit : function() {
+			$modalInfoImgtext.modal({
+				backdrop : 'static',//点击模态透明层不隐藏
+				keyboard : false,//键盘不控制模态框 如：esc按下模态框不消失
+				show : false
+			//实例化后默认不显示
+			});
+			
+			$modaljpushContent.modal({
+				backdrop : 'static',
+				keyboard : false,
+				show : false
+			});
+			$modalInfoImgset.modal({
+				backdrop : 'static',
+				keyboard : false,
+				show : false
+			});
+			
+			
+			$modalreleaseTime.modal({
+				backdrop : 'static',
+				keyboard : false,
+				show : false
+			});
+			
+			$modalInfoVideo.modal({
+				backdrop : 'static',
+				keyboard : false,
+				show : false
+			});
+			
+			$modalTimeLine.modal({
+				backdrop : 'static',
+				keyboard : false,
+				show : false
+			});
+			
+			
+		
+			
+			$modalTuwenEdit.modal({
+				backdrop : 'static',
+				keyboard : false,
+				show : false
+			});
+			$modalVideoEdit.modal({
+				backdrop : 'static',
+				keyboard : false,
+				show : false
+			});
+			$modalTujiEdit.modal({
+				backdrop : 'static',
+				keyboard : false,
+				show : false
+			});
+			
+			$modalInfolocationlist.modal({
+				backdrop : 'static',
+				keyboard : false,
+				show : false
+			})
+			//添加一条数据 图文
+			$('#linkAddItemImgtext').on('click',function() {
+				console.info('click');
+				$modalInfoImgtext.modal('show');//模态框显示
+			});		
+			//添加一条数据 图集
+			$('#linkAddItemImgset').on('click',function() {
+				$modalInfoImgset.modal('show');
+			});
+			//添加一条数据 视频
+			$('#linkAddItemVideo').on('click',function() {
+				$modalInfoVideo.modal('show');//模态框显示
+			});
+			
+			//添加经纬度信息
+			$('#location_list').on('click',function() {
+				console.info('click');
+				$modalInfolocationlist.modal('show');//模态框显示
+			});
+			
+		},
+		getCurrentSearchData:function(){
+			var searchData = $("#searchform").serialize()||'';
+			if(searchData!=''){
+				searchData = searchData+"&pageNo="+${page.pageNo};
+			}else{
+				searchData = "pageNo="+${page.pageNo};
+			}
+			return searchData;
+		}
+	}
+	
+	// 百度地图API功能
+
+	//备注：此处目前仅作为展示 点击详情仅显示图文类型新闻详情
+	//实际开发应根据被查看数据判断新闻类型（图文，图集，视频）以对应详情展示
+	//查看新闻内容详细 
+
+	//查看审核详细
+	function newsAuditDetail(contentId){
+		var url = newsAuditDetailUrl + "?contentId=" + contentId;
+		//先加载页面
+		
+		var $modalTimeLine=$("#modalTimeLine")
+		
+		$modalTimeLine.load(url);
+		// $modalInfoTitle.html('审核详情');
+		$modalTimeLine.modal('show');
+		
+	}
+	function linktop(contentId,categoryId){
+		$.ajax({
+			type : "POST",
+			dataType : "json",
+			data:{"contentId":contentId,"categoryId":categoryId},
+			url : "${rc.contextPath}/content/updateTop.do",
+			success : function(data) {
+				if(data.status==200){
+					alert(data.message);
+				}else{
+					alert(data.message);
+				}
+				var currentSearchData = content_list_page.getCurrentSearchData();
+				$('.hk-main').load(indexUrl,currentSearchData);
+			}
+		});
+	}
+	
+	function editItem(contentId,categoryId,typeId){
+		console.log(typeId+"......");
+		var url = editUrl + "?contentId="+ contentId+"&categoryId="+categoryId;
+		if(typeId=='5'){
+			 $modalTujiEdit.load(url);
+			 $modalTujiEdit.modal('show');
+		}
+		if(typeId=='2'){
+			 $modalTuwenEdit.load(url);
+			 $modalTuwenEdit.modal('show');
+		}
+		if(typeId=='6'){
+			 $modalVideoEdit.load(url);
+			 $modalVideoEdit.modal('show');
+		}
+		if(typeId=='7'){
+			$modalTuwenEdit.load(url);
+			 $modalTuwenEdit.modal('show');
+		}
+		
+			/* $modalNewDetailVideo.load(url);
+			$modalNewDetailVideo.modal('show'); */
+	}	
+	
+	//删除一条数据
+	function deleteItem(contentid,categoryid) {
+		var c = confirm("是否确定删除?");
+		if (c == true) {
+			var data = {"contentId":contentid,"categoryId":categoryid};
+			$.ajax({
+				type : "POST",
+				dataType : "text",
+				data:data,
+				url : deleteUrl,
+				success : function(data, status) {
+					if (status = 'success' && data == 'true') {
+						var currentSearchData = content_list_page.getCurrentSearchData();
+						$('.hk-main').load(indexUrl,currentSearchData);
+					}
+				}
+			});
+		}
+
+	}
+	$('#modalInfolocationlist').on('hidden.bs.modal', function () {
+		$("#searchLocationFlag").val("1");
+		var flagLocation = $("#searchLocationFlag").val();
+		var searchData = $("#location_list_add").serialize()||'';
+		searchData = searchData+"&pageNo=1"+"&flagLocation="+flagLocation;
+		$('.hk-main').load(locationListUrl,searchData);
+	});
+	//页面跳转
+	
+	function searchByColum(){
+		$("#searchLocationFlag").val("0");
+		jumpNormalPage(${page.pageNo});
+	}
+	function jumpNormalPage(page) {
+		
+		var latitude="";
+		var longitude="";
+		<#if form??>
+			longitude='${form.longitude!}';
+			latitude='${form.latitude!}';
+		</#if>
+		
+		var flagLocation = $("#searchLocationFlag").val();
+		if(flagLocation=="0"){
+			var caregoryName=$("#categoryName").val();
+			if(caregoryName==""){
+				$("#categoryId").val("");
+			}
+			var searchData = $("#searchform").serialize()||'';
+			if(searchData!=''){
+				searchData = searchData+"&pageNo="+page+"&flagLocation="+flagLocation;
+			
+			}else{
+				searchData = "pageNo="+page;
+			}
+			$('.hk-main').load(indexUrl,searchData);
+			
+			
+		}else{
+			var searchData = {"longitude":longitude,
+					"latitude":latitude,
+					"pageNo":page,
+					"flagLocation":flagLocation};
+			$('.hk-main').load(locationListUrl,searchData);
+			
+			
+		}
+	}
+	//全选全不选，列表所有选中复选框选中，否则不选中
+	function selectAll() {
+		if($("#checkall").is(":checked")){
+			$("input[name='newsContentCheckbox']").each(function(){  
+	             $(this).prop("checked", true);  
+	         });  
+	    }else{  
+	    	$("input[name='newsContentCheckbox']").each(function(){  
+	             $(this).removeAttr("checked");  
+	         });  
+	    }  
+	}
+	$("#auditStatus").val(${form.auditStatus!});
+	$("#contentTypeId").val(${form.contenttypeId!});
+
+	$(function() {
+		content_list_page.eventInit();
+		hk.methods.elHeightComputed('#treeWrap_v',123);
+		loadlistMenu("${rc.contextPath}/category/allCategoryJson.do?status=1", "treeDemo_v", setting);
+		
+		<#if flagLocation??>
+			$("#searchLocationFlag").val('${flagLocation!}');
+		</#if>
+	
+	<#if form??>
+		var categoryId= '${form.categoryId!}';
+		if(categoryId!=""){
+			$("#categoryId").val(categoryId);
+		}else{
+			$("#categoryId").val(-1);
+		}
+		
+		
+		
+		
+	</#if>
+	
+	boxheight(680,"treeWrap_v_div");
+	boxheight(490,"table_div");
+
+	});
+	
+	function boxheight(height,div){ //函数：获取尺寸
+	    //获取浏览器窗口高度
+	    var winHeight=height;
+	    if (window.innerHeight)
+	        winHeight = height/917* window.innerHeight;
+	    else if ((document.body) && (document.body.clientHeight))
+	        winHeight = height/917*document.body.clientHeight;
+	    //通过Document对body进行检测，获取浏览器可视化高度
+	    if (document.documentElement && document.documentElement.clientHeight)
+	        winHeight = height/917*document.documentElement.clientHeight;
+	    //DIV高度为浏览器窗口高度
+	    document.getElementById(div).style.height= winHeight +"px";
+	}
+	
+	function loadlistMenu(resourceType, treeObjId,setting) {
+		//$.fn.zTree.init($("#" + treeObjId), setting, null);
+		$.ajax({
+			type : "POST",
+			url : resourceType,
+			dataType : "json",
+			success : function(data) {
+				// 如果返回数据不为空，加载"业务模块"目录
+				if (data != null) {
+					// 将返回的数据赋给zTree
+					initTree(data);
+				}
+			}
+		});
+	}
+	
+	function initTree(data){
+		var setting = {
+				callback: {
+					onClick: function(event, treeId, treeNode){
+						$("#categoryId").val(treeNode.id);
+						$("#categoryName").val(treeNode.name);
+						$("#searchLocationFlag").val("0");
+						//$("#show_and_hidden").val(treeNode.id);
+						jumpNormalPage(${page.pageNo});
+						
+					}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+				},
+			data : {
+				simpleData: {
+					enable: true,
+					idKey: "id",
+					pIdKey: "pId",
+					rootPId: 0
+				}
+			},
+		};
+		zTree =$.fn.zTree.init($("#treeDemo_v"), setting, data);
+		//zTree = $.fn.zTree.getZTreeObj(treeObjId);
+		if (zTree) {
+			// 默认展开所有节点
+			zTree.expandAll(true);
+		}
+	}
+function check_type(data){
+	switch(data)
+	{
+	case 1:
+	  	data="普通";
+	  	break;
+	case 2:
+		data="图文";
+	  	break;
+	case 3:
+		data="焦点";
+		break;
+	case 4:
+		data="图集";
+		break;
+	case 5:
+		data="视频";
+		break;
+	default:
+	 data="其他"
+	}
+	return data;
+}
+
+
+function changeReleaseTime(ReleaseTime,contentId){
+	//return;
+	 $("#contentId_releaseTime").val(contentId);
+	$("#modalreleaseTimes").val(ReleaseTime);
+	$('#modalreleaseTimes').datetimebox('setValue',ReleaseTime) ;
+	$modalreleaseTime.modal('show'); 
+
+}
+
+
+
+function releaseTimeClick(){
+	var contentId=$("#contentId_releaseTime").val();
+	//var ReleaseTime =$("#modalreleaseTimes").val();
+	var ReleaseTime = $('#modalreleaseTimes').datetimebox('getValue') ;
+	if(!ReleaseTime){
+		$modalreleaseTime.modal('hide');	
+		return;
+	}
+	$.ajax({
+		type : "POST",
+		dataType : "json",
+		url : "${rc.contextPath}/content/updateReleaseTime.do?contentId="+contentId+"&ReleaseTime="+ReleaseTime+"",
+		success : function(data) {
+			$modalreleaseTime.modal('hide');
+		}
+	});
+	
+/* 	alert(ReleaseTime);
+	$.ajax({
+		url:"${rc.contextPath}/content/updateReleaseTime.do",
+		data:{"contentId":contentId,"ReleaseTime":ReleaseTime},
+		type:"post",
+		dataType:"json",
+		success:function(data){
+			$modalreleaseTime.modal('hide');	
+		}
+	}) */
+	
+}
+
+</script>

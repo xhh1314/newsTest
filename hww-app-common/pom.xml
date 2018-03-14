@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>hww-app</artifactId>
+        <groupId>com.hww.app</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../hww-app/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>hww-app-common</artifactId>
+    <packaging>jar</packaging>
+    
+    <name>hww-app-common</name>
+    
+    <dependencies>
+    
+    	<dependency>
+			<groupId>com.hww.app</groupId>
+			<artifactId>hww-app-common-dto</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		
+        <dependency>
+            <groupId>com.hww.framework</groupId>
+            <artifactId>hww-framework-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+		<dependency>
+			<groupId>com.hww.sns</groupId>
+			<artifactId>hww-sns-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hww.file</groupId>
+			<artifactId>hww-file-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hww.els</groupId>
+			<artifactId>hww-els-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hww.ucenter</groupId>
+			<artifactId>hww-ucenter-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>		
+    </dependencies>
+
+</project>

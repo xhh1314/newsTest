@@ -1,0 +1,369 @@
+<!-- 
+<link rel="stylesheet"
+	href="${rc.contextPath}/resources/ztree/css/zTreeStyle/zTreeStyle.css"
+	type="text/css">
+<link rel="stylesheet"
+	href="${rc.contextPath}/resources/components/bootstrap-fileinput/css/fileinput.min.css" />
+page specific plugin scripts
+<script type="text/javascript"
+	src="${rc.contextPath}/resources/ztree/js/jquery.ztree.core.js"></script>
+<script type="text/javascript"
+	src="${rc.contextPath}/resources/ztree/js/jquery.ztree.excheck.js"></script>
+<script type="text/javascript"
+	src="${rc.contextPath}/resources/ztree/js/jquery.ztree.exedit.js"></script>
+<script src="${rc.contextPath}/resources/admin/js/treeInit.js"></script>
+<script src="${rc.contextPath}/resources/admin/js/sidebar-menu.js"></script>
+inline scripts related to this page
+<script type="text/javascript"> 
+	//获取关联新闻分类树
+   	var relatedCategoryTreeUrl = "${rc.contextPath}/category/allCategoryJson.do";
+   	//图片上传url
+   	var picUploadUrl = "http://47.94.167.149:7810/file/img/upload.do";
+</script>
+<#setting number_format="#">
+
+<div class="modal-dialog" role="document">
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+				aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+			<h5 class="modal-title">
+				<span class="glyphicon glyphicon-file"></span> <span
+					id="modalInfoTitle"></span>
+			</h5>
+		</div>
+		<div class="modal-body">
+			<form id="specialform" method="post" action=""
+				enctype="multipart/form-data" class="form-horizontal">
+				<input type="hidden" name="categoryId"
+					value="<#if special??>${special.categoryId}</#if>" />
+				<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">专题名称</label>
+					<div class="col-sm-10">
+						<input type="text" name="categoryName"
+							value="<#if special??>${special.categoryName!''}</#if>"
+							class="form-control" placeholder="专题名称">
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<label for="inputEmail3" class="col-sm-2 control-label">封面组图</label>
+					<div class="col-sm-10">
+						<input type="file" name="myfile" id="input-id" multiple="multiple"
+							class="file-loading" /> <input type="hidden" name="logo"
+							id="logo" value="<#if special??>${special.logo!''}</#if>" />
+					</div>
+				</div>
+				
+				<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">关键词</label>
+					<div class="col-sm-10">
+						<input type="text" name="keywords"
+							value="<#if special??>${special.keywords!''}</#if>"
+							class="form-control" placeholder="关键词">
+					</div>
+				</div>
+				<div class="form-group form-group-sm">
+					<label class="col-sm-2 control-label">摘要</label>
+					<div class="col-sm-10">
+						<textarea name="summary"
+							value="<#if special??>${special.summary!''}</#if>"
+							class="form-control" placeholder="摘要" cols="30" rows="5"></textarea>
+					</div>
+				</div>
+
+			</form>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-info btn-sm"
+				data-dismiss="modal">
+				<span class="glyphicon glyphicon-remove"></span> 关闭
+			</button>
+			<button id="btnSave" data-action="" type="button"
+				class="btn btn-info btn-sm">
+				<span class="glyphicon glyphicon-saved"></span> 保存
+			</button>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	var setting = {
+		data : {
+			simpleData : {
+				enable: true,
+				idKey: "id",
+				pIdKey: "pId",
+				rootPId: 0,
+				showLine : true,                  //是否显示节点间的连线  
+		        checkable : true                  //每个节点上是否显示 CheckBox  
+			}
+		}
+	};
+	
+	function getCategoryTree(){
+		var treeJson = '';
+		$.ajax({
+			type : "POST",
+			async: false, //同步
+			url : relatedCategoryTreeUrl,
+			dataType : "json",
+			success : function(data) {
+				if (data != null) {
+					treeJson = data;
+				}
+			}
+		});
+		return treeJson;
+	}
+	//保存上传的图片id
+	var fileIds = new Array();
+	//保存新闻分类树
+	var treeJson = '';
+	var specialId = null;
+	<#if special??>
+		specialId = ${special.categoryId};
+	</#if>
+	
+	/**菜单跳转**/
+	function target(id,url){
+		$(id).attr('src', url);
+	}
+	
+	//添加专题栏目
+	var $btnAddMore = $('#btnAddMore');//按钮：点击添加栏目
+	var $topicColumn = $('#topicColumn');//栏目容器
+	//栏目html结构
+	function getColumItem(index){
+		var topicColumnItemHtml = '<div class="item">'
+			+'<span class="item-close glyphicon glyphicon-remove"></span>'
+			+'<div class="form-group form-group-sm">'
+			    +'<label class="col-sm-12 control-label align-left">栏目标题</label>'
+			    +'<div class="col-sm-12">'
+			      +'<input type="text" name="columnTitle" class="form-control" placeholder="栏目标题">'
+			    +'</div>'
+			+'</div>'
+			+'<div class="form-group form-group-sm">'
+			    +'<label class="col-sm-12 control-label align-left">关联新闻分类</label>'
+			    +'<div class="col-sm-12">'
+			      +'<ul id="treeDemo'+index+'"' 
+			      +'class="ztree"></ul>'
+			    +'</div>'
+			+'</div>'
+		+'</div>';
+		return topicColumnItemHtml;
+	}
+	var list=$('#topicColumn .item');
+	var treeDemoIndex = 1;
+	if(list.length>0){
+		treeDemoIndex = list.length+1;
+	}
+	$btnAddMore.on('click',function(){
+		//获取存在的item+1
+		var list=$('#topicColumn .item');
+		var index = 1;
+		if(list.length>0){
+			index = list.length+1;
+		}
+		if(index>1){
+			//判断栏目标题是否为空
+			var columnTitles = $("input[name^='columnTitle']");
+			if(columnTitles.length>0){
+				var value = $(columnTitles[index-2]).val();
+				if(value==undefined||value==''){
+					alert("自定义栏目标题不能为空!");
+					return false;
+				}
+			}
+			//判断新闻分类是否为空
+			var list=$('ul[class="ztree"]');
+			if(list!=null&&list.length>0){
+				var treeDemoId = $(list[list.length-1]).attr("id");
+				var selectTreeObj = $.fn.zTree.getZTreeObj(treeDemoId);
+				if(selectTreeObj!=null){
+					var nodes = selectTreeObj.getSelectedNodes();
+					if(nodes.length==0){
+						alert("必须选择新闻分类");
+						return false;
+					}
+				}	
+			}
+			
+		}
+		
+		$topicColumn.append(getColumItem(treeDemoIndex));
+		//设置新闻分类树
+		loadMenuByJsonStr(treeJson, "treeDemo"+treeDemoIndex, setting);
+		treeDemoIndex++;
+	});
+	
+	
+	var special_add_page ={		
+			//bootstrap-fileinput 控件实例演示
+			fileInputInit:function(){
+				var initialPreviewArray = new Array();
+				<#if special??>
+				<#if special.logoUrls??>
+					var logoUrls = ${special.logoUrls};
+					var logos = new Array(logoUrls);
+					if(logoUrls.indexOf(",")>0){
+						logos = logoUrls.split(",");
+					}
+					for(var i=0;i<logos.length;i++){
+						var imgUrl = logos[i]||'';
+						if(imgUrl!=''){
+							if(imgUrl.indexOf('http')==0){
+								initialPreviewArray.push(imgUrl);
+							}else{
+								initialPreviewArray.push(file_show_prefix+imgUrl);
+							}
+						}
+					}
+				</#if>
+				</#if>
+				var $inputfile = $('#input-id');
+				$inputfile.fileinput({
+					language:'zh',//语言中文
+					showCaption:true,//文本框
+					showPreview:true,//预览
+					showUpload:true,//上传按钮
+					showClose:true,//预览框关闭按钮
+					showBrowse:true,//上传按钮
+					browseOnZoneClick:false,//点击拖拽区不上传
+					allowedFileExtensions:['jpg','png','gif'],//允许文件类型
+					browseClass:'btn btn-info btn-sm', //样式
+					captionClass:'input-sm', 
+					removeClass:'btn btn-info btn-sm',
+					uploadClass:'btn btn-info btn-sm',
+					enctype: 'multipart/form-data',
+					uploadUrl:picUploadUrl,//服务器端图片接收处理路径
+					initialPreviewShowDelete:true,
+					initialPreviewAsData: true, // 特别重要
+					/* initialPreviewConfig: [{  
+			               caption: 'desert.jpg',// 展示的图片名称  
+			               width: '120px',// 图片高度  
+			               url: '{:U('localhost/delete')}',// 预展示图片的删除调取路径  
+			               key: 100,// 可修改 场景2中会用的  
+			               extra: {id: 100} //调用删除路径所传参数   
+			           }],  */ 
+			        //初始化图片显示
+					initialPreview:initialPreviewArray
+				});
+				$inputfile.on("fileuploaded", function (event, data, previewId, index) {
+					//默认异步上传成功结果处理
+					//if (result.status == "success") {
+					 //	$("#mainImagePath").val(result.filePath);
+					//}
+                    $("#logo").val(data.response.urls);
+					fileIds.push(data.response);
+				}).on('fileerror', function(event, data, msg) {
+					console.info(data);
+					console.info(msg);
+				});
+			}
+	}
+	
+	
+	
+	//获取选中的新闻分类ids
+	function getSelectedNodes(){
+		var cidJsonArray= new Array();
+		var list=$('ul[id^=treeDemo]');  //模糊匹配
+		for(var i=1;i<list.length+1;i++){
+			//设置树选中状态
+			var treeDemo = $("#treeDemo"+i);
+			//选中指定节点数组
+			var selectTreeObj = $.fn.zTree.getZTreeObj("treeDemo"+i);
+			if(selectTreeObj!=null){
+				var nodes = selectTreeObj.getSelectedNodes();
+				if(nodes!=null){
+					var cidArray = new Array();
+					for(var j=0;j<nodes.length;j++){
+						var node = nodes[j];
+						cidArray.push(node.id);
+					}
+					if(cidArray.length>0){
+						cidJsonArray.push(cidArray.toString());
+					}
+				}
+			}
+		}
+		return cidJsonArray;
+	}
+	
+	//[{"specialContentId":specialContentId,"columnTitle":columnTitle,""relatedCategoryId":relatedCategoryId},{}]
+	function getSpecialContent(){
+		var result = new Array();
+		var obj = {};
+		var cidJsonArray = getSelectedNodes();
+		var items = $("#topicColumn .item"); //模糊匹配
+		if(items.length>0){
+			var specialContentIds = $("input[name='specialContentId']");
+			var columnTitles = $("input[name='columnTitle']");
+			var idsLength = specialContentIds.length;
+			for(var i =0;i<items.length;i++){
+				if(idsLength>i){
+					var specialContentId = $(specialContentIds[i]).val();
+					obj['specialContentId'] = parseInt(specialContentId);
+				}
+				var columnTitle = $(columnTitles[i]).val();
+				obj['columnTitle'] = columnTitle;
+				var cidObj = cidJsonArray[i];
+				obj['relatedCategoryId'] = cidObj.toString();
+				result.push(obj);
+			}
+		}
+		return result;
+	}
+	
+	$("#btnSave").on('click',function(){
+		/*if(specialId!=null){
+			//编辑
+			if(fileIds.length>0){
+				$("#logo").val(fileIds.toString());
+			}
+		}else{
+			//新增
+			$("#logo").val(fileIds.toString());
+		}*/
+		var specialContent = getSpecialContent();
+		//表单无法直接提交的参数
+		var attachParam = {
+			"specialContents":JSON.stringify(specialContent)
+		}
+		//格式化
+		//var queryString = $('#specialform').formSerialize();
+		
+		// 上传设置  
+        var options = {
+        		type: "post", 
+                url: saveSpecialUrl,
+                // 服务器响应的数据类型  
+                dataType: "text",
+                data:attachParam,//附加参数
+                // 请求成功时执行的回调函数  
+                success: function(data, status, xhr) {
+                	if(status=='success'&&data=='success'){
+    		    		$modalInfo.modal('hide');//手动关闭模态框
+    		    	}
+                    // 图片显示地址  
+                    //$("#allUrl").attr("src", data.path);  
+                }  
+        };
+      $("#specialform").ajaxSubmit(options);  
+	});
+	
+	//栏目删减事件绑定
+	$(document).on('click','.hk-fm-topiccolumn .item .item-close',function(){
+		$(this).parent().fadeOut(200,function(){
+			$(this).remove();
+		});
+	}); 
+	
+	//页面初始化
+	$(function(){
+		special_add_page.fileInputInit();
+	});
+	
+</script> -->

@@ -1,0 +1,620 @@
+<script type="text/javascript">
+	var saveOrUpdateVideoUrl = "${rc.contextPath}/content/saveOrUpdateVideo.do"
+	var videoContentList = "${rc.contextPath}/content/v_list.do"
+</script>
+<!-- Modal 视频内容-添加-->
+<div class="modal-dialog modal-lg" role="document" style="width:95%">
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+				aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+			<h5 class="modal-title">
+				<span class="glyphicon glyphicon-file"></span> <span>添加数据</span>
+			</h5>
+		</div>
+		<div class="modal-body">
+			<form id="videoform_tuwen_edit" name="videoform"
+				class="form-horizontal">
+					<div class="row">
+					 <div class="col-xs-6 col-sm-6">
+					  	<div class="form-group form-group-sm"  >
+									<label class="col-sm-2 control-label">标题</label>
+									<div class="col-sm-7">
+										<input type="text" id="tuwen_edit_title" name="title"
+											value="<#if  r??>${r.title!}</#if>" class="form-control"
+											placeholder="标题" >
+									</div>
+									<label class="col-sm-1 control-label" style="margin-left:-30px;width:90px" >置顶：</label>
+									<div class="col-sm-2" style="padding-top:3px;margin-left:-20px">
+										<#if (r.top)??> <#if r.top==0> <input
+											type="radio" value="1" name="top" id="enable" />是 <input
+											type="radio" value="0" name="top" id="disable"
+											checked="checked" />否 </#if> <#if r.top==1> <input
+											type="radio" value="1" name="top" id="enable" checked="checked" />是
+										<input type="radio" value="0" name="top" id="disable" />否 </#if> <#else>
+										<input type="radio" value="1" name="top" id="enable" />是 <input
+											type="radio" value="0" name="top" id="disable"
+											checked="checked" />否 </#if>
+									</div>
+								</div>
+			  </div>
+					
+					 <div class="col-xs-6 col-sm-4">
+					 <div class="form-group form-group-sm"  >
+							<div class="col-sm-9 input-group input-group-sm" >
+					 <span class="input-group-addon" >来源</span>
+					  <input type="text" value="<#if contentData??><#if contentData.origin??>${contentData.origin.originName!}</#if></#if>"
+									disabled="disabled" style="width:80px"/>
+									<span class="input-group-addon">新闻类型</span> 
+									<input type="text" value="图文"
+									disabled="disabled" style="width:80px" />
+								<input type="hidden" id="contentTypeId_tuwen" name="contenttypeId" value="2">
+						
+					 
+					 </div>
+					 </div>
+	
+					 </div>
+					 
+					  <div class="col-xs-6 col-sm-2"></div>
+							 <div class="form-group form-group-sm" >
+								<div class="col-sm-6 input-group input-group-sm" style="width:100px">
+										<select
+											id="srcCategoryId_tuwen_edit" name="srcCategoryId" class="form-control" >
+											<option value="-1">请先选择栏目</option>
+										</select>
+									</div>
+									</div>
+					
+					</div>
+					<div class="row">
+							 <div class="col-xs-6 col-sm-6">
+							 <div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label">摘要</label>
+							<div class="col-sm-9">
+								<textarea class="form-control" id="tuwen_edit_summary"
+									name="summary" placeholder="摘要" cols="30" rows="2">
+									<#if csmcontent??>${csmcontent.summary!''}</#if></textarea>
+								
+							</div>
+							<textarea id="videoContentTextarea_tuwen_edit"
+							style="display: none">
+					         </textarea>
+					         </div>
+							<div class="form-group form-group-sm"  >
+							<label class="col-sm-2 control-label">内容</label>
+							<div class="col-sm-9">
+								<textarea id="editor_id_edit" name="content" style="height:300px" ><#if csmcontent??>${contentData.content}</#if></textarea>
+							</div>
+							</div>
+						<div class="form-group form-group-sm"  >
+							<label class="col-sm-2 control-label" >缩略图</label>
+							<div class="col-sm-9" >
+								<input id="modalvideo_add_filecover_tuwen_edit" type="file"
+									name="myfile" multiple="multiple">
+									<input type="hidden" name="contentId"
+									value="<#if csmcontent??>${csmcontent.contentId!''}</#if>" />
+									 <input type="hidden"
+									name="thumbUrl" id="thumbUrl_tuwen_edit" value="<#if r??>${r.keywordIds!}</#if>" /> <input
+									type="hidden" name="thumbIds" id="thumbIds_tuwen_edit" value="<#if csmcontent??>${csmcontent.contentId!''}</#if>" />
+							</div>
+						</div>
+						<div class="form-group form-group-sm" >
+						<label class="col-sm-2 control-label"></label>
+							<div class="col-sm-10" id="tuwen_img_list_edit" style="height:200px; overflow:auto">
+							</div>
+						</div>
+						
+						
+					
+							 </div>	
+							  <div class="col-xs-6 col-sm-4">
+							        <div class="form-group form-group-sm" >
+										<label class="col-sm-2 control-label" style="width:80px">短标题</label>
+										<div class="col-sm-7">
+											<input type="text" id="tuwen_edit_shortTitle" name="shortTitle"
+												value="<#if r??>${r.shortTitle!}</#if>" class="form-control"
+												placeholder="短标题" style="width:205px">
+										</div>
+							       </div>  
+							       <div class="form-group form-group-sm" >
+							<label class="col-sm-2 control-label" style="width:80px">作者</label>
+							<div class="col-sm-3">
+								<input type="text" id="tuwen_edit_author" name="author"
+									value="<#if  r??>${r.author!}</#if>" class="form-control"
+									placeholder="作者" style="width:205px" >
+							</div>
+							</div>
+							
+							 <div class="form-group form-group-sm" >
+								<label class="col-sm-2 control-label" style="width:80px">来源链接</label>
+							<div class="col-sm-5">
+								<input type="text" id="tuwen_edit_origin_url" name="originUrl"
+									value="<#if contentData??>${contentData.originUrl!}</#if>"
+									class="form-control" placeholder="来源链接" style="width:200px">
+							</div>
+							</div>
+							
+							 <div class="form-group form-group-sm" >
+							<label class="col-sm-2 control-label" style="width:80px">关键词</label>
+							<div class="col-sm-3" >
+								<input type="text" id="tuwen_edit_keywordIds" name="keywordIds"
+									value="<#if r??>${r.keywordIds!}</#if>" class="form-control"
+									placeholder="多关键词之间  , 分隔" style="width:205px" >
+							</div>
+						  </div>
+							  <div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label" style="width:80px">显示位置</label>
+							<div class="col-sm-5">
+								<input type="number" min="1" max="20" id="tuwen_edit_manuallySortNum" name="manuallySortNum"
+									value="<#if  r??>${r.manuallySortNum!}</#if>" class="form-control"
+									placeholder="在列表中显示的位置(1-20)，可不填" style="width:205px">
+							</div>
+							
+						</div>
+						<div class="form-group form-group-sm">
+						<label class="col-sm-2 control-label" style="width:80px">推荐权重</label>
+							<div class="col-sm-5">
+								<input type="number" min="1" max="10" id="tuwen_edit_priority" name="priority"
+									value="<#if  r??>${r.priority!}</#if>" class="form-control"
+									placeholder="推荐权重(1-10)" style="width:205px">
+							</div>
+							</div>
+							
+							<div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label"style="width:80px">选择位置</label>
+							<div class="col-sm-8">
+								<div class="form-group form-group-sm">
+									<div class="col-sm-1" style="width:300px;" >
+									<span >地址：</span><input id="videocityName_tuwen_edit" type="text"
+											style="width: 100px; margin-right: 10px;height:25px" /> 
+											<button id="tuwenMapSearchEdit" data-action="" type="button" style="height:25px" >查询</button>
+									</div>
+								</div>
+								</div>
+								<div class="form-group form-group-sm" style="width:550px;">	
+									<div  style="width: 200px; margin-left:110px;margin-top:2%;">
+										<span >纬度：</span><input type="text" name="latitude" id="videojd_tuwen_edit"
+											value="<#if  r??>${r.latitude!}</#if>"style="width: 50px" />
+									</div>
+									<div  style="width:200px;margin-top:-5%;margin-left:220px">
+									<span >经度：</span>	<input type="text" name="longitude" id="videowd_tuwen_edit"
+											value="<#if  r??>${r.longitude!}</#if>" style="width: 50px" />
+									</div>
+								</div>
+								<div style="width:600px">
+								<div style="height:200px;width:300px;" id="videomap_tuwen_edit" >
+								</div>
+								
+								</div>
+							
+							</div>
+							  </div>	
+							   <div class="col-xs-6 col-sm-2">
+							    <div class="form-group form-group-sm">
+				   <!--  <label class="col-sm-6  control-label">栏目列表</label> -->
+				     <input type="hidden" id="videocategoryIds_tuwen_edit" name="categoryIds" value="<#if csmcontent??>${csmcontent.categoryIds!''}</#if>" />
+					<div class="col-sm-6  input-group input-group-sm" style="height:400px;">
+								<ul id="videotreeDemo_tuwen_edit" class="ztree"
+									style="margin-top: 0; "></ul>
+							</div>
+				  </div>
+						  <div class="modal-footer" style="width:200px;margin-left:-50px">
+									<button type="button" class="btn btn-info btn-sm"
+										data-dismiss="modal">
+										<span class="glyphicon glyphicon-remove" ></span> 关闭
+									</button>
+									<button id="btnSaveTuwen_edit" data-action="" type="button"
+										class="btn btn-info btn-sm">
+										<span class="glyphicon glyphicon-saved"></span> 保存
+									</button>
+                  </div>	   
+							   
+							   
+							   
+							   </div>	
+					
+					
+					
+					
+					</div>
+				
+			</form>
+		</div>
+			
+	</div>
+
+</div>
+<script type="text/javascript">
+	var tuwen_edit_page = {
+		tuwen_editformValidate : function() {
+			var zTreeO = $.fn.zTree.getZTreeObj("videotreeDemo_tuwen_edit");
+			var nodeIds = zTreeO.getCheckedNodes(true);
+			if (nodeIds == null || nodeIds.length == 0) {
+				alert("至少选择一个所属分类!");
+				return false;
+			}
+			if ($.trim($("#tuwen_edit_title").val()) == null
+					|| $.trim($("#tuwen_edit_title").val()).length == 0) {
+				alert("请填写标题!");
+				return false;
+			}
+			if ($.trim($("#tuwen_edit_summary").val()) == null
+					|| $.trim($("#tuwen_edit_summary").val()).length == 0) {
+				alert("请填写摘要!");
+				return false;
+			}
+			if ($.trim($("#tuwen_edit_keywordIds").val()) == null
+					|| $.trim($("#tuwen_edit_keywordIds").val()).length == 0) {
+				alert("请填关键词!");
+				return false;
+			}
+			if ($.trim($("#tuwen_edit_shortTitle").val()) == null
+					|| $.trim($("#tuwen_edit_shortTitle").val()).length == 0) {
+				alert("请填短标题!");
+				return false;
+			}
+			if ($.trim($("#videojd_tuwen_edit").val()).length == 0
+					|| $.trim($("#videowd_tuwen_edit").val()).length == 0) {
+				alert("请选择位置!");
+				return false;
+			}
+			var sortNum=$("#tuwen_edit_manuallySortNum").val();
+			if(sortNum){
+				if(sortNum<1||sortNum>20){
+					alert("列表显示位置必须是1-20");
+					return false;
+				}
+			}
+			var priority=$("#tuwen_edit_priority").val();
+			if(priority){
+				if(priority<1||priority>10){
+					alert("推荐权重必须是1-10");
+					return false;
+				}
+			}else{
+				$("#tuwen_edit_priority").val("1");
+			}
+			
+			
+			if ($("#srcCategoryId_tuwen_edit").val() == -1) {
+				alert("请选择原始分类!");
+				return false;
+			}
+			return true;
+		},
+		loadMenu : function(resourceType, treeObjId, setting) {
+			//$.fn.zTree.init($("#" + treeObjId), setting, null);
+			$.ajax({
+				type : "POST",
+				url : resourceType,
+				dataType : "json",
+				success : function(data) {
+					// 如果返回数据不为空，加载"业务模块"目录
+					if (data != null) {
+						// 将返回的数据赋给zTree
+						zTree = $.fn.zTree.init($("#" + treeObjId), setting,
+								data);
+						if (zTree) {
+							// 默认展开所有节点
+							zTree.expandAll(true);
+							//如果是编辑，选中节点
+							var treeNodeId = '<#if csmcontent??>${csmcontent.categoryIds!}</#if>';
+							var srcCategoryId='<#if contentData??>${contentData.srcCategoryId!}</#if>';
+							var div="<option value='-1'>--请选择--</option>";
+							if (treeNodeId != '') {
+								$("#videocategoryIds_tuwen_edit").attr('value', treeNodeId);
+								$("#srcCategoryId_tuwen_edit").children().remove();
+								var treeNodeIds=[];
+								treeNodeIds=treeNodeId.split(",");
+								for(var j=0;j<treeNodeIds.length;j++){
+									var nodes = zTree.getNodesByParam("id",treeNodeIds[j], null);
+									if (nodes.length > 0) {
+										for (var i = 0; i < nodes.length; i++) {
+											nodes[i].checked = true;
+											zTree.updateNode(nodes[i]); //重要
+										}
+										if(srcCategoryId!=''&&nodes[0].id==srcCategoryId){
+											div=div+"<option  selected='selected' value='"+nodes[0].id+"'>"+nodes[0].name+"</option>"
+										}else{
+											div=div+"<option value='"+nodes[0].id+"'>"+nodes[0].name+"</option>"
+										}
+									}
+								}
+								$("#srcCategoryId_tuwen_edit").append(div);
+								
+								
+							}
+						}
+					}
+				}
+			});
+		}
+	};
+
+	function filter(node) { //过滤器直选中2级节点累加 
+		return (node.checked == true);
+	}
+
+	function ztreeCheck_tuwen_edit(e, treeId, treeNode) { //这是将所有选中节点的名字 用,分割做拼接 用于持久化到数据库 
+		//console.info(treeNode.tId + ", " + treeNode.name + "," + treeNode.checked);
+		var zTreeObj = $.fn.zTree.getZTreeObj(treeId);
+		var zTree = zTreeObj.getNodesByFilter(filter);
+		var choose = "";
+		var idListStr = "";
+		var div="";
+		var srcCategoryId='<#if contentData??>${contentData.srcCategoryId!}</#if>';
+		if(zTree.length>0){
+			div=div+"<option value='-1'>--请选择--</option>";
+		}else{
+			div=div+"<option value='-1'>--请先选择分类--</option>";
+		}
+		for (var i = 0; i < zTree.length; i++) {
+			if (zTree[i].name != null) {
+				choose += (i == (zTree.length - 1)) ? zTree[i].name
+						: zTree[i].name + ",";
+			}
+			if (zTree[i].id != null) {
+				idListStr += (i == (zTree.length - 1)) ? zTree[i].id
+						: zTree[i].id + ",";
+			}
+			if(srcCategoryId!=''&&zTree[i].id==srcCategoryId){
+				div=div+"<option selected='selected' value='"+zTree[i].id+"'>"+zTree[i].name+"</option>"
+			}else{
+				div=div+"<option value='"+zTree[i].id+"'>"+zTree[i].name+"</option>"
+			}
+
+		}
+		$("#srcCategoryId_tuwen_edit").children().remove();
+		$("#srcCategoryId_tuwen_edit").append(div); 
+		//设值
+		$("#videocategoryIds_tuwen_edit").attr('value', idListStr);
+	}
+
+	var setting = {
+		check : {
+			enable : true,
+			chkStyle : "checkbox",
+			chkboxType : {
+				"Y" : "",
+				"N" : ""
+			}
+		},
+		callback : {
+			onCheck : ztreeCheck_tuwen_edit
+		},
+
+		data : {
+			simpleData : {
+				enable : true,
+				idKey : "id",
+				pIdKey : "pId",
+				rootPId : 0
+			}
+		}
+	};
+	/*********新闻分类树end***********/
+
+	function tuwen_editfileInputInit() {
+		//上传封面
+		$('#modalvideo_add_filecover_tuwen_edit').fileinput({
+			language : 'zh',//语言中文
+			msgPlaceholder:"图片比例 小图是5比4 大图是2比1",
+			showCaption : true,//文本框
+			showPreview : false,//预览
+			showUpload : true,//上传按钮
+			uploadAsync : false, //默认异步上传,此处改为同步
+			showClose : true,//预览框关闭按钮
+			showBrowse : true,//上传按钮
+			browseOnZoneClick : false,//点击拖拽区不上传
+			initialPreviewShowDelete : true,
+			allowedFileExtensions : [ 'jpg', 'png', 'gif' ],//允许文件类型
+			browseClass : 'btn btn-info btn-sm', //样式
+			captionClass : 'input-sm',
+			removeClass : 'btn btn-info btn-sm',
+			uploadClass : 'btn btn-info btn-sm',
+			uploadUrl : img_upload_url,//服务器端图片接收处理路径
+		}).on("filebatchuploadsuccess",
+				function(event, data, previewId, index) {
+					//同步上传返回结果处理
+					console.info(data.response);
+					if (data.response) {
+						var obj = data.response;
+						var urls = obj.urls;
+						var ids = obj.ids;
+
+						var oldUrl = $("#thumbUrl_tuwen_edit").val();
+						var oldId = $("#thumbIds_tuwen_edit").val();
+						if (oldUrl != "") {
+							oldUrl = oldUrl + "," + urls;
+						} else {
+							oldUrl = urls;
+						}
+						if (oldId != "") {
+							oldId = oldId + "," + ids;
+						} else {
+							oldId = ids;
+						}
+						$("#thumbUrl_tuwen_edit").val(oldUrl);
+						$("#thumbIds_tuwen_edit").val(oldId);
+						drowImageTuwenEdit(oldUrl, oldId);
+					}
+					//cotent_save_tuwen_edit();
+				});
+	}
+
+	var videolocal_tuwen_edit;
+	$(function() {
+		//video_add_page.ueditorInit();
+		//tuwen_edit_page.wangEditorInit();
+		tuwen_editfileInputInit();
+		tuwen_edit_page.loadMenu(
+				"${rc.contextPath}/category/allCategoryJson.do",
+				"videotreeDemo_tuwen_edit", setting);
+		var map = new BMap.Map("videomap_tuwen_edit");
+		var point = new BMap.Point(116.331398, 39.897445);
+		map.centerAndZoom(point, 11);
+		map.addEventListener("click", function(e) {
+			//$("#videowd_tuwen_edit").attr("value", e.point.lng);
+			//$("#videojd_tuwen_edit").attr("value", e.point.lat);
+			$("#videowd_tuwen_edit").val( e.point.lng);
+			$("#videojd_tuwen_edit").val( e.point.lat);
+		});
+		map.enableScrollWheelZoom();
+		map.addControl(new BMap.NavigationControl());
+		videolocal_tuwen_edit = new BMap.LocalSearch(map, {
+			renderOptions : {
+				map : map
+			}
+		});
+		tuwen_img_add_List();
+	});
+
+	function drowImageTuwenEdit(img_url, img_id) {
+		$("#tuwen_img_list_edit").children().remove();
+		if (img_url != null && img_url != "") {
+			var img_urls = img_url.split(",");
+			var img_ids = img_id.split(",");
+
+			for ( var i in img_urls) {
+				
+				var div = "<div id='"+img_ids[i]+"_div' class='col-sm-6 col-md-4' style='height: 180px;width: 180px;'>"
+				+ "<div align='center' style='height:180px;width: 180px;'>"
+				+"<div class='thumbnail' style='height:130px;width:130px;' >"
+				+ "<img src='"+file_upload_prefix+img_urls[i]+"' style='width:100%;height:100%;'>"
+				+"</div>"
+				+ "<div class='caption'>"
+				+ "<p style='text-align:center'><a class='btn btn-primary' id='"+img_ids[i]
+				+ "' role='button' onclick='tuwen_img_delete_edit(event);'>删除</a></p>"
+				+ " </div>" + "</div>" + "</div>";
+				/* var div = "<div class='col-sm-6 col-md-4' id='"+img_ids[i]+"_div' style='height: 200px;width: 130px;'>"
+						+ "<div class='thumbnail' style='height: 130px;width: 130px;'>"
+						+ "<img src='"+file_upload_prefix+img_urls[i]+" 'id='"+img_ids[i]+"_img'>"
+						+ "<div class='caption'>"
+						+ "<p style='text-align:center'><a class='btn btn-primary' id='"
+						+ img_ids[i]
+						+ "' onclick='tuwen_img_delete_edit(event);' role='button'>删除</a></p>"
+						+ "</div>" + "</div>" + "</div>"; */
+				$("#tuwen_img_list_edit").append(div);
+			}
+		}
+	}
+
+	function tuwen_img_delete_edit(event) {
+		var id = event.target.id + "";
+		$("#" + id + "_div").remove();
+
+		var logoIdsChange = $("#thumbIds_tuwen_edit").val();
+		var logoUrlsChange = $("#thumbUrl_tuwen_edit").val();
+
+		var urlArray = logoUrlsChange.split(",");
+		var idArray = logoIdsChange.split(",");
+		var logoIdsChange_new = "";
+		var logoUrlsChange_new = "";
+		for (var i = 0; i < idArray.length; i++) {
+			if (idArray[i] != id) {
+				logoIdsChange_new = logoIdsChange_new + idArray[i] + ",";
+				logoUrlsChange_new = logoUrlsChange_new + urlArray[i] + ",";
+			}
+		}
+		logoIdsChange_new = logoIdsChange_new.substr(0,
+				logoIdsChange_new.length - 1);
+		logoUrlsChange_new = logoUrlsChange_new.substr(0,
+				logoUrlsChange_new.length - 1);
+		$("#thumbIds_tuwen_edit").val(logoIdsChange_new);
+		$("#thumbUrl_tuwen_edit").val(logoUrlsChange_new);
+	}
+	function tuwen_img_add_List() {
+		var img_url = "<#if csmcontent??>${csmcontent.thumbUrl!}</#if>";
+		var img_ids = "<#if csmcontent??>${csmcontent.thumbIds!}</#if>";
+
+		drowImageTuwenEdit(img_url, img_ids);
+
+		$("#thumbUrl_tuwen_edit").val(img_url);
+		$("#thumbIds_tuwen_edit").val(img_ids);
+	}
+
+	$("#tuwenMapSearchEdit").on('click', function() {
+		var city = $("#videocityName_tuwen_edit").val();
+		if (city != "") {
+			videolocal_tuwen_edit.search(city);
+		}
+	});
+	$("#btnSaveTuwen_edit").on('click', function() {
+		var validated = tuwen_edit_page.tuwen_editformValidate();
+		if (validated == false) {
+			return false;
+		}
+		cotent_save_tuwen_edit();
+		//先上传封面,回调成功再往下执行
+	});
+	function cotent_save_tuwen_edit() {
+		//$('#modalvideo_add_filecover_tuwen_edit').fileinput('upload');
+		var content = editor_tuwen.getContent();
+		content = encodeURIComponent(content);
+		document.getElementById("btnSaveTuwen_edit").disabled = false;
+		$.ajax({
+			type : "POST",
+			data : $("#videoform_tuwen_edit").serialize(),
+			dataType : "json",
+			url : "${rc.contextPath}/content/updateNewWithContent.do",
+			success : function(data) {
+				if (data.status == 200) {
+					alert(data.message);
+					$modalTuwenEdit.modal('hide');
+				} else {
+					alert(data.message);
+				}
+				document.getElementById("btnSaveTuwen_edit").disabled = true;
+			},
+			error : function(e) {
+				alert("异常！");
+				document.getElementById("btnSaveTuwen_edit").disabled = true;
+			}
+		});
+
+	}
+
+	/* var callBackPath = cms_server_id + "/cmsadmin/redirect.html"
+	var editor_tuwen = KindEditor.create('textarea[id="editor_id_edit"]', {
+		width : '100%',
+		height :'300px',
+		filterMode : true,
+		uploadJson : file_upload_prefix
+				+ "/file/img/kindEditorUpload.do?callBackPath=" + callBackPath,
+		allowFileManager : true,
+		filePostName : 'myfile',
+		items: ["source", "|", "undo", "redo", "|", "preview", "print", 
+			"template", "code", "cut", "copy", "paste", "plainpaste", "wordpaste",
+			"|", "justifyleft", "justifycenter", "justifyright", "justifyfull", 
+			"insertorderedlist", "insertunorderedlist", "indent", "outdent", 
+			"subscript", "superscript", "clearhtml", "quickformat", "selectall", "|",
+			"fullscreen", "/", "formatblock", "fontname", "fontsize", "|", "forecolor", 
+			"hilitecolor", "bold", "italic", "underline", "strikethrough", "lineheight", 
+			"removeformat", "|", "image", "insertfile", "table", "hr", "emoticons",
+			"baidumap", "pagebreak", "anchor", "link", "unlink"],
+		//fileManagerJson:img_upload_url,
+		afterUpload : function(url) {
+		}
+	});
+	 */
+	$('#modalTuwenEdit').off('shown.bs.modal').on('shown.bs.modal', function (e) {
+	    $(document).off('focusin.modal');//解决编辑器弹出层文本框不能输入的问题
+	});
+	 
+	 UE.delEditor("editor_id_edit");
+	 var editor_tuwen = UE.getEditor('editor_id_edit');
+
+	 UE.Editor.prototype._bkGetActionUrl = UE.Editor.prototype.getActionUrl;
+	    UE.Editor.prototype.getActionUrl = function(action) {
+	        if (action == 'uploadimage') {
+	        	var url = API_DOMAIN + 'file/ueditor/upload';
+	            return url;
+	        } else {
+	            return this._bkGetActionUrl.call(this, action);
+	        }
+	    }
+</script>
+

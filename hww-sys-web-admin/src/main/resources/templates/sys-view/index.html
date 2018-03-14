@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<#include "common_header.html">
+	</head>
+
+	<body class="no-skin">
+
+		<#include "top.html">
+
+		<div class="main-container ace-save-state" id="main-container">
+			<script type="text/javascript">
+				try{ace.settings.loadState('main-container')}catch(e){}
+			</script>
+
+			<#include "sys_menu.html">
+
+			<div class="main-content">
+				<div class="main-content-inner">
+					<div class="breadcrumbs ace-save-state" id="breadcrumbs">
+						<!-- <ul class="breadcrumb">
+							<li>
+								<i class="ace-icon fa fa-home home-icon"></i>
+								<a href="#">首页</a>
+							</li>
+							<li class="active">控制台</li>
+						</ul> --><!-- /.breadcrumb -->
+
+						<div class="nav-search" id="nav-search">
+							<form class="form-search">
+								<span class="input-icon">
+									<input type="text" placeholder="Search ..." class="nav-search-input" id="nav-search-input" autocomplete="off" />
+									<i class="ace-icon fa fa-search nav-search-icon"></i>
+								</span>
+							</form>
+						</div><!-- /.nav-search -->
+					</div>
+
+					<div class="page-content">
+
+						<#include "ace_setting.html">
+
+						<div class="page-header">
+							<!-- <h1>
+								控制台
+								<small>
+									<i class="ace-icon fa fa-angle-double-right"></i>
+									overview &amp; stats
+								</small>
+							</h1> -->
+						</div><!-- /.page-header -->
+
+					</div><!-- /.page-content -->
+				</div>
+			</div><!-- /.main-content -->
+
+			<#include "footer.html">
+
+		</div><!-- /.main-container -->
+
+		<#include "footerjs.html">
+
+		<!-- inline scripts related to this page -->
+	</body>
+</html>

@@ -1,0 +1,92 @@
+<div class="modal-dialog modal-lg" role="document" style="width: 60%">
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+				aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+			<h5 class="modal-title">
+				<span class="glyphicon glyphicon-file"></span> <span>选择地区经纬度</span>
+			</h5>
+		</div>
+		<div class="modal-body">
+			<form id="location_list_add" name="locationform"
+				class="form-horizontal">
+				<div class="row">
+
+					<div class="form-group form-group-sm">
+						<div class="col-sm-12">
+							<div class="form-group form-group-sm">
+									
+								<div class="col-sm-4">
+									纬度:  <input type="text" name="latitude" id="locationji_list_add" />
+								</div>
+								<div class="col-sm-4">
+									经度:  <input type="text" name="longitude" id="locationwd_list_add" />
+								</div>
+								<div class="col-sm-3">
+										地址:  <input id="locations_list_add" type="text" />
+									</div>
+										<input type="button" value="查询" onclick="locationMapSearch()" />
+							</div>
+							<div style="height: 600px;" id="locationmap_list"></div>
+						</div>
+					</div>
+
+				</div>
+
+			</form>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-info btn-sm"
+				data-dismiss="modal">
+				<span class="glyphicon glyphicon-remove"></span> 关闭
+			</button>
+			<button id="btnSavelocation" data-action="" type="button"
+				class="btn btn-info btn-sm" onclick="searchByLocation()">
+				<span class="glyphicon glyphicon-saved"></span> 搜索
+			</button>
+		</div>
+	</div>
+</div>
+<script>
+	
+	function searchByLocation(){
+		if($("#locationji_list_add").val()==""||$("#locationwd_list_add").val()==""){
+			alert("请选择位置");
+			return ;
+		}
+		
+		$('#modalInfolocationlist').modal('hide');
+		
+		
+	}
+
+	var locationmap_list_add;
+	$(function() {
+		var map = new BMap.Map("locationmap_list");
+		var point = new BMap.Point(116.331398, 39.897445);
+		map.centerAndZoom(point, 11);
+		map.addEventListener("click", function(e) {
+			$("#locationwd_list_add").val(e.point.lng);
+			$("#locationji_list_add").val(e.point.lat)
+			//$("#locationwd_list_add").attr("value", e.point.lng);
+			//$("#locationji_list_add").attr("value", e.point.lat);
+		});
+		map.enableScrollWheelZoom();
+		map.addControl(new BMap.NavigationControl());
+		locationmap_list_add = new BMap.LocalSearch(map, {
+			renderOptions : {
+				map : map
+			}
+		});
+	});
+	function locationMapSearch() {
+		var city = $("#locations_list_add").val();
+		if (city != "") {
+			locationmap_list_add.search(city);
+		}
+	}
+</script>
+
+

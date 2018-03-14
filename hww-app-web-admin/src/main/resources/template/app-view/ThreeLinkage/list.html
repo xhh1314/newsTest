@@ -1,0 +1,364 @@
+
+<script type="text/javascript">
+	//加载列表
+	var countryUrl = "${rc.contextPath}/country/v_list.do";
+	var editCountryUrl = "${rc.contextPath}/country/v_edit.do";
+	var editProvinceUrl = "${rc.contextPath}/province/v_edit.do";
+	var editCityUrl = "${rc.contextPath}/city/v_edit.do";
+</script>
+
+	
+<div class="row">  
+<div class="col-sm-4" style="width:32%; height:500px;">	
+<form name="searchform" id="searchform" class="form-inline hk-search">
+	<div class="row">
+		<div class="col-sm-3 col-xs-3">
+			<input type="text" id="countryName" class="form-control input-sm" placeholder="国家名称">
+		</div>
+		<div class="col-sm-3s  col-xs-3">
+			<button  type="button" onclick="findCountryName()" class="btn btn-info btn-sm">
+				<span class="glyphicon glyphicon-search"></span> <span>搜索</span>
+			</button>
+		</div>
+	</div>
+</form>		      	
+<div class="hk-toolbar">
+ <@shiro.hasPermission name="/country/v_edit.do">  
+	<div class="btn-group btn-group-sm">
+		<a id="addCountry" class="btn btn-default" style="margin-left:10px">
+				<span class="glyphicon glyphicon-plus"></span> 国家添加
+		</a>
+	</div>
+	</@shiro.hasPermission> 
+</div>
+<div style="width:100%; height:400px; overflow-y:auto">
+<table class="table table-hover table-bordered" id="table_list">
+	<thead>
+		<tr>
+			<th>国家名称</th>
+			<th>操作</th>
+		</tr>
+	</thead>
+	<tbody style="overflow:auto;">
+
+		<#list countryList as p>
+		
+		<!-- <tr onclick="findProvince(${p.countryId!});">-->
+			<tr>
+			<td onclick="findProvince(${p.countryId!});">${p.countryName!}</td> 
+			<td>
+			<@shiro.hasPermission name="/country/v_edit.do">
+			<a class="btn btn-info btn-xs" href="javascript:editCountry('${p.countryId!}')" >编辑</a> 
+			</@shiro.hasPermission> 
+			<!-- <a href="javascript:deleteItem()" class="btn btn-danger btn-xs">删除</a> -->
+			 </td>
+			 </tr>
+		<!-- </tr> -->
+		
+		</#list>
+	</tbody>
+</table>
+</div>
+</div>
+
+<div class="col-sm-4" style="width:32%; height:400px;">
+<form name="searchform" id="searchform" class="form-inline hk-search">
+	<div class="row">
+		<div class="col-sm-3 col-xs-3">
+			<input type="text" id="provinceName" class="form-control input-sm" placeholder="省份名称">
+		</div>
+		<div class="col-sm-3s  col-xs-3">
+			<button  type="button" onclick="findProvinceName()" class="btn btn-info btn-sm">
+				<span class="glyphicon glyphicon-search"></span> <span>搜索</span>
+			</button>
+		</div>
+	</div>
+</form>
+<div class="hk-toolbar">
+	<div class="btn-group btn-group-sm">
+	<@shiro.hasPermission name="/province/v_edit.do">  
+		<button id="addProvince" type="button" class="btn btn-default" style="margin-left:10px">
+			<span class="glyphicon glyphicon-plus"></span> 省份添加
+		</button>
+		</@shiro.hasPermission> 
+	</div>
+</div>
+<div style="width:100%; height:400px; overflow:scroll;">
+<table class="table table-hover table-bordered" id="table_list" style=" height:700px; overflow-y:auto">
+	<thead>
+		<tr>
+			<th>省份名称</th>
+			<th>操作</th>
+		</tr>
+	</thead>
+	<tbody>
+	<#if provinceList??>
+		<#list provinceList as l>
+		<tr>
+			<td onclick="findCity(${l.provinceId!});">${l.provinceName!}</td>
+			<td>
+			<@shiro.hasPermission name="/province/v_edit.do">  
+			<a class="btn btn-info btn-xs" href="javascript:editProvince('${l.provinceId!}')" >编辑</a> 
+			</@shiro.hasPermission>
+			<!-- <a href="javascript:deleteItem()" class="btn btn-danger btn-xs">删除</a></td> -->
+		</tr>
+		</#list>
+		</#if>
+	</tbody>
+</table>
+</div>
+
+</div>
+<div class="col-sm-4" style="width:32%; height:400px;">
+<form name="searchform" id="searchform" class="form-inline hk-search">
+	<div class="row">
+		<div class="col-sm-3 col-xs-3">
+			<input type="text" id="cityName" class="form-control input-sm" placeholder="城市名称">
+		</div>
+		<div class="col-sm-3s  col-xs-3">
+			<button  type="button" onclick="findCityName()" class="btn btn-info btn-sm">
+				<span class="glyphicon glyphicon-search"></span> <span>搜索</span>
+			</button>
+		</div>
+	</div>
+</form>		      	
+<div class="hk-toolbar">
+<@shiro.hasPermission name="/city/v_edit.do">  
+	<div class="btn-group btn-group-sm">
+		<button id="addCity" type="button" class="btn btn-default" style="margin-left:10px">
+				  		<span
+					class="glyphicon glyphicon-plus"></span> 城市添加
+		</button>
+	</div>
+	</@shiro.hasPermission> 
+</div>
+<div style="width:100%; height:500px; overflow:scroll;">
+<table class="table table-hover table-bordered" id="table_list">
+	<thead>
+		<tr>
+			<th>城市名称</th>
+			<th>操作</th>
+		</tr>
+	</thead>
+	<tbody>
+	<#if cityList??>
+		<#list cityList as c>
+		<tr>
+			<td>${c.cityName!}</td>
+			<td>
+			<@shiro.hasPermission name="/city/v_edit.do">  
+			<a href="javascript:editCity('${c.cityId!}')" 
+				class="btn btn-info btn-xs" >编辑</a> 
+				</@shiro.hasPermission> 
+			<!-- <a href="javascript:deleteItem()" class="btn btn-danger btn-xs">删除</a></td> -->
+		</tr>
+		</#list>
+		</#if>
+	</tbody>
+</table>
+</div>
+
+</div>
+
+<div class="modal fade" id="countryModal" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel">
+	<#include "addcountry.html" />
+</div>
+<div class="modal fade" id="provinceModal" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel">
+	<#include "addprovince.html" />
+</div>
+<div class="modal fade" id="cityModal" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel">
+	<#include "addcity.html" />
+</div>
+<div class="modal fade" id="ecountryModal" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel">
+	<#include "editcountry.html" />
+</div>
+<div class="modal fade" id="eprovinceModal" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel">
+	<#include "editprovince.html" />
+</div>
+<div class="modal fade" id="ecityModal" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel">
+	<#include "editcity.html" />
+</div>
+</div>
+
+<script type="text/javascript">
+var $countryModal = $('#countryModal'); //模态框
+var $provinceModal = $('#provinceModal');//模态框
+var $cityModal = $('#cityModal');//模态框 
+var $ecountryModal = $('#ecountryModal'); //模态框
+var $eprovinceModal = $('#eprovinceModal');//模态框
+var $ecityModal = $('#ecityModal');//模态框 
+
+
+//模态框完全关闭后重新load
+$countryModal.on('hidden.bs.modal', function () {
+	console.log("s");
+	 findCity(curProvinceId);
+});
+$('#provinceModal').on('hidden.bs.modal', function () {
+	 findCity(curProvinceId);
+});
+$('#cityModal').on('hidden.bs.modal', function () {
+	 findCity(curProvinceId);
+});
+$('#ecountryModal').on('hidden.bs.modal', function () {
+	 findCity(curProvinceId);
+});
+$('#eprovinceModal').on('hidden.bs.modal', function () {
+	 findCity(curProvinceId);
+});
+$('#ecityModal').on('hidden.bs.modal', function () {
+	 findCity(curProvinceId);
+});
+
+var list_page = {
+		//初始化
+		init : function() {
+			this.eventInit();
+		},
+		//事件绑定
+		eventInit : function() {
+			//添加一条国家数据
+			$('#addCountry').click(function() {
+				$countryModal.modal('show');//模态框显示
+			});
+			//添加一条省份数据
+			$('#addProvince').click(function() {
+				if(!countryIds){
+					alert("请选择所属国家!");
+					return false;
+				}
+				$provinceModal.modal('show');//模态框显示
+			});
+			//添加一条城市数据
+			$('#addCity').click(function() {
+				if(!countryIds){
+					alert("请选所属国家!");
+					return false;
+				}
+				if(!provinceIds){
+					alert("请选择所属省份!");
+					return false;
+				}
+				$cityModal.modal('show');//模态框显示
+			});
+		}
+	}
+	
+$(function(){
+	list_page.init();
+});
+function editCountry(countryId) {
+	countryIds = countryId;
+	var data = {"countryId":countryId};	   
+	//先加载页面
+	//$ecountryModal.load(editCountryUrl,data);  
+		$.ajax({
+		data:data,
+		url:editCountryUrl,
+		dataType:"json",
+		success:function(data){
+			console.log(data.country);
+			var country = data.country;
+			$("#country_update_name").val(country.countryName);
+			$("#country_update_longitude").val(country.longitude);
+			$("#country_update_latitude").val(country.latitude);
+			$("#country_update_radius").val(country.radius);
+		}
+	});
+	$ecountryModal.modal('show');
+
+}; 
+function editProvince(provinceId) {
+	provinceIds=provinceId;
+	 var data = {"provinceId":provinceId};	   
+		$.ajax({
+		data:data,
+		url:editProvinceUrl,
+		dataType:"json",
+		success:function(data){
+			console.log(data.province);
+			var province = data.province;
+			$("#province_update_name").val(province.provinceName);
+		}
+	});
+	$eprovinceModal.modal('show');
+}; 
+function editCity(cityId) {
+	cityIds=cityId;
+	var data = {"cityId":cityId};	   
+	$.ajax({
+		data:data,
+		url:editCityUrl,
+		dataType:"json",
+		success:function(data){
+			console.log(data.city);
+			var city = data.city;
+			$("#city_update_name").val(city.cityName);
+		}
+	}); 
+	$ecityModal.modal('show');
+
+}; 
+
+
+var countryIds;
+var provinceIds;
+var countryNames;
+var provinceNames;
+var curCountryId;
+var curProvinceId;
+
+function findProvince(countryId){
+	if(curCountryId==countryId){
+		return;
+	}
+	curCountryId=countryId;
+	$(".hk-main").load(countryUrl,"countryId="+countryId);
+	countryIds = countryId;
+}
+function findCity(provinceId){
+	if(curProvinceId==provinceId){
+		return;
+	}
+	curProvinceId=provinceId;
+	$(".hk-main").load(countryUrl,"countryId="+curCountryId+"&provinceId="+provinceId);
+	provinceIds = provinceId;
+}
+function findCountryName(){
+	var countryName = $("#countryName").val();
+	$(".hk-main").load(countryUrl,"countryName="+countryName);
+	countryNames = countryName;
+}
+function findProvinceName(){
+	if(!countryIds){
+		return false;
+	}
+	var provinceName = $("#provinceName").val();
+	provinceNames = provinceName;
+	$(".hk-main").load(countryUrl,"countryId="+curCountryId+"&provinceName="+provinceName);
+}
+function findCityName(){
+	if(!provinceIds){
+		return false;
+	}
+	var cityName = $("#cityName").val();
+	$(".hk-main").load(countryUrl,"countryId="+curCountryId+"&provinceId="+curProvinceId+"&cityName="+cityName);
+}
+
+function hideModal(model) {
+	model.removeClass("in");
+	$(".modal-backdrop").remove();
+	$('body').removeClass('modal-open');
+	$('body').css('padding-right', '');
+	model.hide();
+}
+
+
+
+</script>

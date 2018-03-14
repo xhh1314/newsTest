@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<#include "../common_header.html">
+		<link rel="stylesheet" href="${rc.contextPath}/ztree/css/zTreeStyle/zTreeStyle.css" type="text/css">
+	<style type="text/css">
+	ul.ztree {margin-top: 10px;border: 1px solid #617775;background: #f0f6e4;width:220px;height:360px;overflow-y:scroll;overflow-x:auto;}
+	</style>
+	</head>				
+	<body class="no-skin">
+		<div class="main-container ace-save-state" id="main-container">
+			<script type="text/javascript">
+				try{ace.settings.loadState('main-container')}catch(e){}
+			</script>
+			<div class="main-content">
+				<div class="main-content-inner">
+					<!-- <div class="page-content"> -->
+						<div class="row">
+							<div class="col-xs-12">
+								<!-- PAGE CONTENT BEGINS -->
+								<form id="submitForm" class="form-horizontal" role="form">
+								<input type="hidden" name="menuId" value="${entity.menuId}" id="menuId"/>
+								<input type="hidden" name="parentId" value="${entity.parentId}" id="parentId"/>
+									<div class="form-group">
+										<label class="col-sm-2 control-label no-padding-right">上级菜单：</label>
+										<div class="col-sm-4">
+											<div class="pos-rel">
+												<input id="citySel" value="${entity.parentMenuName!}" class="typeahead scrollable" type="text" readonly="readonly"/><a id="menuBtn" href="#" onclick="showMenu(); return false;">选择</a>
+											</div>
+										</div>
+										<label class="col-sm-2 control-label no-padding-right">url：</label>
+										<div class="col-sm-4">
+											<div class="pos-rel">
+												<input id="url" name="url" value="${entity.url!}" class="typeahead scrollable" type="text" placeholder="url"/>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label no-padding-right">菜单名称：</label>
+										<div class="col-sm-4">
+											<div class="pos-rel">
+												<input id="menuName" name="menuName" value="${entity.menuName!}" class="typeahead scrollable" type="text" placeholder="菜单名称" required=""/>
+											</div>
+										</div>
+										<label class="control-label col-xs-2 col-sm-2 no-padding-right" for="food">状态：</label>
+										<div class="col-xs-5 col-sm-4">
+											<@p.select value="${entity.status!}" name="status" id="status" />
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label no-padding-right">显示顺序：</label>
+										<div class="col-sm-4">
+											<div class="pos-rel">
+												<input id="priority" name="priority" value="${entity.priority!}" class="typeahead scrollable" type="text" placeholder="显示顺序" />
+											</div>
+										</div>
+										<label class="col-sm-2 control-label no-padding-right">左侧菜单显示？：</label>
+										<div class="col-sm-4">
+											<div class="pos-rel">
+												<label>
+													<input id="display" name="display" value="1" <#if entity.display==1>checked="checked"</#if> class="ace ace-switch ace-switch-2" type="checkbox" />
+													<span class="lbl"></span>
+												</label>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label no-padding-right">图标：</label>
+										<div class="col-sm-4">
+											<div class="pos-rel">
+												<input id="icon" name="icon" value="${entity.icon!}" class="typeahead scrollable" type="text" placeholder="图标样式代码"/>
+											</div>
+										</div>
+										<label class="control-label col-xs-2 col-sm-2 no-padding-right" for="food">所属站点：</label>
+										<div class="col-xs-4 col-sm-4">
+											<select name="siteId" id="siteId" >
+					                            <option value="">--请选择--</option>
+					                            <#list sites as site>
+					                            <option value="${site.siteId}" <#if site.siteId==entity.siteId>selected="selected"</#if>>${site.siteName}</option>
+					                            </#list>
+					                        </select>
+										</div>
+									</div>
+									<div class="clearfix form-actions">
+										<div class="col-md-offset-3 col-md-9">
+											<button class="btn btn-info" type="button" id="submitbutton">
+												<i class="ace-icon fa fa-check bigger-110"></i>
+												提交
+											</button>
+
+											&nbsp; &nbsp; &nbsp;
+											<button class="btn" type="reset">
+												<i class="ace-icon fa fa-undo bigger-110"></i>
+												重置
+											</button>
+										</div>
+									</div>
+								</form>
+							</div>
+							
+						</div>
+					<!-- </div> -->
+				</div>
+			</div>
+		</div>
+		<div id="menuContent" class="menuContent" style="display:none; position: absolute;">
+			<ul id="treeDemo" class="ztree" style="margin-top:0; width:260px;"></ul>
+		</div>
+		<#include "../footerjs.html">
+		<!-- page specific plugin scripts -->
+		<script type="text/javascript" src="${rc.contextPath}/ztree/js/jquery.ztree.core.js"></script>
+		<script src="${rc.contextPath}/admin/js/treeInit.js"></script>
+		<script src="${rc.contextPath}/admin/js/form.js"></script>
+		<script type="text/javascript">
+		jQuery(function($) {
+			loadMenu("${rc.contextPath}/menu/allMenuJson.do?op=${entity.menuId}&cCategoryIds=${entity.parentId}", "treeDemo", setting);
+			$("#submitbutton").click(function() {
+				if(validateForm()){
+					$.ajax({
+						type: 'POST',
+						url: "${rc.contextPath}/menu/o_update.do",
+						data: $("#submitForm").serialize(),
+						dataType:'json',
+						success: function(data) {
+						if(data) {
+							//artDialog({content:'提交成功', x:'right', y:'bottom', time:'1', fixed:true});
+							alert("提交成功");
+						}
+						}
+					});
+				}
+			});
+		})
+		
+		function validateForm(){
+				return true;
+		}
+		
+		var zTree;
+		var setting = {
+			view: {
+				dblClickExpand: false
+			},
+			data: {
+				simpleData: {
+					enable: true
+				}
+			},
+			callback: {
+				onClick: onClick
+			}
+		};
+		
+		function onClick(e, treeId, treeNode) {
+			var zTree = $.fn.zTree.getZTreeObj("treeDemo"),
+			nodes = zTree.getSelectedNodes(),
+			v = "";
+			nodes.sort(function compare(a,b){return a.id-b.id;});
+			for (var i=0, l=nodes.length; i<l; i++) {
+				v += nodes[i].name + ",";
+			}
+			if (v.length > 0 ) v = v.substring(0, v.length-1);
+			var cityObj = $("#citySel");
+			cityObj.attr("value", v);
+			
+			v2 = "";
+			for (var i=0, l=nodes.length; i<l; i++) {
+				v2 += nodes[i].id + ",";
+			}
+			if (v2.length > 0 ) v2 = v2.substring(0, v2.length-1);
+			var parentObj = $("#parentId");
+			parentObj.attr("value", v2);
+		}
+
+		function showMenu() {
+			var cityObj = $("#citySel");
+			var cityOffset = $("#citySel").offset();
+			$("#menuContent").css({left:cityOffset.left + "px", top:cityOffset.top + cityObj.outerHeight() + "px"}).slideDown("fast");
+
+			$("body").bind("mousedown", onBodyDown);
+		}
+		function hideMenu() {
+			$("#menuContent").fadeOut("fast");
+			$("body").unbind("mousedown", onBodyDown);
+		}
+		function onBodyDown(event) {
+			if (!(event.target.id == "menuBtn" || event.target.id == "menuContent" || $(event.target).parents("#menuContent").length>0)) {
+				hideMenu();
+			}
+		}
+			
+		</script>							
+	</body>
+</html>

@@ -1,0 +1,9 @@
+eureka: 
+  client:
+    register-with-eureka: false  #不向注册中心注册自己
+    fetch-registry: false  #注册中心的职责就是去维护服务实例，不需要去检索服务
+    service-url: 
+      defaultZone: http://127.0.0.1:8761/eureka  #定义注册中心的地址
+  server:
+    enable-self-preservation: false   # 设为false，关闭自我保护
+    eviction-interval-timer-in-ms: 15000  # 清理间隔（单位毫秒，默认是60*1000）

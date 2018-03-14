@@ -1,0 +1,376 @@
+<script type="text/javascript">
+	var saveOrUpdateVideoUrl="${rc.contextPath}/content/saveOrUpdateVideo.do"
+	var videoContentList="${rc.contextPath}/content/v_list.do"
+</script>
+	<!-- Modal 视频内容-添加-->
+			  <div class="modal-dialog modal-lg" role="document" style="width: 80%">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			        <h5 class="modal-title">
+			        	<span class="glyphicon glyphicon-file"></span> 
+			        	<span>添加数据</span>
+			        </h5>
+			      </div>
+			      <div class="modal-body">
+			        <form id="videoform" name="videoform" class="form-horizontal">
+			        <div class="row">
+			        <div class="col-md-8" style="height: 700px;">
+			          <div class="form-group form-group-sm">
+					    <label  class="col-sm-2 control-label">标题</label>
+					    <div class="col-sm-10">
+					      <input type="text" name="title" value="<#if r??>${r.title!}</#if>" class="form-control" placeholder="标题">
+					    </div>
+					  </div>
+			        <div class="form-group form-group-sm">
+					    <label  class="col-sm-2 control-label">摘要</label>
+					    <div class="col-sm-10">
+					      <textarea class="form-control" placeholder="摘要" cols="30" rows="5"></textarea>
+					    </div>
+					  </div>
+					  <textarea id="videoContentTextarea" style="display: none" name="content">
+					  </textarea>
+					  <div class="form-group form-group-sm">
+					    <label  class="col-sm-2 control-label">内容</label>
+					    <div class="col-sm-10">
+					    	<div id="videoContentEditor" >
+								 <#if contentData??>
+						        	${contentData.content}
+						        </#if>
+							</div>
+					    </div>
+					  </div>
+					  </div>
+			        
+			       <div class="col-md-4">
+						<!-- <div class="form-group form-group-sm">
+							<label class="col-sm-2 control-label">新闻标题</label>
+							<div class="col-sm-10">
+								<p class="form-control-static">
+									<#if (news.top)??><#if news.top==0>否</#if><#if news.top==1>是</#if><#else>否</#if>
+								</p>
+							</div>
+						</div> -->
+						 <div class="form-group form-group-sm"  style="margin-left:15px;">
+			    	      <div class="col-sm-5 input-group input-group-sm">
+				<span class="input-group-addon">新闻类型</span> <select id="contentTypeId" name="contenttypeId" class="form-control">
+					<option value="0">全部</option>
+					<#list typeList as type>
+					<#if type.contentTypeName!='焦点'>
+						<option value="${type.contentTypeId}">${type.contentTypeName}</option>
+					</#if>
+					</#list>
+				</select>
+			</div>
+			</div>
+			 <div class="form-group form-group-sm">
+					    <label  class="col-sm-2 control-label">关键词</label>
+					    <div class="col-sm-10">
+					      <input type="text" name="keywordIds" value="<#if r??>${r.keywordIds!}</#if>" class="form-control" placeholder="关键词">
+					    </div>
+					  </div>
+					  <div class="form-group form-group-sm">
+					    <label  class="col-sm-2 control-label">来源</label>
+					    <div class="col-sm-10">
+					      <input type="text" name="origin_url" value="<#if contentData??><#if contentData.origin??>${contentData.origin.originUrl!}</#if></#if>" 
+					      class="form-control" placeholder="来源">
+					    </div>
+					  </div>
+					  <div class="form-group form-group-sm">
+					    <label  class="col-sm-2 control-label">所属分类</label>
+					    <input type="hidden" id="videocategoryIds" name="categoryIds"/>  
+					    <div class="col-sm-10">
+					      <ul id="videotreeDemo" class="ztree" style="margin-top:0; width:260px;"></ul>
+					    </div>
+					  </div>
+					  </div>
+					   </div>
+					  <div class="row">
+					    <div class="col-md-8">
+					  <div class="form-group form-group-sm">
+					    <label  class="col-sm-2 control-label">封面</label>
+					    <div class="col-sm-10">
+							<input id="modalvideo_add_filecover" type="file" name="myfile" multiple="multiple">
+							<input type="hidden" name="thumbUrl" id="videothumbUrl"/>
+					    </div>
+					  </div>
+					  <div class="form-group form-group-sm">
+					    <label  class="col-sm-2 control-label">上传视频</label>
+					    <div class="col-sm-10">
+							<input id="modalvideo_add_filevideo" name="videofiles" type="file">
+							<input type="hidden" id="videoUrls" name="videoUrls" >
+					    </div>
+					  </div>
+					  </div>
+					    <div class="col-md-4">
+					  <div class="form-group form-group-sm">
+					    <label  class="col-sm-2 control-label">选择位置</label>
+					    <div class="col-sm-10">
+					    	<div class="form-group form-group-sm">
+					    		<div class="col-sm-3">
+									 地址: <input id="videocityName" type="text" style="width:100px; margin-right:10px;" />
+									<input type="button" value="查询" onclick="videoMapSearch()" />
+									</div>
+									<div class="col-sm-3">
+				                	经度:<input type="text" name="longitude" id="videojd" value="<#if r??>${r.longitude!}</#if>" />
+				                	</div>
+				                	<div class="col-sm-3">
+				                	纬度:<input type="text" name="latitude" id="videowd" value="<#if r??>${r.latitude!}</#if>"/>
+								</div>
+							</div>
+					      	<div style="height: 200px;" id="videomap">
+							</div>
+					    </div>
+					  </div>
+					  </div>
+					  </div>
+					</form>
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-info btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 关闭</button>
+			        <button id="btnSaveVideo" data-action="" type="button" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-saved"></span> 保存</button>
+			      </div>
+			    </div>
+			  </div>
+		
+<script type="text/javascript">
+var video_add_page={
+		/* ueditorInit:function(){
+			//命名形式：ue_模态框_内容类型_操作类型(如：ue_modal_video_edit代表视频编辑模态框下的ueditor编辑器)
+			var ue_modal_imgtext_add = UE.getEditor('ue_modal_imgtext_add');
+			var ue_modal_imgtext_edit = UE.getEditor('ue_modal_imgtext_edit');
+			var ue_modal_video_add = UE.getEditor('ue_modal_video_add');
+			var ue_modal_video_edit = UE.getEditor('ue_modal_video_edit');
+		} */
+		//wangEditor 控件实例演示
+		wangEditorInit:function (){
+		    var editor = new wangEditor('#videoContentEditor');
+		    editor.customConfig.uploadFileName = 'myfile'
+		    editor.customConfig.uploadImgServer = img_upload_url;//图片服务器上传路径
+		    editor.customConfig.onchange = function (html) {
+		        // 监控变化，同步更新到 textarea
+		        $('#videoContentTextarea').val(html)
+		    }
+		    editor.customConfig.uploadImgHooks = {
+		    		success: function (xhr, editor, result) {
+		    	        // 图片上传并返回结果，图片插入成功之后触发
+		    	    },
+		    	    // （但是，服务器端返回的必须是一个 JSON 格式字符串！！！否则会报错）
+		    	    customInsert: function (insertImg, result, editor) {
+		    	    	if(result){
+		    	    		 var url = result.urls;
+				    	     url = file_show_prefix+url;
+				    	     insertImg(url)
+		    	    	}
+		    	    }
+		    }
+		    editor.create();
+		    
+		},
+	//表单校验
+	formValidate:function (){
+		var zTreeO =  $.fn.zTree.getZTreeObj("videotreeDemo");
+		var nodeIds = zTreeO.getCheckedNodes(true);
+		if(nodeIds==null||nodeIds.length==0){
+			alert("至少选择一个所属分类!");
+			return false;
+		}
+		return true;
+	},
+	loadMenu:function (resourceType, treeObjId,setting) {
+		//$.fn.zTree.init($("#" + treeObjId), setting, null);
+		$.ajax({
+			type : "POST",
+			url : resourceType,
+			dataType : "json",
+			success : function(data) {
+				// 如果返回数据不为空，加载"业务模块"目录
+				if (data != null) {
+					// 将返回的数据赋给zTree
+					zTree = $.fn.zTree.init($("#" + treeObjId), setting, data);
+					if (zTree) {
+						// 默认展开所有节点
+						zTree.expandAll(false);
+						//如果是编辑，选中节点
+						var treeNodeId = '<#if r??>${r.categoryId!}</#if>';
+						if(treeNodeId!=''){
+							var nodes = zTree.getNodesByParam("id",treeNodeId, null);
+							if(nodes.length>0){
+								for(var i=0;i<nodes.length;i++){
+									nodes[i].checked = true;
+									zTree.updateNode(nodes[i]); //重要
+								}
+							}
+						}
+					}
+				}
+			}
+		});
+	}
+};
+
+
+function filter(node) {   //过滤器直选中2级节点累加  
+    return (node.checked == true);  
+}  
+
+function ztreeCheck(e, treeId, treeNode){  //这是将所有选中节点的名字 用,分割做拼接 用于持久化到数据库  
+     //console.info(treeNode.tId + ", " + treeNode.name + "," + treeNode.checked);
+	var zTreeObj = $.fn.zTree.getZTreeObj(treeId);
+     var zTree = zTreeObj.getNodesByFilter(filter);  
+     var choose = "";  
+     var idListStr="";
+     for (var i=0;i<zTree.length;i++) {  
+         if(zTree[i].name !=null){
+        	 choose +=(i == (zTree.length-1))?zTree[i].name:zTree[i].name+",";
+         }  
+         if (zTree[i].id != null) {  
+    	     idListStr+= (i == (zTree.length-1))?zTree[i].id:zTree[i].id+",";  
+    	  }  
+     
+     }
+     //设值
+     $("#videocategoryIds").attr('value',idListStr);
+} 
+	
+	var setting = {
+			check: {
+				enable: true,
+				chkStyle: "checkbox",
+				chkboxType: { "Y": "", "N": "" }
+			},
+			callback: {  
+		        onCheck: ztreeCheck  
+			},
+			
+			data : {
+				simpleData: {
+					enable: true,
+					idKey: "id",
+					pIdKey: "pId",
+					rootPId: 0
+				}
+			}
+		};
+	/*********新闻分类树end***********/
+
+function videofileInputInit(){
+	//上传封面
+	$('#modalvideo_add_filecover').fileinput({
+		language:'zh',//语言中文
+		showCaption:true,//文本框
+		showPreview:false,//预览
+		showUpload:false,//上传按钮
+		uploadAsync: false, //默认异步上传,此处改为同步
+		showClose:true,//预览框关闭按钮
+		showBrowse:true,//上传按钮
+		browseOnZoneClick:false,//点击拖拽区不上传
+		initialPreviewShowDelete:true,
+		allowedFileExtensions:['jpg','png','gif'],//允许文件类型
+		browseClass:'btn btn-info btn-sm', //样式
+		captionClass:'input-sm', 
+		removeClass:'btn btn-info btn-sm',
+		uploadClass:'btn btn-info btn-sm',
+		enctype: 'multipart/form-data',
+		uploadUrl:img_upload_url,//服务器端图片接收处理路径
+	}).on("filebatchuploadsuccess", function (event, data, previewId, index) {
+		 //同步上传返回结果处理
+			console.info(data.response);
+			if (data.response) {
+				  var obj = data.response;
+				  var urls = obj.urls;
+				  var ids = obj.ids;
+			      $("#videothumbUrl").attr('value',urls);
+			}
+			
+	  });
+
+	//上传视频
+	$('#modalvideo_add_filevideo').fileinput({
+		language:'zh',//语言中文
+		showCaption:true,//文本框
+		showPreview:false,//预览
+		showUpload:true,//上传按钮
+		uploadAsync: false, //默认异步上传,此处改为同步
+		showClose:true,//预览框关闭按钮
+		showBrowse:true,//上传按钮
+		browseOnZoneClick:false,//点击拖拽区不上传
+		initialPreviewShowDelete:true,
+		allowedFileExtensions:['ogg','mp4','webm'],//允许文件类型
+		browseClass:'btn btn-info btn-sm', //样式
+		captionClass:'input-sm', 
+		removeClass:'btn btn-info btn-sm',
+		uploadClass:'btn btn-info btn-sm',
+		enctype: 'multipart/form-data',
+		uploadUrl:video_upload_url,//视频上传路径
+	}).on("filebatchuploadsuccess", function (event, data, previewId, index) {
+		 //同步上传返回结果处理
+		if (data.response) {
+			  var obj = data.response;
+			  var urls = obj.urls;
+			  $("#videoUrls").attr('value',urls);
+		}
+		//最后上传表单
+		var formData = $("#videoform").serialize();
+		// 上传设置  
+	    var options = {    
+	    		type: "post", 
+	            url: saveOrUpdateVideoUrl,
+	            // 服务器响应的数据类型  
+	            dataType: "text",
+	            async: false, //同步
+	            //data:attachParam,//附加参数
+	            // 请求成功时执行的回调函数  
+	            success: function(data, status, xhr) {
+	            	if(status=='success'&&data=='success'){
+	            		$modalInfoVideo.modal('hide');//手动关闭模态框
+			    	}
+	            }  
+	    };
+	    $("#videoform").ajaxSubmit(options);
+  });
+}
+
+
+
+
+var videolocal;
+$(function() {
+	//video_add_page.ueditorInit();
+	video_add_page.wangEditorInit();
+	videofileInputInit();
+	video_add_page.loadMenu("${rc.contextPath}/category/allCategoryJson.do", "videotreeDemo", setting);
+	var map = new BMap.Map("videomap");
+	var point = new BMap.Point(116.331398,39.897445);
+	map.centerAndZoom(point,11);
+	map.addEventListener("click",function(e){
+		$("#videowd").attr("value",e.point.lng);
+		$("#videojd").attr("value",e.point.lat);
+	});  
+	map.enableScrollWheelZoom();
+	map.addControl(new BMap.NavigationControl());
+	videolocal = new BMap.LocalSearch(map, {
+	       renderOptions:{map: map}
+	});
+});
+
+
+function videoMapSearch(){
+	var city = $("#videocityName").val();
+	if(city != ""){
+		videolocal.search(city);
+	}
+}
+//视频添加
+$("#btnSaveVideo").on('click', function() {
+	var validated = video_add_page.formValidate();
+	if(validated==false){
+		return false;
+	}
+	//先上传封面,回调成功再往下执行
+	$('#modalvideo_add_filecover').fileinput('upload');
+	//上传视频
+	$('#modalvideo_add_filevideo').fileinput('upload');
+	
+});
+</script>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta charset="utf-8" />
+		<title>海客用户中心管理后台</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+		<script type="text/javascript">
+		/* 页面全局url */
+		//保存专题url
+		var saveSpecialUrl = "${rc.contextPath}/special/save.do";
+		//保存专题内容url
+		var saveSpecialContentUrl = "${rc.contextPath}/special/saveChildCategory.do";
+		
+		var toEditSpecialUrl = "${rc.contextPath}/special/toedit.do";
+		//添加专题下自定义栏目(子专题)
+		var toAddChildSpecial = "${rc.contextPath}/special/child_add.do";
+		//本页面列表url
+		var loadSpecialListUrl = "${rc.contextPath}/special/list.do";
+		//专题详情页面
+		var getSpecialDetailUrl = "${rc.contextPath}/special/detail.do";
+		var deleteSpecialUrl = "${rc.contextPath}/special/delete.do";
+		var batchDeleteSpecialUrl = "${rc.contextPath}/special/batchDelete.do";
+		//专题审核详情页
+		var auditDetailUrl = "${rc.contextPath}/audit/special_audit_detail.do";
+		//专题树
+		var loadSpecialTreeUrl = "${rc.contextPath}/category/getCategoryJsonByType.do";
+		</script>
+		<#setting number_format="#">
+	</head>
+
+	<body class="page-content">
+		<!-- 区块：主内容区域 begin-->
+		<div class="special-main">
+			<form name="searchform" id="searchform" class="form-inline hk-search">
+				<div class="row">
+					<div class="col-sm-2 col-xs-6">
+		  				<input type="text" name="specialName" value="<#if searchVo.specialName??>${searchVo.specialName}</#if>" 
+		  				class="form-control input-sm" placeholder="专题名称">
+					</div>
+					<div class="col-sm-2  col-xs-6">
+						<div class="input-group input-group-sm">
+						  <span class="input-group-addon" id="basic-addon3">审核状态</span>
+						   <select id="auditStatus" name ="auditStatus" class="form-control">
+							  <option value=''>全部</option>
+							  <option value='0'>待审核</option>
+							  <option value='1'>已审核</option>
+						  </select>
+						</div>
+					</div>
+					<div class="col-sm-2  col-xs-6">
+			  			<button id="btnSearch" type="button" class="btn btn-info btn-sm" onclick="tosearch()">
+				  			<span class="glyphicon glyphicon-search"></span> 
+				  			<span>搜索</span>
+				  		</button>
+					</div>
+				</div>
+			</form>
+			<div class="hk-toolbar">
+				<div class="btn-group btn-group-sm">
+				  	<button type="button" class="btn btn-default">
+				  		<span class="glyphicon glyphicon-th-list"></span> 
+				  		操作
+				  	</button>
+				  	<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				    	<span class="caret"></span>
+				 	</button>
+				 	<button id="linkAddItem" type="button" class="btn btn-default" style="margin-left:10px">
+				  		<span class="glyphicon glyphicon-plus"></span> 
+				    	添加
+				  	</button>
+				  	<ul class="dropdown-menu">
+				    	<li>
+				    		<a id="linkDelItems" href="#">
+				    			<span class="glyphicon glyphicon-remove"></span> 
+				    			批量删除
+				    		</a>
+				    	</li>
+				  	</ul>
+				</div>
+			</div>
+			<div class="row pd-8">
+				<div class="col-sm-3">
+						<div id="treeWrap" class="tree-wrap hk-scrollbar">
+			      			<ul id="specialListTreeDemo" class="ztree"></ul>
+			      		</div>
+				</div>
+				<div class="col-sm-9">
+					<div style="padding:8px; height:200px; border-radius:2px;" id="categoryForm">
+			      	</div>
+				</div>
+			</div>
+
+		  	<!-- Modal 专题表单-->
+			<div class="modal fade" id="modalInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+			  <#include "special_add.html" />
+			</div>
+			<!-- Modal 审核详情 -->
+			<div class="modal fade" id="modalTimeLine" tabindex="-1" role="dialog">
+			  <!-- "../common/audit_detail.html"-->
+			</div>
+			<!-- Modal 专题详情 -->
+			<div class="modal fade" id="modalTopicDetail" tabindex="-1" role="dialog">
+			  <!-- "special_detail.html" -->
+			  </div>
+			</div>
+		</div>
+		<!-- 区块：主内容区域 end -->
+<script type="text/javascript">
+var special_list_setting = {
+		view : {
+			addHoverDom: addHoverDom,
+			removeHoverDom: removeHoverDom
+		},
+		data : {
+			simpleData : {
+				enable: true,
+				idKey: "id",
+				pIdKey: "pId",
+				rootPId: 0,
+				showLine : true,                  //是否显示节点间的连线       
+			}
+		},
+		check: {
+			enable: true,   //true / false 分别表示 显示 / 不显示 复选框或单选框
+		　　autoCheckTrigger: true,   //true / false 分别表示 触发 / 不触发 事件回调函数
+		　　chkStyle: "checkbox",   //勾选框类型(checkbox 或 radio）
+		　　chkboxType: { "Y": "s", "N": "s" }   //勾选 checkbox 对于父子节点的关联关系
+		}
+	};
+	
+	var treeJson;
+	function getCategoryTree(typeId){
+		var url = loadSpecialTreeUrl;
+		if(typeId){
+			url = url +"?typeId="+typeId;
+		}
+		$.ajax({
+			type : "POST",
+			async: false, //同步
+			url : url,
+			dataType : "json",
+			success : function(data) {
+				if (data != null) {
+					treeJson = data;
+				}
+			}
+		});
+		return treeJson;
+	}
+	
+	
+	IDMark_A = "_a";
+	function addHoverDom(treeId, treeNode) {
+		//if (treeNode.id==1) return;
+		var aObj = $("#" + treeNode.tId + IDMark_A);
+		
+		if ($("#diyAddBtn_"+treeNode.id).length>0||$("#diyEditBtn_"+treeNode.id).length>0) return;
+		var editStr = "";
+		//固定为二级树
+		if(treeNode.level==0){
+			editStr = editStr+"<span class='button add' id='diyAddBtn_" +treeNode.id+ "' title='添加子菜单' onfocus='this.blur();'></span>";
+		}
+		
+		if(treeNode.pId!=null){
+			editStr = editStr+"<span class='button edit' id='diyEditBtn_" +treeNode.id+ "' title='修改菜单' onfocus='this.blur();'></span>";
+		}
+		aObj.append(editStr);
+		
+		//添加子分类
+		var addbtn = $("#diyAddBtn_"+treeNode.id);
+		if (addbtn) addbtn.bind("click", function(){
+			$("#categoryForm").load(toAddChildSpecial+"?parentId="+treeNode.id);
+			
+			
+		});
+		//编辑分类
+		var editbtn = $("#diyEditBtn_"+treeNode.id);
+		if (editbtn) editbtn.bind("click", function(){
+			var data = {"specialId":treeNode.id};
+			if(treeNode.level==0){
+				$modalInfoTitle.html('修改专题');
+				$modalInfo.load(toEditSpecialUrl,data);
+				$modalInfo.modal('show');//模态框显示
+			}else{
+				$("#categoryForm").load(toEditSpecialUrl,data);
+
+				
+			}
+		});
+	}
+	function removeHoverDom(treeId, treeNode) {
+		
+		$("#diyAddBtn_"+treeNode.id).unbind().remove();
+		$("#diyEditBtn_" +treeNode.id).unbind().remove();
+	}
+</script>
+
+<script type="text/javascript">
+		//专题表单模态框相关
+		var $modalInfo = $('#modalInfo');
+		var $modalInfoTitle = $modalInfo.find('#modalInfoTitle');
+		//审核详情模态框
+		var $modalTimeLine = $('#modalTimeLine');
+		//专题详情模态框
+		var $modalTopicDetail = $('#modalTopicDetail');
+		$modalInfo.modal({
+			backdrop:'static',//点击模态透明层不隐藏
+			keyboard:false,//键盘不控制模态框 如：esc按下模态框不消失
+			show:false//实例化后默认不显示
+		});
+		//模态框完全关闭后重新load
+		$modalInfo.on('hidden.bs.modal', function () {
+			loadMain(loadSpecialListUrl);
+		});
+		
+		$modalTimeLine.modal({
+			backdrop:'static',
+			keyboard:false,
+			show:false
+		});
+		$modalTopicDetail.modal({
+			backdrop:'static',
+			keyboard:false,
+			show:false
+		});
+		
+		//添加一条数据
+		$('#linkAddItem').on('click',function(){
+			$modalInfoTitle.html('添加数据');
+			$modalInfo.modal('show');//模态框显示
+		});
+
+		//查看审核详细
+		function linkTimeLine(specialId){
+			var data = {"categoryId":specialId};
+			$modalTimeLine.load(auditDetailUrl,data);
+			$modalTimeLine.modal('show');
+		}
+
+		
+			//此页面
+			var page = {
+				//初始化
+				//事件绑定
+				init:function(){
+					
+				}
+			}
+			
+			$(function(){
+				page.init();
+				//设置搜素框审核状态下拉选中
+	    		<#if searchVo.auditStatus??>
+	    			$("#auditStatus").val(${searchVo.auditStatus});
+	    		</#if>
+			});
+			
+			function tosearch(){
+				var data = $("#searchform").serialize();
+				$('.hk-main').load(loadSpecialListUrl,data);
+				
+			}
+			
+			//查看专题详细 
+			function linkSpecialDetail(specialId){
+				var data = {"specialId":specialId};
+				$modalTopicDetail.load(getSpecialDetailUrl,data);
+				$modalTopicDetail.modal('show');
+			}
+			//编辑专题
+			function toEditSpecial(specialId){
+				var data = {"categoryId":specialId};
+				$modalInfo.load(toEditSpecialUrl,data);
+				$modalInfo.modal('show');
+			}
+			
+			//删除一条数据
+			function deleteItem(specialId){
+				var c = confirm("确定删除"+specialId+"么?");
+				if(c==true){
+					var data ={"specialId":specialId};
+					$.ajax({
+					    type:"POST",
+					    dataType:"text",
+					    data:data,
+					    url:deleteSpecialUrl,
+					    success:function(data,status){
+					    	if(status='success'&&data=='success'){
+					    		$('.hk-main').load(loadSpecialListUrl);
+					    	}
+					    }
+					});
+				}
+				
+			}
+			
+			function getCheckedItems(){
+				var ids= new Array();
+				$("input:checkbox[name='specialCheckbox']:checked").each(function() {
+					ids.push(parseInt($(this).val())); // 每一个被选中项的值
+				});
+				return ids;
+			}
+			//批量删除
+			$('#linkDelItems').on('click',function(){
+				var ids= getCheckedItems();
+				if(ids.length==0) {
+					alert("请至少选择一条记录");
+					return false;
+				}
+				var c = confirm("确定删除选中的专题么?");
+				if(c==true){
+					$.ajax({
+					    type:"POST",
+					    dataType:"text",
+					    data:{"specialIds":ids},
+					    //contentType: "application/json; charset=utf-8",
+					    url:batchDeleteSpecialUrl,
+					    success:function(data,status){
+					    	if(status='success'&&data=='success'){
+					    		$('.hk-main').load(loadSpecialListUrl);
+					    	}
+					    },
+					    error:function(data){
+					    	console.info(data);
+					    	alert("删除失败!");
+					    }
+					});
+				}
+			});
+			
+			/** 分页普通跳转 **/
+			function jumpNormalPage(page){
+				var checkid = null;
+				$('.hk-main').load(loadSpecialListUrl+"?pageNo="+page);
+			}	
+			
+			//全选全不选，列表所有选中复选框选中，否则不选中
+			function selectAll() {
+				if($("#checkall").is(":checked")){  
+					$("input[name='specialCheckbox']").each(function(){  
+			             $(this).prop("checked", true);  
+			         });  
+			    }else{  
+			    	$("input[name='specialCheckbox']").each(function(){  
+			             $(this).removeAttr("checked");  
+			         });  
+			    }  
+			}
+			
+			//本页面初始化
+			$(function(){
+				hk.methods.elHeightComputed('#treeWrap',239);
+				getCategoryTree(3);
+				//加载菜单
+				loadMenuByJsonStr(treeJson, "specialListTreeDemo", special_list_setting);
+			});
+			
+</script>
+
+	</body>
+</html>

@@ -1,0 +1,23 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>com.hww</groupId>
+		<artifactId>hww-parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../hww-parent/pom.xml</relativePath>
+	</parent>
+	
+	<groupId>com.hww.file</groupId>
+	<artifactId>hww-file</artifactId>
+	<packaging>pom</packaging>
+	
+	<modules>
+		<module>../hww-file-common</module>
+		<module>../hww-file-common-dto</module>
+		<module>../hww-file-web-service</module>
+		<module>../hww-file-api</module>
+	</modules>
+
+</project>

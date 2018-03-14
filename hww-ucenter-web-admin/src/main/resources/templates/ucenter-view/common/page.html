@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<script src="${rc.contextPath}/admin/js/form.js"></script>
+<div class="row">
+						  		<div class="col-sm-8">
+						  			<ul class="pagination">
+								  		<li class="disabled">
+								      		<a href="javascript:jumpNormalPage(1);">首页</a>
+								    	</li>
+								    	<li class="active">
+								      		<a href="javascript:jumpNormalPage(${page.pageNo-1});">上一页</a>
+								    	</li>
+								    	<#list page.pageNumList as num>
+								    		<li>
+								      		<a href="javascript:jumpNormalPage(${num?string});">${num?string}</a>
+								    	</li>
+								    	</#list>
+								    	<li>
+								      		<a href="javascript:jumpNormalPage(${page.pageNo+1});">下一页</a>
+								    	</li>
+								    	<li>
+								      		<a href="javascript:jumpNormalPage(${page.totalPage});">尾页</a>
+								    	</li>
+								  	</ul>
+						  		</div>
+						  		<div class="col-sm-4">
+						  			<p class="hk-record-info">${page.pageNo}/${page.totalPage} 共 ${page.totalCount} 条</p>
+						  		</div>
+						  	</div>				
+</html>													
+									
+									

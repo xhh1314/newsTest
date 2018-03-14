@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<#include "../common_header.html">
+		<link rel="stylesheet" href="${rc.contextPath}/resources/ztree/css/zTreeStyle/zTreeStyle.css" type="text/css">
+	</head>
+
+	<body class="no-skin" style="overflow: hidden;">
+
+		<#include "../top.html">
+
+		<div class="main-container ace-save-state" id="main-container">
+			<script type="text/javascript">
+				try{ace.settings.loadState('main-container')}catch(e){}
+			</script>
+
+			<#include "../access/sys_menu.html">
+
+			<div class="main-content">
+				<div class="main-content-inner">
+					<div class="breadcrumbs ace-save-state" id="breadcrumbs">
+						<ul class="breadcrumb">
+							<li>
+								<i class="ace-icon fa fa-home home-icon"></i>
+								<a href="#">首页</a>
+							</li>
+							<li class="">系统设置</li>
+							<li class="active">菜单管理</li>
+						</ul><!-- /.breadcrumb -->
+
+						<#include "../search.html">
+						<#include "../ace_setting.html">
+					</div>
+
+					<div class="page-content" style="overflow: auto;height: 470px;">
+
+						
+
+						<!-- <div class="page-header">
+							<div class="row">
+								<div class="col-xs-12">
+									当前栏目：
+								</div>/.span
+							</div>/.row     
+						</div>/.page-header -->
+						
+						<div class="row">
+							<div class="col-xs-3">
+								<div class="widget-box widget-color-blue">
+									<div class="widget-header">
+										<h4 class="widget-title lighter smaller">
+											菜单
+										</h4>
+									</div>
+
+									<div class="widget-body" style="overflow: auto;bottom: 0px;">
+										<div class="widget-main">
+											<div id="treeDemo" class="ztree"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="col-xs-9">
+								<iframe id="menuList" name="menuList" src="" style="border: 0;width: 100%;height: 100%;"></iframe>
+							</div><!-- /.span -->
+						</div><!-- /.row -->
+					</div><!-- /.page-content -->
+				</div>
+			</div><!-- /.main-content -->
+			<#include "../footer.html">
+		</div><!-- /.main-container -->
+
+		<#include "../footerjs.html">
+
+		<!-- page specific plugin scripts -->
+		<script type="text/javascript" src="${rc.contextPath}/resources/ztree/js/jquery.ztree.core.js"></script>
+		<script type="text/javascript" src="${rc.contextPath}/resources/ztree/js/jquery.ztree.excheck.js"></script>
+		<script type="text/javascript" src="${rc.contextPath}/resources/ztree/js/jquery.ztree.exedit.js"></script>
+		<script src="${rc.contextPath}/resources/admin/js/treeInit.js"></script>
+		<script src="${rc.contextPath}/resources/admin/js/sidebar-menu.js"></script>
+		<!-- inline scripts related to this page -->
+		<script type="text/javascript">
+		//初始化宽度、高度    
+	    $("#main-container").height($(window).height()-76);
+		$("#menuList").height($(window).height()-240);
+		//当文档窗口发生改变时 触发  
+	    $(window).resize(function(){
+			$("#main-container").height($(window).height()-76);
+			$("#menuList").height($(window).height()-240);
+			//$(".sidebar").height($(window).height()-99);
+			
+			//var thisHeight = $("#nav_list").height($(window).outerHeight()-173);
+			//$(".submenu").height();
+			//$("#nav_list").children(".submenu").css("height",thisHeight);
+	  	});
+		
+		jQuery(function($){
+	
+			loadMenu("${rc.contextPath}/menu/allMenuJson.do", "treeDemo", setting);
+			
+		});
+		
+		var zTree;
+
+		var setting = {
+			view : {
+				addHoverDom: addHoverDom,
+				removeHoverDom: removeHoverDom
+			},
+			data : {
+				simpleData : {
+					enable:true
+				}
+			}
+		};
+		/** 用于捕获节点被点击的事件回调函数  **/
+		function zTreeOnClick(event, treeId, treeNode) {
+			target('#menuList',"${rc.contextPath}/menu/v_edit.do?inOrOut=true&menuId="+treeNode.id);
+		
+			
+			return true;
+		}
+		IDMark_A = "_a";
+		function addHoverDom(treeId, treeNode) {
+			//if (treeNode.id==1) return;
+			var aObj = $("#" + treeNode.tId + IDMark_A);
+			
+			if ($("#diyAddBtn_"+treeNode.id).length>0||$("#diyEditBtn_"+treeNode.id).length>0) return;
+			var editStr = "<span class='button add' id='diyAddBtn_" +treeNode.id+ "' title='添加子菜单' onfocus='this.blur();'></span>";
+			if(treeNode.pId!=null){
+				editStr = editStr+"<span class='button edit' id='diyEditBtn_" +treeNode.id+ "' title='修改菜单' onfocus='this.blur();'></span>";
+			}
+			aObj.append(editStr);
+			var addbtn = $("#diyAddBtn_"+treeNode.id);
+			if (addbtn) addbtn.bind("click", function(){
+				target('#menuList',"${rc.contextPath}/menu/v_add.do?inOrOut=true&parentId="+treeNode.id);
+			});
+			
+			var editbtn = $("#diyEditBtn_"+treeNode.id);
+			if (editbtn) editbtn.bind("click", function(){
+				target('#menuList',"${rc.contextPath}/menu/v_edit.do?inOrOut=true&menuId="+treeNode.id);
+			});
+		}
+		function removeHoverDom(treeId, treeNode) {
+			//if (treeNode.parentTId && treeNode.getParentNode().id!=1) return;
+			
+			$("#diyAddBtn_"+treeNode.id).unbind().remove();
+			$("#diyEditBtn_" +treeNode.id).unbind().remove();
+		}
+		
+		/**菜单跳转**/
+		function target(id,url){
+			$(id).attr('src', url);
+		}
+		</script>
+	</body>
+</html>

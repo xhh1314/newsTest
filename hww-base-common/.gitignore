@@ -1,0 +1,8 @@
+<<<<<<< HEAD
+/bin/
+=======
+/.settings/
+/bin/
+.classpath
+/target/
+>>>>>>> branch 'master' of http://123.56.233.109/server/hww.git

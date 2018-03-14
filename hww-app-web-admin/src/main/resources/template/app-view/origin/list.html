@@ -1,0 +1,203 @@
+
+<script type="text/javascript">
+	var editOriginUrl = "${rc.contextPath}/origin/edit.do";
+	var deleteOriginUrl = "${rc.contextPath}/origin/delete.do";
+	var indexOriginUrl = "${rc.contextPath}/origin/list.do"
+</script>
+
+<form class="form-inline hk-search" id="searchForm" name="submitForm" action="list.do" method="post">
+	<input type="hidden" value="${page.pageNo}" id="pageNo" name="pageNo"/>
+	<div class="row">
+		<div class="col-sm-2 col-xs-6">
+			<input type="text" class="form-control input-sm" placeholder="来源名称" name="originName" id="originNameSearch" value='${form.originName!}'>
+		</div>
+		<div class="col-sm-2 col-xs-6">
+			<input type="text" class="form-control input-sm" placeholder="来源地址" name="originUrl" id="originUrlSearch" value='${form.originUrl!}'>
+		</div>
+		<div class="col-sm-2 col-xs-6">
+			<input type="text" class="form-control input-sm" placeholder="来源链接" name="link" id="linkSearch" value='${form.link!}'>
+		</div>
+		<div class="col-sm-2 col-xs-6">
+			<div class="input-group input-group-sm">
+				<span class="input-group-addon" id="basic-addon3">审核状态</span>
+			<#if (form.status)??>
+				<#if form.status==0>
+					<select class="form-control" id="sstatus" name="status">
+						<option value="">全部</option>
+						<option value="1">正常</option>
+						<option value="0" selected="selected">冻结</option>
+					</select>
+				</#if>
+				<#if form.status==1>
+					<select class="form-control" id="sstatus" name="status">
+						<option value="">全部</option>
+						<option value="1" selected="selected">正常</option>
+						<option value="0">冻结</option>
+					</select>
+				</#if>
+				<#else>
+					<select class="form-control" id="sstatus" name="status">
+						<option value="" selected="selected">全部</option>
+						<option value="1">正常</option>
+						<option value="0">冻结</option>
+					</select>
+			</#if>
+			</div>
+		</div>
+		<div class="col-sm-2  col-xs-6" >
+			<button type="button" class="btn btn-info btn-sm" onclick="search()">
+				<span class="glyphicon glyphicon-search"></span> <span>搜索</span>
+			</button>
+		</div>
+	</div>
+</form>
+<div class="hk-toolbar">
+	<div class="btn-group btn-group-sm">
+		<button type="button" class="btn btn-default">
+			<span class="glyphicon glyphicon-th-list"></span> 操作
+		</button>
+		<button type="button" class="btn btn-default dropdown-toggle"
+			data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu">
+			<li><a id="linkAddItem" href="javascript:void(0)"> <span
+					class="glyphicon glyphicon-plus"></span> 添加
+			</a></li>
+		</ul>
+	</div>
+</div>
+<table class="table table-hover table-bordered">
+	<thead>
+		<tr>
+			<th><input type="checkbox"></th>
+			<th>来源ID</th>
+			<th>来源名称</th>
+			<th>来源地址</th>
+			<th>站点ID</th>
+			<th>状态</th>
+			<th>图标</th>
+			<th>文字</th>
+			<th>链接</th>
+			<th>创建时间</th>
+			<th>最后修改时间</th>
+			<th>操作</th>
+		</tr>
+	</thead>
+	<tbody>
+		<#list page.list as entity>
+		<tr>
+			<td><input type="checkbox"></td>
+			<td><#if (entity.originId)??>${entity.originId?c}<#else></#if></td>
+			<td><#if (entity.originName)??>${entity.originName}<#else></#if></td>
+			<td><#if (entity.originUrl)??>${entity.originUrl}<#else></#if></td>
+			<td><#if (entity.siteId)??>${entity.siteId}<#else></#if></td>
+            <td><#if (entity.status==0 )>
+			冻结
+			<#else>
+			正常
+			</#if>
+			</td>
+			<td><#if (entity.icon)??>${entity.icon}<#else></#if></td>
+			<td><#if (entity.word)??>${entity.word}<#else></#if></td>
+			<td><#if (entity.link)??>${entity.link}<#else></#if></td>
+			<td><#if (entity.createTime)??>${entity.createTime}<#else></#if></td>
+			<td><#if (entity.lastModifyTime)??>${entity.lastModifyTime}<#else></#if></td>
+			<td>
+				<a href="javascript:editItem(${entity.originId?c})" class="btn btn-info btn-xs" id="linkEditItem">编辑</a>
+				<a href="javascript:deleteItem(${entity.originId?c})" class="btn btn-danger btn-xs">删除</a></td>
+		</tr>
+		</#list>
+	</tbody>
+</table>
+<#include "../common/page.html"> 
+<!-- Modal -->
+<div class="modal fade" id="modalInfo" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel">
+	<#include "add.html">
+</div>
+</div>
+<!-- 区块：主内容区域 end --> <script type="text/javascript">
+	//此页面
+
+	var length = $("tbody tr").length;
+	//var begin = (${page.pageNo}-1)*length+1;
+	for (var i = 0; i < length; i++) {
+		$("tbody tr:eq(" + i + ") td[data-field='index']").text(i + 1);
+	}
+
+	var contenttype_list_page = {
+		//初始化
+		init : function() {
+			this.eventInit();
+		},
+		//事件绑定
+		eventInit : function() {
+			//信息表单模态框
+			var $modalInfo = $('#modalInfo');//模态框
+			var $modalInfoTitle = $modalInfo.find('#modalTite');//模态框标题
+			//bootstrap模态框实例
+			$modalInfo.modal({
+				backdrop : 'static',//点击模态透明层不隐藏
+				keyboard : false,//键盘不控制模态框 如：esc按下模态框不消失
+				show : false
+			//实例化后默认不显示
+			});
+			
+			//添加一条数据
+			$('#linkAddItem').click(function() {
+				$modalInfoTitle.html('添加数据');
+				$modalInfo.modal('show');//模态框显示
+			});
+			//编辑一条数据
+			$('#linkEditItem').click(function() {
+				$modalInfoTitle.html('编辑数据');
+				$modalInfo.modal('show');
+			});
+		}
+	}
+
+	//在当前行编辑
+	function editItem(categoryId) {
+
+		var url = editOriginUrl + "?originId=" + categoryId;
+		//先加载页面
+		$modalInfo.load(url);
+		$modalInfoTitle.html('编辑数据');
+		$modalInfo.modal('show');
+	};
+
+	//删除一条数据
+	function deleteItem(categoryId) {
+		var c = confirm("确定删除" + categoryId + "么?");
+		if (c == true) {
+			var url = deleteOriginUrl + "?originId=" + categoryId;
+			$.ajax({
+				type : "POST",
+				dataType : "text",
+				url : url,
+				success : function(data, status) {
+					if (status = 'success' && data == 'true') {
+						$('.hk-main').load(indexOriginUrl);
+					}
+				}
+			});
+		}
+
+	}
+	
+	function search(){
+        var data = $("#searchForm").serialize();
+        $('.hk-main').load(indexOriginUrl, data);
+	}
+
+    function jumpNormalPage(pageNo) {
+        $("#pageNo").val(pageNo);
+        var data = $("#searchForm").serialize();
+        $('.hk-main').load(indexOriginUrl, data);
+    }
+
+	$(function() {
+		contenttype_list_page.init();
+	});
+</script>

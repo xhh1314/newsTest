@@ -1,0 +1,138 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hww.framework</groupId>
+		<artifactId>hww-framework</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../hww-framework/pom.xml</relativePath>
+	</parent>
+
+	<artifactId>hww-framework-web-admin</artifactId>
+	<packaging>jar</packaging>
+	
+	<name>hww-framework-web-admin</name>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<jcaptcha.version>1.0</jcaptcha.version>
+		<shiro.version>1.2.3</shiro.version>
+		<shiro.redis.version>2.4.2.1-RELEASE</shiro.redis.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.hww.base</groupId>
+			<artifactId>hww-base-util</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hww.base</groupId>
+			<artifactId>hww-base-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<!-- <dependency>
+			<groupId>com.hww.config</groupId>
+			<artifactId>hww-config</artifactId>
+			<version>${project.version}</version>
+		</dependency> -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-freemarker</artifactId>
+		</dependency>
+		<!-- 支持 @ConfigurationProperties 注解 -->	
+		<dependency> 
+		  <groupId>org.springframework.boot</groupId> 
+		  <artifactId>spring-boot-configuration-processor</artifactId>
+		</dependency>
+		<!-- jcaptcha start -->
+		<dependency>
+			<groupId>com.octo.captcha</groupId>
+			<artifactId>jcaptcha</artifactId>
+			<version>${jcaptcha.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- jcaptcha end -->
+
+
+		<!-- SECURITY begin -->
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-core</artifactId>
+			<version>${shiro.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-spring</artifactId>
+			<version>${shiro.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-cas</artifactId>
+			<version>${shiro.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-web</artifactId>
+			<version>${shiro.version}</version>
+		</dependency>
+		<dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-quartz</artifactId>
+            <version>${shiro.version}</version>
+        </dependency>
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-ehcache</artifactId>
+			<version>${shiro.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>net.sf.ehcache</groupId>
+					<artifactId>ehcache-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.crazycake</groupId>
+			<artifactId>shiro-redis</artifactId>
+			<version>${shiro.redis.version}</version>
+		</dependency>
+		<!-- SECURITY end -->
+	</dependencies>
+	<build>
+		
+		<resources>
+			<resource>
+	                <directory>${basedir}/src/main/webapp</directory>
+                    <!-- 注意此次必须要放在此目录下才能被访问到 -->
+		            <targetPath>META-INF/resources</targetPath> 
+	                <includes>
+	                    <include>**/**</include>
+	                </includes>
+	   		 </resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/**</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
+</project>

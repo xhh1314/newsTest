@@ -1,0 +1,12 @@
+spring:
+  profiles:
+    active: prod
+  application:
+    name: api-gateway
+eureka:
+  instance:
+    preferIpAddress: true
+    instance-id: ${spring.cloud.client.ipAddress}:${server.port}
+  client:
+    serviceUrl:
+      defaultZone: http://10.1.11.36:8761/eureka/

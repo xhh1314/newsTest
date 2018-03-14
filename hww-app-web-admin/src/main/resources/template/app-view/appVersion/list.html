@@ -1,0 +1,125 @@
+<div class="hk-toolbar">
+<@shiro.hasPermission name='/version/save.do'>
+	<div class="btn-group btn-group-sm">
+		<button type="button" class="btn btn-default">
+			<span class="glyphicon glyphicon-th-list"></span>
+			操作
+		</button>
+		<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu">
+			<li>
+                <a id="linkAddItemsword" href="javascript:toAdd()">
+					<span class="glyphicon glyphicon-plus"></span>
+					添加
+				</a>
+			</li>
+		</ul>
+	</div>
+	</@shiro.hasPermission> 
+</div>
+
+
+
+
+
+<div style="overflow-x: hidden; overflow-y: auto; height:450px; width:auto;">
+	<table id="simple-table" class="table  table-bordered table-hover">
+		<thead>
+		<tr>
+			<th class="hidden-300">app名称</th>
+			<th class="hidden-300">版本名称</th>
+			<th class="detail-col">apk链接</th>
+			<th class="detail-col">创建时间</th>
+			<@shiro.hasPermission name='/version/del.do'>
+			<th class="detail-col"><i class="ace-icon fa fa-clock-o bigger-110 hidden-300"></i>操作</th>
+			</@shiro.hasPermission> 
+		</tr>
+		</thead>
+		<tbody id="tblBody">
+		<#list page.list as version>
+			<tr>
+				<td><#if (version.appName)??>${version.appName}</#if></td>
+				<td><#if (version.versionName)??>${version.versionName}</#if></td>
+				<td><#if (version.apkUrl)??>${version.apkUrl}</#if></td>
+				<td>
+					<#if (version.createTime)??>${version.createTime}</#if>
+				</td>
+					<@shiro.hasPermission name='/version/del.do'>
+				<td>
+					<!-- <button type="button" class="btn-eidt btn btn-xs btn-info" onclick="toEdit(${version.id})">编辑</button> -->
+					<button type="button" class="btn btn-xs btn-danger" onclick="removeUser('${version.id}')">删除</button>
+				</td>
+				</@shiro.hasPermission> 
+			</tr>
+		</#list>
+		</tbody>
+	</table>
+</div>
+<div class="modal fade" id="countryModal" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel">
+	<#include "addAppVersion.html" />
+</div>
+
+
+<script>
+
+var page = {
+        init : function() {
+            this.eventInit();
+        },
+        eventInit : function() {
+            //信息表单模态框
+            var $countryModal = $('#countryModal');
+            var $modalInfoTitle = $countryModal.find('#modalTite');
+            $countryModal.modal({
+                backdrop : 'static',
+                keyboard : false,
+                show : false
+            });
+            //添加一条数据
+            $('#linkAddItemsword').click(function () {
+                $modalInfoTitle.html('添加数据');
+                $countryModal.modal('show');
+                $("#pwdDiv").show();
+                $("#btnSave").show();
+                $("#btnUpdate").hide(); 
+            });
+           
+        }
+    }
+
+    jQuery(function($) {
+        page.init();
+    });
+
+
+  function removeUser(id){
+	  $.ajax({
+			type : "POST",
+			data :{"id":id},
+			dataType : "json",
+			url : "${rc.contextPath}/version/del.do",
+			success : function(data) {
+				  alert(data);
+				  $countryModal.modal('hide');
+				  $('.hk-main').load("${rc.contextPath}/version/list.do");
+				  
+				  
+				
+				
+			}
+	})
+  }
+
+
+
+
+
+
+
+
+
+
+</script>

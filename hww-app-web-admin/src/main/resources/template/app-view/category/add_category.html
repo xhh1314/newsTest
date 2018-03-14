@@ -1,0 +1,308 @@
+<script type="text/javascript">
+	var editUrl = "${rc.contextPath}/category/v_edit.do";
+	var deleteUrl = "${rc.contextPath}/category/o_delete.do";
+	var indexUrl = "${rc.contextPath}/category/v_list.do"
+</script>
+<form id="submitForm" class="form-horizontal" role="form" >
+	<!-- <input type="hidden" name="parentId" value="${form.parentId}" id="parentId"/> -->
+	<div class="tabbable">
+		<ul class="nav nav-tabs padding-12 tab-color-blue background-blue"
+			id="myTab4">
+			<li class="active"><a data-toggle="tab" href="#home4">频道信息</a></li>
+		</ul>
+		<div class="tab-content">
+			<div id="home4" class="tab-pane in active">
+				<div class="form-group">
+					<label class="col-sm-2 control-label no-padding-right">上级分类：</label>
+					<div class="col-sm-4">
+						<div class="pos-rel">
+							<input id="citySel" value="${parent.columnName}"
+								class="typeahead scrollable" type="text" readonly="readonly" />
+							<input type="hidden" name="parentId" value="${parent.columnId}"
+								class="typeahead scrollable" type="text" readonly="readonly" />
+						</div>
+					</div>
+					<!-- 				</div>
+				<div class="form-group"> -->
+					<label class="col-sm-2 control-label no-padding-right">栏目名称：</label>
+					<div class="col-sm-4">
+						<div class="pos-rel">
+							<input id="columnName" name="columnName" value=""
+								class="typeahead scrollable" type="text" placeholder="栏目名称"
+								required="" />
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label no-padding-right">显示顺序：</label>
+					<div class="col-sm-4">
+						<div class="pos-rel">
+							<input id="sort" min="2" name="sort" class="typeahead scrollable"
+								type="number" placeholder="显示顺序" />
+						</div>
+					</div>
+					<!-- <div class="form-group"> -->
+					<label class="col-sm-2 control-label no-padding-right">描述：</label>
+					<div class="col-sm-4">
+						<div class="pos-rel">
+							<input id="columnDesc" name="columnDesc"
+								class="typeahead scrollable" type="text" placeholder="描述" />
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label no-padding-right">启用：</label>
+					<div class="col-sm-4">
+						<div class="pos-rel">
+							<label> <input id="status" name="status" value="1"
+								class="ace ace-switch ace-switch-2" checked="checked"
+								type="checkbox" /> <span class="lbl"></span>
+							</label>
+						</div>
+					</div>
+					<!-- 				</div>
+				<div class="form-group"> -->
+					<label class="col-sm-2 control-label no-padding-right">默认推荐：</label>
+					<div class="col-sm-4">
+						<div class="pos-rel">
+							<label> <input id="isDefault" name="isDefault" value="1"
+								class="ace ace-switch ace-switch-2" type="checkbox" /> <span
+								class="lbl"></span>
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2 col-sm-2 no-padding-right"
+						for="food">所属站点：</label>
+					<div class="col-xs-4 col-sm-4">
+						<select name="siteId" id="siteId">
+							<option value="">--请选择--</option>
+							<#list sites as site> <#if site.siteId==form.siteId>
+							<option value="${site.siteId}" selected="selected">${site.siteName}</option>
+							<#else>
+							<option value="${site.siteId}">${site.siteName}</option></#if> </#list>
+						</select>
+					</div>
+					<label class="col-sm-2 control-label no-padding-right">是否自定义：</label>
+					<div class="col-sm-4">
+						<div class="pos-rel">
+							<label> <input id="isCustom" name="isCustom" value="1"
+								class="ace ace-switch ace-switch-2" type="checkbox" /> <span
+								class="lbl"></span>
+							</label>
+						</div>
+					</div>
+					<label class="col-sm-2 control-label no-padding-right">是否显示：</label>
+					<div class="col-sm-4">
+						<div class="pos-rel">
+							<label> <input id="isDisplay" name="isDisplay" value="1"
+								class="ace ace-switch ace-switch-2" type="checkbox" /> <span
+								class="lbl"></span>
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2 col-sm-2 no-padding-right"
+						for="food">与新闻分类关联：</label>
+					<div class="col-sm-8" style="height:300px; overflow:auto">
+						<div id="cmsCategoryTree_add" class="tree-wrap hk-scrollbar">
+							<ul id="cmsCategoryTree_add_demo" class="ztree"></ul>
+							<input id="cmsCategoryIds" name="cmsCategoryIds" value="" type="hidden" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="clearfix form-actions">
+		<div class="col-md-offset-3 col-md-9">
+			<button class="btn btn-info" type="button" id="submitbutton">
+				<i class="ace-icon fa fa-check bigger-110"></i> 提交
+			</button>
+			&nbsp; &nbsp; &nbsp;
+			<button class="btn" type="reset">
+				<i class="ace-icon fa fa-undo bigger-110"></i> 重置
+			</button>
+		</div>
+	</div>
+</form>
+
+<script type="text/javascript">
+	var loadCmsCategoryTreeUrl="${rc.contextPath}/category/allCmsCategoryJson.do";
+
+	var cms_category_add_page = {
+			onClick:function(e, treeId, treeNode) {
+				var zTree = $.fn.zTree.getZTreeObj("cmsCategoryTree_add_demo"),
+				nodes = zTree.getSelectedNodes(),
+				v = "";
+				nodes.sort(function compare(a,b){return a.id-b.id;});
+				for (var i=0, l=nodes.length; i<l; i++) {
+					v += nodes[i].name + ",";
+				}
+				if (v.length > 0 ) v = v.substring(0, v.length-1);
+				var cityObj = $("#citySel");
+				cityObj.attr("value", v);
+				
+				v2 = "";
+				for (var i=0, l=nodes.length; i<l; i++) {
+					v2 += nodes[i].id + ",";
+				}
+				if (v2.length > 0 ) v2 = v2.substring(0, v2.length-1);
+				var parentObj = $("#parentId");
+				parentObj.attr("value", v2);
+			}
+	};
+	
+	var cms_category_add_setting = {
+			view: {
+				dblClickExpand: false
+			},
+			data: {
+				simpleData: {
+					enable: true
+				}
+			},
+			callback: {
+				onClick: cms_category_add_page.onClick
+			},
+			check: {
+				enable: true,   //true / false 分别表示 显示 / 不显示 复选框或单选框
+			　　autoCheckTrigger: true,   //true / false 分别表示 触发 / 不触发 事件回调函数
+			　　chkStyle: "checkbox",   //勾选框类型(checkbox 或 radio）
+			　　chkboxType: { "Y": "s", "N": "s" }   //勾选 checkbox 对于父子节点的关联关系
+			}
+		};
+	
+	jQuery(function($) {
+		
+		loadMenu(loadCmsCategoryTreeUrl, "cmsCategoryTree_add_demo",cms_category_add_setting);
+		$("#submitbutton").click(function() {
+			if(validateForm()==false){
+				return;
+			}
+			var sortVal = $("#sort").val();
+			$.ajax({
+				type : 'POST',
+				url : "${rc.contextPath}/category/sort.do",
+				data : {"sort":sortVal},
+				dataType : 'json',
+				success : function(data) {
+					if(data){
+						if(data.result==-1){
+							alert(data.message);
+							return;
+						}
+						if(data.result==0){
+							alert("显示顺序："+data.exist+"已经被占用！")
+						}
+						if(data.result==1){
+							var data2 = $("#submitForm").serialize();
+
+							if (document.getElementById("status").checked == false) {
+								data2 = data2 + "&status=" + 0;
+							}
+							if (document.getElementById("isCustom").checked == false) {
+								data2 = data2 + "&isCustom=" + 0;
+							}
+							if (document.getElementById("isDefault").checked == false) {
+								data2 = data2 + "&isDefault=" + 0;
+							}
+							$.ajax({
+								type : 'POST',
+								url : "${rc.contextPath}/category/saveColumn.do",
+								data : data2,
+								dataType : 'json',
+								success : function(data3) {
+									if (data3) {
+										//artDialog({content:'提交成功', x:'right', y:'bottom', time:'1', fixed:true});
+										alert("提交成功");
+										$('.hk-main').load(indexUrl);
+									}
+								}
+							});
+						}
+					}
+				},
+				errer:function(e){
+					alert(e);
+				}
+			});
+		});
+	})
+
+	function validateForm() {
+		
+		var treeObj = $.fn.zTree.getZTreeObj("cmsCategoryTree_add_demo");
+		var nodes = treeObj.getCheckedNodes(true);
+        var id_array = [];
+		if(nodes.length>0){
+			for(var i=0;i<nodes.length;i++){
+				id_array.push(nodes[i].id);
+			}
+		}
+		var relatedCategoryId = id_array.toString();
+		$("#cmsCategoryIds").val(relatedCategoryId);
+		
+		if(relatedCategoryId==""){
+			alert("请至少选择一个新闻分类！");
+			return false;
+		}
+
+		var sortVal = $("#sort").val();
+		if ($.trim(sortVal) == "") {
+			alert("显示顺序不能为空！");
+			return false;
+		}
+		if (sortVal < 2) {
+			alert("显示顺序必须大于等于2！");
+			return false;
+		}
+		if (trim($("#columnName").val()) == "") {
+			alert("栏目名称不能为空！");
+			return false;
+		}
+		
+		return true;
+	}
+	function trim(str) {
+		return LTrim(RTrim(str));
+	}
+	function LTrim(str) {
+		var i;
+		for (i = 0; i < str.length; i++) {
+			if (str.charAt(i) != " ")
+				break;
+		}
+		str = str.substring(i, str.length);
+		return str;
+	}
+	function RTrim(str) {
+		var i;
+		for (i = str.length - 1; i >= 0; i--) {
+			if (str.charAt(i) != " ")
+				break;
+		}
+		str = str.substring(0, i + 1);
+		return str;
+	}
+	var treeJson;
+	function getCategoryTree(){
+		var url = loadCmsCategoryTreeUrl;
+		$.ajax({
+			type : "POST",
+			async: false,
+			url : url,
+			dataType : "json",
+			success : function(data) {
+				if (data != null) {
+					treeJson = data;
+				}
+			}
+		});
+		return treeJson;
+	}
+
+</script>

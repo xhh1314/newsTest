@@ -1,0 +1,90 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>列表</title>
+<link href="${rc.contextPath}/resources/admin/css/main.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet"
+	href="${rc.contextPath}/resources/third/ztree/css/zTreeStyle.css"
+	type="text/css">
+<script type="text/javascript"
+	src="${rc.contextPath}/resources/third/ztree/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript"
+	src="${rc.contextPath}/resources/third/ztree/js/jquery.ztree.core.js"></script>
+<script type="text/javascript" src="${rc.contextPath}/resources/third/ztree/js/jquery.ztree.excheck.js"></script>
+
+<script type="text/javascript"
+	src="${rc.contextPath}/resources/admin/js/treeInit.js"></script>
+<script type="text/javascript"
+	src="${rc.contextPath}/resources/admin/js/commonAll.js"></script>
+</head>
+<script>
+	var zTree;
+
+	var setting = {
+			check: {
+				enable: true,
+				autoCheckTrigger:true,
+				chkStyle: "checkbox",
+				chkboxType :{"Y" : "p", "N" : "s"} //Y:勾选（参数：p:影响父节点），N：不勾（参数s：影响子节点）[p 和 s 为参数] 
+			},
+			view: {
+				dblClickExpand: false
+			},
+			data: {
+				simpleData: {
+					enable: true,
+					idKey : "id",
+					pIdKey : "pId",
+					rootPId : ""
+				}
+			},
+			callback: {
+				onClick: onClick,
+				onCheck: onCheck
+			}
+		};
+	function onClick(e, treeId, treeNode) {
+			var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+			zTree.checkNode(treeNode, !treeNode.checked, null, true);
+			return false;
+	}
+	function onCheck(e, treeId, treeNode) {
+			var zTree = $.fn.zTree.getZTreeObj("treeDemo"),
+			nodes = zTree.getCheckedNodes(true),
+			v = "";
+			for (var i=0, l=nodes.length; i<l; i++) {
+				v += nodes[i].name + ",";
+			}
+			if (v.length > 0 ) v = v.substring(0, v.length-1);
+			var cityObj = $("#citySel");
+			cityObj.attr("value", v);
+			
+			v2 = "";
+			for (var i=0, l=nodes.length; i<l; i++) {
+				v2 += nodes[i].id + ",";
+			}
+			if (v2.length > 0 ) v2 = v2.substring(0, v2.length-1);
+			var parentObj = $("#otherCategoryIds");
+			parentObj.attr("value", v2);
+		}
+	
+	$(document).ready(function() {
+		loadMenu("${rc.contextPath}/auth/treeData.do", "treeDemo", setting);
+		// 默认展开所有节点
+		if (zTree) {
+			// 默认展开所有节点
+			zTree.expandAll(false);
+		}
+	});
+</script>
+
+</head>
+
+<body>
+<div class="main">
+	<ul id="treeDemo" class="ztree"></ul>
+	
+</div>
+<div><input type="button" value="提交"/></div>
+</body>
+</html>
