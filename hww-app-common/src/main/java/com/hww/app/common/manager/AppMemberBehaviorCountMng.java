@@ -16,7 +16,7 @@ public interface AppMemberBehaviorCountMng extends IBaseEntityMng<Long, AppMembe
 //	List<AppBehaviorCountDto> loadByContentIdsAndBevType(List<Long> contentIds,Integer bevType,Integer plateType);
 
 	
-	void addBehaviorCount(Long contentId,Integer bevType,Integer plateType,int count);
+	void addBehaviorCount(Long contentId,Integer bevType,Integer plateType,int count,Long memberId);
 	
 	
 	

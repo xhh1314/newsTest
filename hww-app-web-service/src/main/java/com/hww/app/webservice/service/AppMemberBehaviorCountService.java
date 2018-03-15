@@ -10,5 +10,5 @@ public interface AppMemberBehaviorCountService {
 	
 	Map<String,Integer> behaviorCount(Long contentId,Integer plateType);
 
-	void addBehaviorCount(Long contentId, Integer bevType,Integer plateType, int count);
+	void addBehaviorCount(Long contentId, Integer bevType,Integer plateType, int count,Long memberId);
 }

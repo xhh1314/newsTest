@@ -48,7 +48,12 @@
 			<groupId>com.hww.ucenter</groupId>
 			<artifactId>hww-ucenter-common</artifactId>
 			<version>${project.version}</version>
-		</dependency>		
+		</dependency>
+		<dependency>
+			<groupId>com.hww.sns</groupId>
+			<artifactId>hww-sns-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
     </dependencies>
 
 </project>

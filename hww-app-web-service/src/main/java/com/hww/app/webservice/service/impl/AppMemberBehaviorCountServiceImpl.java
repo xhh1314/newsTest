@@ -23,8 +23,8 @@ public class AppMemberBehaviorCountServiceImpl implements AppMemberBehaviorCount
 
 	
 	@Override
-	public void addBehaviorCount(Long contentId,Integer bevType,Integer plateType,int count) {
-		appMemberBehaviorCountMng.addBehaviorCount(contentId, bevType,plateType, count);
+	public void addBehaviorCount(Long contentId,Integer bevType,Integer plateType,int count,Long memberId) {
+		appMemberBehaviorCountMng.addBehaviorCount(contentId, bevType,plateType, count,memberId);
 		
 	}
 
