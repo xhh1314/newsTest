@@ -10,9 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.hww.app.common.dto.AppBehaviorCountDto;
-import com.hww.app.common.entity.AppMemberBehaviorCount;
 import com.hww.app.common.manager.AppMemberBehaviorCountMng;
-import com.hww.app.webservice.HwwConsts;
+import com.hww.framework.common.tool.HwwConsts;
 import com.hww.app.webservice.service.AppMemberBehaviorCountService;
 
 @Service("appappMemberBehaviorCountService")

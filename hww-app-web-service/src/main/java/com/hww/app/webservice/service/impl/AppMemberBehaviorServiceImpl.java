@@ -4,7 +4,7 @@ import com.hww.app.common.dto.AppBehaviorDto;
 import com.hww.app.common.entity.AppMemberBehavior;
 import com.hww.app.common.manager.AppMemberBehaviorMng;
 import com.hww.app.common.vo.AppMemberBehaviorVo;
-import com.hww.app.webservice.HwwConsts;
+import com.hww.framework.common.tool.HwwConsts;
 import com.hww.app.webservice.service.AppMemberBehaviorCountService;
 import com.hww.app.webservice.service.AppMemberBehaviorService;
 import com.hww.base.util.BeanMapper;

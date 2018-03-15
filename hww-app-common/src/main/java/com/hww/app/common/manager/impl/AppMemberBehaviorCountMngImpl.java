@@ -7,8 +7,11 @@ import com.hww.app.common.entity.AppMemberBehaviorCount;
 import com.hww.app.common.manager.AppMemberBehaviorCountMng;
 import com.hww.base.common.manager.impl.BaseEntityMngImpl;
 import com.hww.base.util.BeanMapper;
+import com.hww.framework.common.tool.HwwConsts;
+import com.hww.framework.common.tool.JedisPoolUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +44,13 @@ public class AppMemberBehaviorCountMngImpl extends BaseEntityMngImpl<Long, AppMe
 
 	@Override
 	public void addBehaviorCount(Long contentId, Integer bevType,Integer plateType, int count) {
+			Jedis conn=null;
+			conn= JedisPoolUtil.getConnection();
+			if(plateType==(HwwConsts.PlateType.topic)){
+				if(bevType==HwwConsts.Behavior.b1_dz){
+
+				}
+			}
 		AppMemberBehaviorCount behaviorCount=appMemberBehaviorCountDao.loadByContentIdAndBevType(contentId, bevType,plateType);
 		if(behaviorCount==null) {
 			AppMemberBehaviorCount behaviorCount2 =new AppMemberBehaviorCount();

@@ -1,4 +1,4 @@
-package com.hww.app.webservice;
+package com.hww.framework.common.tool;
 
 
 import java.util.ArrayList;
@@ -13,6 +13,12 @@ public class HwwConsts {
 	public static final class BehaviorValue{
 		public static final Integer bev1=1; 
 		public static final Integer bev0=0; 
+	}
+
+	public static final class PlateType{
+		public static final Integer news=0;
+		public static final Integer topic=1;
+		public static final Integer post=2;
 	}
 	
 	public static final class Behavior{
