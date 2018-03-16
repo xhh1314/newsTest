@@ -1,6 +1,7 @@
 package com.hww.ucenter.common.manager.impl;
 
 import com.hww.base.common.manager.impl.BaseEntityMngImpl;
+import com.hww.framework.common.constant.RedisKey;
 import com.hww.framework.common.tool.JedisPoolUtil;
 import com.hww.ucenter.common.dao.FollowDao;
 import com.hww.ucenter.common.dto.SaveConcernDto;
@@ -71,7 +72,7 @@ public class FollowMngImpl extends BaseEntityMngImpl<Long, UCenterFollow, Follow
 		Jedis conn = null;
 		try {
 			conn = JedisPoolUtil.getConnection();
-			String key = "ucenter:follow:" + uCenterFollow.getMemberId();
+			String key = RedisKey.Follow.getValue() + uCenterFollow.getMemberId();
 			Set<String> stringSet = conn.smembers(key);
 			if (stringSet == null || stringSet.size() == 0) {
 				FollowVo followVo = new FollowVo();
@@ -97,7 +98,7 @@ public class FollowMngImpl extends BaseEntityMngImpl<Long, UCenterFollow, Follow
 	public List<Long> listFollowIdByMemberId(Long memberId) {
 		Jedis conn = null;
 		Set<String> followId = null;
-		String key = "ucenter:follow:" + memberId;
+		String key =RedisKey.Follow.getValue() + memberId;
 		try {
 			conn = JedisPoolUtil.getConnection();
 			followId = conn.smembers(key);

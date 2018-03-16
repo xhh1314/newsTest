@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.hww.app.common.dto.AppBehaviorCountDto;
 import com.hww.app.common.manager.AppMemberBehaviorCountMng;
-import com.hww.framework.common.tool.HwwConsts;
+import com.hww.framework.common.constant.HwwConsts;
 import com.hww.app.webservice.service.AppMemberBehaviorCountService;
 
 @Service("appappMemberBehaviorCountService")

@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import com.hww.base.common.manager.impl.BaseEntityMngImpl;
 import com.hww.base.common.util.Finder;
 import com.hww.base.util.BeanMapper;
+import com.hww.framework.common.constant.RedisKey;
 import com.hww.framework.common.tool.JedisPoolUtil;
 import com.hww.sns.common.dao.SnsTopicDao;
 import com.hww.sns.common.dto.HBaseSnsQueryDto;
@@ -47,8 +48,8 @@ public class SnsTopicMngImpl extends BaseEntityMngImpl<Long, SnsTopic, SnsTopicD
 		Map<String, String> map = BeanMapper.mapBeanToStringMap(dto);
 		Jedis conn = JedisPoolUtil.getConnection();
 		try {
-			conn.hmset("sns:topic:" + dto.getTopicId(), map);
-			conn.zadd("sns:topic:user:count:" + dto.getMemberId(), dto.getCreateTime().getTime(),
+			conn.hmset(RedisKey.SnsTopic.getValue() + dto.getTopicId(), map);
+			conn.zadd(RedisKey.UserTopic.getValue() + dto.getMemberId(), dto.getCreateTime().getTime(),
 					dto.getTopicId().toString() + ":" + dto.getCreateTime().getTime());
 		} catch (Exception e) {
 			log.error("exception:{}", e);
@@ -90,13 +91,13 @@ public class SnsTopicMngImpl extends BaseEntityMngImpl<Long, SnsTopic, SnsTopicD
 			pageSize = queryDto.getPageSize();
 			long start = (queryDto.getPageNo() - 1) * pageSize;
 			long end = start + pageSize - 1;
-			Set<String> topicIdStr = conn.zrevrange("sns:topic:user:" + authorId, start, end);
+			Set<String> topicIdStr = conn.zrevrange(RedisKey.UserTopic.getValue() + authorId, start, end);
 			if (topicIdStr == null || topicIdStr.size() == 0) {
 				queryDto.setPageSize(50);
 				queryDto.setPageNo(1);
 				List<SnsTopic> newTopicList = snsTopicDao.listTopicByAuthorMemberId(queryDto);
 				for (SnsTopic val : newTopicList) {
-					conn.zadd("sns:topic:user:count:" + val.getMemberId(), val.getCreateTime().getTime(),
+					conn.zadd(RedisKey.UserTopic.getValue() + val.getMemberId(), val.getCreateTime().getTime(),
 							val.getTopicId().toString() + ":" + val.getCreateTime().getTime());
 				}
 			}
@@ -106,7 +107,7 @@ public class SnsTopicMngImpl extends BaseEntityMngImpl<Long, SnsTopic, SnsTopicD
 				return Lists.newArrayList();
 			}
 			for (String topicId : topicIdStr) {
-				Map<String, String> topicBean = conn.hgetAll("sns:topic:" + topicId);
+				Map<String, String> topicBean = conn.hgetAll(RedisKey.SnsTopic.getValue() + topicId);
 				if (topicBean == null) {
 					topicIdMiss.add(Long.parseLong(topicId));
 				} else {
@@ -117,7 +118,7 @@ public class SnsTopicMngImpl extends BaseEntityMngImpl<Long, SnsTopic, SnsTopicD
 
 			snsTopicListOfMiss = snsTopicDao.listSnsTopicByIds(topicIdMiss);
 			for (SnsTopic val : snsTopicListOfMiss) {
-				conn.hmset("sns:topic:" + val.getTopicId(), BeanMapper.mapBeanToStringMap(val));
+				conn.hmset(RedisKey.SnsTopic.getValue() + val.getTopicId(), BeanMapper.mapBeanToStringMap(val));
 			}
 		} finally {
 			if (conn != null)
@@ -161,7 +162,7 @@ public class SnsTopicMngImpl extends BaseEntityMngImpl<Long, SnsTopic, SnsTopicD
 		int end = begin + snsQueryDto.getPageSize() - 1;
 		Map<Long, Set<String>> responseMap = new HashMap<>(32);
 		for (Long id : followMemberIds) {
-			String key = "sns:topic:" + id;
+			String key = RedisKey.SnsTopic.getValue() + id;
 			Response<Set<String>> response = pipeline.zrevrange(key, begin, end);
 			if(response!=null && response.get()!=null)
 			responseMap.put(id, response.get());

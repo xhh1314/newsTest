@@ -1,4 +1,4 @@
-package com.hww.framework.common.tool;
+package com.hww.framework.common.constant;
 
 
 import java.util.ArrayList;
