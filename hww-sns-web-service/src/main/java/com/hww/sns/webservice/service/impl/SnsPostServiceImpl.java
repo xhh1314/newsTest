@@ -216,7 +216,7 @@ public class SnsPostServiceImpl implements SnsPostService {
 		}
 		snsPost.setTopicId(topicId);// 设置新的topicid=--->用来关联是哪个新闻的评论
 
-		snsPostMng.save(snsPost);
+		snsPostMng.saveSnsPost(snsPost);
 		SnsPostVo snsPostVo = new SnsPostVo();
 		UCenterMemberDto postAuthor = userFeignClient.findById(snsPost.getMemberId());
 		if (postAuthor != null) {

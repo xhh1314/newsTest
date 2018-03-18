@@ -61,9 +61,9 @@ public class AppMemberBehaviorServiceImpl implements AppMemberBehaviorService {
 			
 			
 			if(HwwConsts.BehaviorValue.bev0.equals(bevValue)){
-				behaviorCountService.addBehaviorCount(contentId, bevType,plateType, -1);
+				behaviorCountService.addBehaviorCount(contentId, bevType,plateType, -1,memberId);
 			}else {
-				behaviorCountService.addBehaviorCount(contentId, bevType,plateType, 1);
+				behaviorCountService.addBehaviorCount(contentId, bevType,plateType, 1,memberId);
 			}
 			
 		}else {
@@ -78,7 +78,7 @@ public class AppMemberBehaviorServiceImpl implements AppMemberBehaviorService {
 				//第一次点击肯定不会出现直接取消点赞的情况
 				//behaviorCountService.addBehaviorCount(contentId, bevType,plateType, -1);
 			}else {
-				behaviorCountService.addBehaviorCount(contentId, bevType,plateType, 1);
+				behaviorCountService.addBehaviorCount(contentId, bevType,plateType, 1,memberId);
 			}
 		}
 		

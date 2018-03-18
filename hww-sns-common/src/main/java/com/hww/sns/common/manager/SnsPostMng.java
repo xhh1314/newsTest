@@ -3,6 +3,7 @@ package com.hww.sns.common.manager;
 import com.hww.base.common.manager.IBaseEntityMng;
 import com.hww.sns.common.dao.SnsPostDao;
 import com.hww.sns.common.dto.HBaseSnsQueryDto;
+import com.hww.sns.common.dto.SnsPostDto;
 import com.hww.sns.common.entity.SnsPost;
 import com.hww.sns.common.entity.SnsTopic;
 import com.hww.sns.common.vo.PostListVo;
@@ -33,6 +34,8 @@ public interface SnsPostMng
 	Integer loadCountForTopic(Long topicId,Integer showStatus);
 
 	Integer loadCountForNews(Long newsId,Integer showStatus);
+
+	SnsPostDto saveSnsPost(SnsPost post);
 	
 //    List<SnsPost> smPostList(PostListVo vo);
 }

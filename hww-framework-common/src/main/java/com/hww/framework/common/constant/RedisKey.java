@@ -13,9 +13,13 @@ public enum RedisKey {
 	SnsComment("sns:comment:"),
 
 	/**
-	 * 记录被点赞过的文章,value组成为:contentId:behaviorType
+	 * 记录被点赞过的文章,value组成为:contentId:behaviorType:plateType
 	 */
 	LikeHistory("like:history"),
+	/**
+	 * 记录被评论过的文章,value组成为:contentId:behaviorType:plateType
+	 */
+	CommentHistory("comment:history"),
 
 	/**
 	 * 记录谁点赞了文章，key为likeCollection:+contentId,value是memberId

@@ -5,6 +5,9 @@ import java.util.*;
 import com.alibaba.fastjson.JSON;
 import org.dozer.DozerBeanMapper;
 
+import static com.alibaba.fastjson.parser.Feature.InitStringFieldAsEmpty;
+import static com.alibaba.fastjson.serializer.SerializerFeature.WriteNullListAsEmpty;
+
 public class BeanMapper {
 	private static DozerBeanMapper dozer = new DozerBeanMapper();
 
@@ -53,7 +56,8 @@ public class BeanMapper {
 	 */
 	public static Map<String, String> mapBeanToStringMap(Object obj) {
 		Map<String, String> map = new HashMap<>(32);
-		Map<String, Object> temp = JSON.parseObject(JSON.toJSONString(obj), Map.class);
+		String strVal=JSON.toJSONString(obj,WriteNullListAsEmpty);
+		Map<String, Object> temp = JSON.parseObject(strVal, Map.class,InitStringFieldAsEmpty);
 		temp.forEach((s, o) -> {
 			if (o instanceof String) {
 				map.put(s, (String) o);
