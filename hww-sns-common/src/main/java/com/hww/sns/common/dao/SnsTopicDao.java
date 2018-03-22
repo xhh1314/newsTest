@@ -30,7 +30,7 @@ public interface SnsTopicDao
      * @param snsTopicIdMiss
      * @return
      */
-    List<SnsTopic> listTopicIdAndCreateTimeByMemeberId(List<Long> snsTopicIdMiss);
+    List<SnsTopic> listTopicByMemeberIds(List<Long> snsTopicIdMiss);
 
 //    public List<ConcernTopicVo> concernTopics(ConcernTopicVo concernTopicVo,String concerns);
     

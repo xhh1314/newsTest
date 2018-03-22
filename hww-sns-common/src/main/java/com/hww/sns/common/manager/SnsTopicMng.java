@@ -46,9 +46,11 @@ public interface SnsTopicMng
 	List<SnsTopic> loadTopicListForRecomm(int limit);
 
 	SnsTopicDto saveTopic(SnsTopicDto Dto);
-	
-	
-    
+
+    void updateTopicUpNum(Long topicId, Integer upNum);
+    void updateTopicCommentNum(Long topicId,Integer upnum,Integer commentNum);
+
+
 //    Integer topicCountByContentId(Long contentId);
     
     

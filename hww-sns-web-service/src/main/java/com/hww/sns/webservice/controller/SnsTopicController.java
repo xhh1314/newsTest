@@ -477,6 +477,18 @@ public class SnsTopicController {
 		return cu;
 	}
 
+	@RequestMapping(value = "/updateTopicUpNum.do")
+	public R updateTopicUpNum(@RequestParam("topicId") Long topicId,@RequestParam("upNum") Integer upNum){
+		snsTopicMng.updateTopicUpNum(topicId,upNum);
+		return R.ok();
+	}
+
+	@RequestMapping(value = "/updateTopicCommentAndLikeNumber.do")
+	public R updateTopicCommentAndLikeNumber(@RequestParam("topicId") Long topicId,@RequestParam("upNum") Integer upNum,@RequestParam("commentNum") Integer commentNum){
+		snsTopicMng.updateTopicCommentNum(topicId,upNum,commentNum);
+		return R.ok();
+	}
+
 	/**
 	 * 舉報接口
 	 * 

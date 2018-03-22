@@ -13,9 +13,9 @@ public enum RedisKey {
 	SnsComment("sns:comment:"),
 
 	/**
-	 * 记录被点赞过的文章,value组成为:contentId:behaviorType:plateType
+	 * 记录被点赞过的文章,和被评论过的文章,value组成为:contentId:behaviorType:plateType
 	 */
-	LikeHistory("like:history"),
+	LikeAndCommentHistory("like:comment:history"),
 	/**
 	 * 记录被评论过的文章,value组成为:contentId:behaviorType:plateType
 	 */

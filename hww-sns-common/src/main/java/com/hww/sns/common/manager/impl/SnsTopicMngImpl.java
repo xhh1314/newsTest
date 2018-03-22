@@ -1,8 +1,5 @@
 package com.hww.sns.common.manager.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.hww.base.common.manager.impl.BaseEntityMngImpl;
 import com.hww.base.common.util.Finder;
@@ -155,36 +152,70 @@ public class SnsTopicMngImpl extends BaseEntityMngImpl<Long, SnsTopic, SnsTopicD
 		if (followMemberIds.size() > 100) {
 			return snsTopicDao.loadConcernUserTopics(snsQueryDto, followMemberIds);
 		}
-		Jedis conn;
-		conn = JedisPoolUtil.getConnection();
-		Pipeline pipeline = conn.pipelined();
-		int begin = (snsQueryDto.getPageNo() - 1) * snsQueryDto.getPageSize();
-		int end = begin + snsQueryDto.getPageSize() - 1;
-		Map<Long, Set<String>> responseMap = new HashMap<>(32);
-		for (Long id : followMemberIds) {
-			String key = RedisKey.SnsTopic.getValue() + id;
-			Response<Set<String>> response = pipeline.zrevrange(key, begin, end);
-			if(response!=null && response.get()!=null)
-			responseMap.put(id, response.get());
-		}
-		pipeline.sync();
-		List<Long> snsTopicIdMiss = new LinkedList<>();
-		List<SnsTopic> topicsFromRedis = new LinkedList<>();
-		for(Long id:followMemberIds){
-			Set<String> topicIds=responseMap.get(id);
-			if(topicIds==null)
-				snsTopicIdMiss.add(id);
-			for(String str:topicIds){
-				String[] strArray= str.split(";");
-				SnsTopic topic=new SnsTopic();
-				topic.setTopicId(Long.parseLong(strArray[0]));
-				topic.setCreateTime(new Timestamp(Long.parseLong(strArray[1])));
-				topicsFromRedis.add(topic);
+		Jedis conn = null;
+		try {
+			conn = JedisPoolUtil.getConnection();
+			Pipeline pipeline = conn.pipelined();
+			int begin = (snsQueryDto.getPageNo() - 1) * snsQueryDto.getPageSize();
+			int end = begin + snsQueryDto.getPageSize() - 1;
+			Map<Long, Set<String>> responseMap = new HashMap<>(32);
+			for (Long id : followMemberIds) {
+				String key = RedisKey.SnsTopic.getValue() + id;
+				Response<Set<String>> response = pipeline.zrevrange(key, begin, end);
+				if (response != null && response.get() != null)
+					responseMap.put(id, response.get());
 			}
+			pipeline.sync();
+			List<Long> snsTopicIdMiss = new LinkedList<>();
+			// 从redis查出的集合
+			List<SnsTopic> topicsFromRedis = new LinkedList<>();
+			for (Long id : followMemberIds) {
+				Set<String> topicIds = responseMap.get(id);
+				if (topicIds == null)
+					snsTopicIdMiss.add(id);
+				for (String str : topicIds) {
+					String[] strArray = str.split(";");
+					SnsTopic topic = new SnsTopic();
+					topic.setTopicId(Long.parseLong(strArray[0]));
+					topic.setCreateTime(new Timestamp(Long.parseLong(strArray[1])));
+					topicsFromRedis.add(topic);
+				}
+			}
+			// 确实有miss的情况再查数据库
+			if (snsTopicIdMiss.size() > 0) {
+				List<SnsTopic> topicMiss = snsTopicDao.listTopicByMemeberIds(snsTopicIdMiss);
+				Pipeline pipeline1 = conn.pipelined();
+				for (SnsTopic topic : topicMiss) {
+					pipeline1.hmset(RedisKey.SnsTopic.getValue() + topic.getTopicId(),
+							BeanMapper.mapBeanToStringMap(topic));
+					pipeline1.zadd(RedisKey.UserTopic.getValue() + topic.getMemberId(), topic.getCreateTime().getTime(),
+							topic.getTopicId() + ":" + topic.getCreateTime());
+					// 数据库查出的内容也加入
+					topicsFromRedis.add(topic);
+				}
+				pipeline1.sync();
+			}
+			if (topicsFromRedis.size() == 0)
+				return Lists.newArrayList();
+			// 排序
+			List<SnsTopic> finallyTopic = topicsFromRedis.parallelStream().sorted((o1, o2) -> {
+				long val1 = o1.getCreateTime().getTime();
+				long val2 = o2.getCreateTime().getTime();
+				if (val1 < val2)
+					return 1;
+				else if (val1 > val2)
+					return -1;
+				else
+					return 0;
+			}).collect(Collectors.toList()).subList(begin, end);
+			return finallyTopic;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		} finally {
+			if (conn != null)
+				conn.close();
 		}
-		List<SnsTopic> topicMiss=new LinkedList<>();
-		topicMiss=snsTopicDao.listTopicIdAndCreateTimeByMemeberId(snsTopicIdMiss);
-		return null;
+
 	}
 
 	@Override
@@ -327,4 +358,20 @@ public class SnsTopicMngImpl extends BaseEntityMngImpl<Long, SnsTopic, SnsTopicD
 		return Long.parseLong(find(f).get(0).toString());
 	}
 
+	@Override
+	public void updateTopicUpNum(Long topicId, Integer upNum) {
+		Finder finder=Finder.create("update SnsTopic set upNum=:upNum where topicId=:topicId");
+		finder.setParam("upNum",upNum);
+		finder.setParam("topicId",topicId);
+		update(finder);
+	}
+
+	@Override
+	public void updateTopicCommentNum(Long topicId, Integer upNum,Integer commentNum) {
+		Finder finder=Finder.create("update SnsTopic set commentNum=:commentNum,upNum=:upNum where topicId=:topicId");
+		finder.setParam("commentNum",commentNum);
+		finder.setParam("upNum",upNum);
+		finder.setParam("topicId",topicId);
+		update(finder);
+	}
 }

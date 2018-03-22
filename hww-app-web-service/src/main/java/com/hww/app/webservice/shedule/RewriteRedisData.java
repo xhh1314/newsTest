@@ -12,9 +12,6 @@ public class RewriteRedisData {
 
     public void writeLike(){
 
-        Feature[] features=new Feature[2];
-        features[0]=Feature.AllowArbitraryCommas;
-
     }
 
 }

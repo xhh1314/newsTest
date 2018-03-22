@@ -56,8 +56,10 @@ public class BeanMapper {
 	 */
 	public static Map<String, String> mapBeanToStringMap(Object obj) {
 		Map<String, String> map = new HashMap<>(32);
-		String strVal=JSON.toJSONString(obj,WriteNullListAsEmpty);
-		Map<String, Object> temp = JSON.parseObject(strVal, Map.class,InitStringFieldAsEmpty);
+		String strVal = JSON.toJSONString(obj, WriteNullListAsEmpty);
+		Map<String, Object> temp = JSON.parseObject(strVal, Map.class, InitStringFieldAsEmpty);
+		if (temp.size() == 0)
+			return map;
 		temp.forEach((s, o) -> {
 			if (o instanceof String) {
 				map.put(s, (String) o);

@@ -1,6 +1,7 @@
 package com.hww.sns.api;
 
 
+import com.hww.base.util.R;
 import com.hww.sns.common.dto.HBaseSnsQueryDto;
 import com.hww.sns.common.dto.HBaseSnsQueryFeginApiDto;
 import com.hww.sns.common.vo.SnsPostVo;
@@ -60,5 +61,8 @@ public interface SnsFeignClient{
     @RequestMapping(value = "/sns/topic/myTopicsFeginApi.do/{memberId}", method = RequestMethod.POST)
     List<SnsTopicVo> myTopics(@PathVariable("memberId") Long memberId);
   //from -ucenter----------------------------
+
+	@RequestMapping(value = "sns/topic/updateTopicCommentAndLikeNumber.do")
+	public R updateTopicCommentAndLikeNumber(@RequestParam("topicId") Long topicId, @RequestParam("upNum") Integer upNum, @RequestParam("commentNum") Integer commentNum);
 	
 }

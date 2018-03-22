@@ -97,8 +97,8 @@ public class SnsTopicDaoImpl extends LocalDataBaseDaoImpl<Long, SnsTopic> implem
     }
 
     @Override
-    public List<SnsTopic> listTopicIdAndCreateTimeByMemeberId(List<Long> snsTopicId) {
-        Finder finder=Finder.create("select a.topic_id as topicId,a.create_time as createTime  from sns_topic a inner join ");
+    public List<SnsTopic> listTopicByMemeberIds(List<Long> snsTopicId) {
+        Finder finder=Finder.create("select * from sns_topic a inner join ");
         finder.append("(select s.topic_id from sns_topic s where member_id in (:memberIds) and status=1 and show_status=1) temp ");
         finder.append("  on a.topic_id=temp.topic_id");
         finder.setParamList("memberIds",snsTopicId);

@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.session.SessionProperties;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 
@@ -139,7 +138,7 @@ public class AppMemberBehaviorCountMngImpl
 			}
 			conn.hincrBy(topicKey, "upNum", count);
 			// 记录被点赞过的文章，用一个定时任务不停的刷新数据到数据库
-			conn.sadd(RedisKey.LikeHistory.getValue(), contentId + ":" + bevType + ":" + plateType);
+			conn.sadd(RedisKey.LikeAndCommentHistory.getValue(), contentId + ":" + bevType + ":" + plateType);
 			String likeCollectionKey = RedisKey.LikeCollection.getValue() + contentId;
 			// 文章被点赞的集合很有可能过期，所以这里采用的策略是，每次定时任务刷到数据库之后，就从缓存里清除
 			// 当这里再次用到的时候再从数据库去查询，以保证数据一致性
@@ -174,6 +173,14 @@ public class AppMemberBehaviorCountMngImpl
 
 	}
 
+	/**
+	 * 用户评论行为存储到redis实现
+	 * @param contentId
+	 * @param bevType
+	 * @param plateType
+	 * @param count
+	 * @param memberId
+	 */
 	private void addCommentCount(Long contentId, Integer bevType, Integer plateType, int count, Long memberId) {
 		Jedis conn = null;
 		try {
@@ -207,7 +214,7 @@ public class AppMemberBehaviorCountMngImpl
 				return;
 			conn.hincrBy(commentKey, "commentNum", count);
 			// 记录被评论过的文章，方便定时任务把数据刷新到数据库
-			conn.sadd(RedisKey.CommentHistory.getValue(), contentId + ":" + bevType + ":" + plateType);
+			conn.sadd(RedisKey.LikeAndCommentHistory.getValue(), contentId + ":" + bevType + ":" + plateType);
 		} catch (RuntimeException e) {
 			throw new RuntimeException(e);
 		} finally {
