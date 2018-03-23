@@ -21,4 +21,5 @@ public class AppMemberBehaviorDaoImpl extends LocalEntityDaoImpl<Long, AppMember
 		List<Long> memberId = (List<Long>) findJoin(f, AppMemberBehavior.class);
 		return memberId;
 	}
+
 }

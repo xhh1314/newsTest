@@ -13,6 +13,7 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "app_member_behavior")
 public class AppMemberBehavior implements IBaseEntity<Long> {
+	private static final long serialVersionUID = -425890651835632580L;
 
 	// Fields
 

@@ -374,4 +374,9 @@ public class SnsTopicMngImpl extends BaseEntityMngImpl<Long, SnsTopic, SnsTopicD
 		finder.setParam("topicId",topicId);
 		update(finder);
 	}
+
+	@Override
+	public SnsTopic getSnsTopicFromDataBase(Long topicId) {
+		return find(topicId);
+	}
 }

@@ -36,6 +36,10 @@ public interface SnsPostMng
 	Integer loadCountForNews(Long newsId,Integer showStatus);
 
 	SnsPostDto saveSnsPost(SnsPost post);
-	
+
+    void updateLikesAndCommentNumToDataBase(Long postId, Integer upNum, Integer commentNum);
+
+	SnsPost getSnsPostFromDatabase(Long postId);
+
 //    List<SnsPost> smPostList(PostListVo vo);
 }

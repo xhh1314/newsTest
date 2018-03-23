@@ -17,6 +17,7 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "app_category")
 public class AppCategory extends AbsBaseEntity<Long> implements IBaseTree<Long> {
+	private static final long serialVersionUID = 7886163180316092511L;
 
 	// Fields
 

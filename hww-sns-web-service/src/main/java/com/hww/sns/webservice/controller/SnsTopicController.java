@@ -124,7 +124,8 @@ public class SnsTopicController {
 			} else {
 				HSearchDto searchDto = new HSearchDto().setSearchType(4).setOrderBy(1)
 						.setLatitude(snsQueryDto.getLatitude()).setLongitude(snsQueryDto.getLongitude())
-						.setPageNo(snsQueryDto.getPageNo()).setPageSize(snsQueryDto.getPageSize()).setMemberId(snsQueryDto.getMemberId());
+						.setPageNo(snsQueryDto.getPageNo()).setPageSize(snsQueryDto.getPageSize())
+						.setMemberId(snsQueryDto.getMemberId());
 				List<Long> tipicIds = elsFeignClient.searchNearTopicIdsFeginApi(searchDto);
 				if (tipicIds == null) {
 					return R.ok().put("data", null);
@@ -478,15 +479,21 @@ public class SnsTopicController {
 	}
 
 	@RequestMapping(value = "/updateTopicUpNum.do")
-	public R updateTopicUpNum(@RequestParam("topicId") Long topicId,@RequestParam("upNum") Integer upNum){
-		snsTopicMng.updateTopicUpNum(topicId,upNum);
+	public R updateTopicUpNum(@RequestParam("topicId") Long topicId, @RequestParam("upNum") Integer upNum) {
+		snsTopicMng.updateTopicUpNum(topicId, upNum);
 		return R.ok();
 	}
 
 	@RequestMapping(value = "/updateTopicCommentAndLikeNumber.do")
-	public R updateTopicCommentAndLikeNumber(@RequestParam("topicId") Long topicId,@RequestParam("upNum") Integer upNum,@RequestParam("commentNum") Integer commentNum){
-		snsTopicMng.updateTopicCommentNum(topicId,upNum,commentNum);
+	public R updateTopicCommentAndLikeNumber(@RequestParam("topicId") Long topicId,
+			@RequestParam("upNum") Integer upNum, @RequestParam("commentNum") Integer commentNum) {
+		snsTopicMng.updateTopicCommentNum(topicId, upNum, commentNum);
 		return R.ok();
+	}
+
+	@RequestMapping(value = "/getSnsTopicFromDataBase.do", method = RequestMethod.GET)
+	public SnsTopic getSnsTopicFromDataBase(@RequestParam("topicId") Long topicId) {
+		return snsTopicMng.getSnsTopicFromDataBase(topicId);
 	}
 
 	/**

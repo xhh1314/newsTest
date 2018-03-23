@@ -50,6 +50,8 @@ public interface SnsTopicMng
     void updateTopicUpNum(Long topicId, Integer upNum);
     void updateTopicCommentNum(Long topicId,Integer upnum,Integer commentNum);
 
+    SnsTopic getSnsTopicFromDataBase(Long topicId);
+
 
 //    Integer topicCountByContentId(Long contentId);
     

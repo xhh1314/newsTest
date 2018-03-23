@@ -12,7 +12,9 @@ public interface AppMemberBehaviorCountDao extends IBaseEntityDao<Long, AppMembe
 	AppMemberBehaviorCount loadByContentIdAndBevType(Long contentId, Integer bevType,Integer plateType);
 
 	List<AppMemberBehaviorCount> loadByContentId(Long contentId,Integer plateType);
-	
+
+    Integer getCountByBehaviorAndPlate(Long contentId, Integer behaviorType, Integer plateType);
+
 //	List<AppMemberBehaviorCount> loadByContentIdsAndBevType(List<Long> contentIds, Integer bevType,Integer plateType);
 	
 

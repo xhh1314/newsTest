@@ -1,35 +1,41 @@
 package com.hww.app.common.manager.impl;
 
-import com.hww.app.common.dao.AppMemberBehaviorCountDao;
-import com.hww.app.common.dao.AppMemberBehaviorDao;
-import com.hww.app.common.dto.AppBehaviorCountDto;
-import com.hww.app.common.entity.AppMemberBehaviorCount;
-import com.hww.app.common.manager.AppMemberBehaviorCountMng;
-import com.hww.base.common.manager.impl.BaseEntityMngImpl;
-import com.hww.base.util.BeanMapper;
-import com.hww.framework.common.constant.HwwConsts;
-import com.hww.framework.common.constant.RedisKey;
-import com.hww.framework.common.tool.JedisPoolUtil;
-import com.hww.sns.api.SnsFeignClient;
-import com.hww.sns.common.dto.SnsPostDto;
-import com.hww.sns.common.dto.SnsTopicDto;
-import com.hww.sns.common.vo.SnsPostVo;
-import com.hww.sns.common.vo.SnsTopicVo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import redis.clients.jedis.Jedis;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
-@Service("appMemberBehaviorCountMngImpl")
+import com.hww.base.common.util.Finder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.alibaba.fastjson.JSON;
+import com.hww.app.common.dao.AppMemberBehaviorCountDao;
+import com.hww.app.common.dao.AppMemberBehaviorDao;
+import com.hww.app.common.dto.AppBehaviorCountDto;
+import com.hww.app.common.entity.AppMemberBehavior;
+import com.hww.app.common.entity.AppMemberBehaviorCount;
+import com.hww.app.common.manager.AppMemberBehaviorCountMng;
+import com.hww.base.common.manager.impl.BaseEntityMngImpl;
+import com.hww.base.util.BeanMapper;
+import com.hww.base.util.TimeUtils;
+import com.hww.framework.common.constant.HwwConsts;
+import com.hww.framework.common.constant.RedisKey;
+import com.hww.framework.common.tool.JedisPoolUtil;
+import com.hww.sns.api.SnsFeignClient;
+import com.hww.sns.common.dto.SnsPostDto;
+import com.hww.sns.common.entity.SnsTopic;
+import com.hww.sns.common.vo.SnsPostVo;
+import com.hww.sns.common.vo.SnsTopicVo;
+
+import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
+
+@Service
 public class AppMemberBehaviorCountMngImpl
 		extends BaseEntityMngImpl<Long, AppMemberBehaviorCount, AppMemberBehaviorCountDao>
 		implements AppMemberBehaviorCountMng {
@@ -106,6 +112,7 @@ public class AppMemberBehaviorCountMngImpl
 	}
 
 	/**
+	 * 把点赞数量耦合在主题里，虽然数据冗余能提高查询效率，但是这种方式开发起来相当复杂，这种方式不具备扩展性，没增加一个类型，就需要重新去写对应类型的实现
 	 * 点赞redis实现
 	 * @param contentId
 	 * @param bevType
@@ -113,59 +120,36 @@ public class AppMemberBehaviorCountMngImpl
 	 * @param count
 	 * @param memberId
 	 */
-	private void addLikeCount(Long contentId, Integer bevType, Integer plateType, int count, Long memberId) {
+	private void addLikeCount(Long contentId, Integer bevType, Integer plateType, Integer count, Long memberId) {
 		Jedis conn = null;
-
 		try {
-			conn = JedisPoolUtil.getConnection();
-			String topicKey = RedisKey.SnsTopic.getValue() + contentId;
-			String upnum = conn.hget(topicKey, "upNum");
-			// 缓存里没有则查询数据库
-			if (upnum == null) {
-				synchronized (this) {
-					if (upnum == null) {
-						// 主题
-						if (plateType == (HwwConsts.PlateType.topic)) {
-							SnsTopicVo snsTopicVo = snsFeignClient.topicDetail(contentId);
-							SnsTopicDto snsTopicDto = new SnsTopicDto();
-							org.springframework.beans.BeanUtils.copyProperties(snsTopicVo, snsTopicDto);
-							conn.hmset(topicKey, BeanMapper.mapBeanToStringMap(snsTopicDto));
-							conn.expire(topicKey, expireTime);
-							upnum = snsTopicDto.getUpNum().toString();
-						}
+			conn=JedisPoolUtil.getConnection();
+			String likedHistoryCollectionKey = RedisKey.LikedHistoryCollection.getValue();
+			String memberKey = contentId + ":" + plateType;
+			Double number = conn.zscore(likedHistoryCollectionKey, memberKey);
+			if (number == null) {
+				synchronized (memberKey) {
+					if (number == null) {
+						Integer numberFromDataBase = appMemberBehaviorCountDao.getCountByBehaviorAndPlate(contentId,
+								bevType, plateType);
+						if (numberFromDataBase == null)
+							conn.zadd(likedHistoryCollectionKey, 0, memberKey);
+						else
+							number = numberFromDataBase.doubleValue();
 					}
 				}
 			}
-			conn.hincrBy(topicKey, "upNum", count);
-			// 记录被点赞过的文章，用一个定时任务不停的刷新数据到数据库
-			conn.sadd(RedisKey.LikeAndCommentHistory.getValue(), contentId + ":" + bevType + ":" + plateType);
-			String likeCollectionKey = RedisKey.LikeCollection.getValue() + contentId;
-			// 文章被点赞的集合很有可能过期，所以这里采用的策略是，每次定时任务刷到数据库之后，就从缓存里清除
-			// 当这里再次用到的时候再从数据库去查询，以保证数据一致性
-			if (conn.exists(likeCollectionKey)) {
-				if (count == 1)
-					conn.sadd(likeCollectionKey, memberId.toString());
-				else
-					conn.srem(likeCollectionKey, memberId.toString());
-				conn.expire(likeCollectionKey, expireTime);
+			if (number == 0 && count == -1) {
+				return;
 			}
-			{
-				synchronized (this) {
-					if (!conn.exists(likeCollectionKey)) {
-						List<Long> memberIds = appMemberBehaviorDao.listMemberIdsByContentIdAndBehaviorType(contentId,
-								bevType);
-						if (memberIds != null && memberIds.size() > 0) {
-							List<String> memberString = memberIds.stream().map(val -> val.toString())
-									.collect(Collectors.toList());
-							String[] memberArray = new String[memberString.size()];
-							memberString.toArray(memberArray);
-							conn.sadd(likeCollectionKey, memberArray);
-						}
-					}
-				}
-			}
-		} catch (BeansException e) {
-			log.error("error!:{}", e);
+			conn.zincrby(likedHistoryCollectionKey, number.intValue() + count, memberKey);
+			writeMemberBehaviorToCache(conn, contentId, bevType, plateType, count, memberId);
+			if (count == 1)
+				conn.sadd(RedisKey.ContentLikedCollection.getValue() + memberKey, memberId.toString());
+			if (count == -1)
+				conn.srem(RedisKey.ContentLikedCollection.getValue() + memberKey, memberId.toString());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		} finally {
 			if (conn != null)
 				conn.close();
@@ -184,44 +168,45 @@ public class AppMemberBehaviorCountMngImpl
 	private void addCommentCount(Long contentId, Integer bevType, Integer plateType, int count, Long memberId) {
 		Jedis conn = null;
 		try {
-			conn = JedisPoolUtil.getConnection();
-			String commentKey = RedisKey.SnsComment.getValue() + contentId;
-			String oldCount = conn.hget(commentKey, "commentNum");
-			if (oldCount == null) {
-				lockOfComment.lock();
-				try {
-					if (oldCount == null) {
-						SnsPostVo postVo = snsFeignClient.postDetail(contentId);
-						if (postVo == null) {
-							conn.hset(commentKey, "commentNum", "0");
-							conn.expire(commentKey, 2);
-							oldCount = "0";
-						} else {
-							SnsPostDto postDto = new SnsPostDto();
-							BeanUtils.copyProperties(postVo, postDto);
-							conn.hmset(commentKey, BeanMapper.mapBeanToStringMap(postDto));
-							oldCount = postDto.getCommentNum().toString();
-						}
-					}
-				} catch (BeansException e) {
-					throw new RuntimeException(e);
-				} finally {
-					lockOfComment.unlock();
-				}
-
-			}
-			if (count == -1 && Integer.parseInt(oldCount) == 0)
-				return;
-			conn.hincrBy(commentKey, "commentNum", count);
-			// 记录被评论过的文章，方便定时任务把数据刷新到数据库
-			conn.sadd(RedisKey.LikeAndCommentHistory.getValue(), contentId + ":" + bevType + ":" + plateType);
+			conn=JedisPoolUtil.getConnection();
+			String commentHistoryCollectionKey = RedisKey.CommentedHistoryCollection.getValue();
+			String memberKey = contentId + ":" + plateType;
+			Double number = conn.zscore(commentHistoryCollectionKey, memberKey);
+			if (number == null) {
+                synchronized (memberKey) {
+                    if (number == null) {
+                        Integer numberFromDataBase = appMemberBehaviorCountDao.getCountByBehaviorAndPlate(contentId,
+                                bevType, plateType);
+                        if (numberFromDataBase == null)
+                            conn.zadd(commentHistoryCollectionKey, 0, memberKey);
+                        else
+                            number = numberFromDataBase.doubleValue();
+                    }
+                }
+            }
+			if (count != 1)
+                throw new RuntimeException("评论数量不能为非1的值！");
+			conn.zincrby(commentHistoryCollectionKey, number.intValue() + count, memberKey);
+			writeMemberBehaviorToCache(conn, contentId, bevType, plateType, count, memberId);
 		} catch (RuntimeException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("增加评论数发生异常！");
 		} finally {
-			if (conn != null)
+			if (conn!=null)
 				conn.close();
 		}
 
+	}
+
+	private void writeMemberBehaviorToCache(Jedis conn, Long contentId, Integer bevType, Integer plateType, int count,
+			Long memberId) {
+		AppMemberBehavior memberBehavior = new AppMemberBehavior();
+		memberBehavior.setBevType(bevType);
+		memberBehavior.setPlateType(plateType);
+		memberBehavior.setBevValue(count);
+		memberBehavior.setContentId(contentId);
+		memberBehavior.setMemberId(memberId);
+		memberBehavior.setCreateTime(TimeUtils.getDateToTimestamp());
+		conn.lpush(RedisKey.UserBehavior.getValue(), JSON.toJSONString(memberBehavior));
 	}
 
 	// @Override

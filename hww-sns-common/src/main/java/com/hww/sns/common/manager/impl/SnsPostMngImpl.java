@@ -172,4 +172,17 @@ public class SnsPostMngImpl extends BaseEntityMngImpl<Long, SnsPost, SnsPostDao>
 		return Integer.parseInt(list.get(0).get("cu").toString());
 	}
 
+	@Override
+	public void updateLikesAndCommentNumToDataBase(Long postId, Integer upNum, Integer commentNum) {
+		Finder f=Finder.create("update SnsPost set upNum=:upNum,commentNum=:commentNum where postId=:postId");
+		f.setParam("commentNum",commentNum);
+		f.setParam("upNum",upNum);
+		f.setParam("postId",postId);
+		update(f);
+	}
+
+	@Override
+	public SnsPost getSnsPostFromDatabase(Long postId) {
+		return find(postId);
+	}
 }
