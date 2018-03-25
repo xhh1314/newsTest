@@ -14,6 +14,7 @@ public interface AppMemberBehaviorCountDao extends IBaseEntityDao<Long, AppMembe
 	List<AppMemberBehaviorCount> loadByContentId(Long contentId,Integer plateType);
 
     Integer getCountByBehaviorAndPlate(Long contentId, Integer behaviorType, Integer plateType);
+	AppMemberBehaviorCount getAppMemeberBehaviorCount(Long contentId, Integer behaviorType, Integer plateType);
 
 //	List<AppMemberBehaviorCount> loadByContentIdsAndBevType(List<Long> contentIds, Integer bevType,Integer plateType);
 	

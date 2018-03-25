@@ -1,4 +1,4 @@
-package com.hww.app.webservice.shedule;
+package com.hww.app.webservice.scheduled;
 
 
 import org.slf4j.Logger;
@@ -22,7 +22,11 @@ public class ScheduledWriteLikeNumberToMysqlService implements ApplicationRunner
   @Override
   public void run(ApplicationArguments args) throws Exception {
     log.info("------------执行刷入点赞数据计划任务----------");
-    scheduledExecutorService.scheduleAtFixedRate(new RewriteLikeNum(),10,10, TimeUnit.MINUTES);
+    scheduledExecutorService.scheduleAtFixedRate(new RewriteLikedNumber(),1,10, TimeUnit.MINUTES);
+    log.info("------------执行刷入评论数据计划任务----------");
+    scheduledExecutorService.scheduleAtFixedRate(new RewriteCommentNumber(),1,10, TimeUnit.MINUTES);
+    log.info("-------------执行刷入用户行为数据计划任务---------------");
+    scheduledExecutorService.scheduleAtFixedRate(new RewriteUserBehavior(),1,10, TimeUnit.MINUTES);
   }
 
   @PreDestroy

@@ -19,78 +19,62 @@ import java.util.List;
 @RequestMapping("/app/behavior")
 public class AppMemberBehaviorController {
 	private static final Log log = LogFactory.getLog(AppMemberBehaviorController.class);
-	
-  @Autowired
-  private AppMemberBehaviorService appMemberBehaviorService;
-  
 
+	@Autowired
+	private AppMemberBehaviorService appMemberBehaviorService;
 
 	@RequestMapping(value = "/createBehavior.do", method = RequestMethod.POST)
 	public R createBehavior(@RequestBody AppBehaviorDto behaviorDto) {
-	  try{
-		  if(behaviorDto.getContentId()==null) {
-			  return R.error("请选择对应新闻或者新鲜事");
-		  }
-		  if(behaviorDto.getMemberId()==null) {
-			  return R.error("当前用户未登录");
-		  }
-		  if(behaviorDto.getBevType()==null||!HwwConsts.userBeahavList.contains(behaviorDto.getBevType())) {
-			  return R.error("用户行为类型错误");
-		  }
-		  if(behaviorDto.getPlateType()==null||!HwwConsts.userBeahavPlateList.contains(behaviorDto.getPlateType())) {
-			  return R.error("所属类型类型错误");
-		  }
-		  if(behaviorDto.getBevValue()==null) {
-			  return R.error("操作值错误");
-		  }
-		  appMemberBehaviorService.createBehavior(behaviorDto);
-		  return R.ok("操作成功");
-	  }catch(Exception e){
-		  e.printStackTrace();
-		  return R.error("操作失败");
-	  }
-  }
-
+		try {
+			if (behaviorDto.getContentId() == null) {
+				return R.error("请选择对应新闻或者新鲜事");
+			}
+			if (behaviorDto.getMemberId() == null) {
+				return R.error("当前用户未登录");
+			}
+			if (behaviorDto.getBevType() == null || !HwwConsts.userBeahavList.contains(behaviorDto.getBevType())) {
+				return R.error("用户行为类型错误");
+			}
+			if (behaviorDto.getPlateType() == null
+					|| !HwwConsts.userBeahavPlateList.contains(behaviorDto.getPlateType())) {
+				return R.error("所属类型类型错误");
+			}
+			if (behaviorDto.getBevValue() == null) {
+				return R.error("操作值错误");
+			}
+			appMemberBehaviorService.createBehavior(behaviorDto);
+			return R.ok("操作成功");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return R.error("操作失败");
+		}
+	}
 
 	@RequestMapping(value = "/behaviorExist.do", method = RequestMethod.POST)
-//  @ResponseBody
+	// @ResponseBody
 	public String behaviorExist(@RequestBody AppBehaviorDto behaviorDto) {
-	  if(behaviorDto.getMemberId()==null||behaviorDto.getContentId()==null||behaviorDto.getBevType()==null){
-		  return "n";
-	  }
-	  AppMemberBehaviorVo appMemberBehaviorVo = appMemberBehaviorService.loadUserBehaviorForContentByType(
-			  behaviorDto.getMemberId(),
-			  behaviorDto.getContentId(),
-			  behaviorDto.getBevType(),
-			  BehaviorValue.bev1,
-			  behaviorDto.getPlateType());
-	  
-	  if(appMemberBehaviorVo==null){
-		  return "n";
-	  }else{
-		  Integer bevValue = appMemberBehaviorVo.getBevValue();
-		  if(BehaviorValue.bev1.intValue()==bevValue.intValue()){
-			  return "y";
-		  }
-		  return "n";
-	  }
-  }
-  
-  @RequestMapping(value = "/loadcontentids.do", method = RequestMethod.POST)
-//  @ResponseBody
-  public List<Long> loadBehaviorContentIds(@RequestBody AppBehaviorDto appBehaviorDto){
-	  if(appBehaviorDto.getMemberId()==null||appBehaviorDto.getBevType()==null) {
-		  return Lists.newArrayList();
-	  }
-	  
-	  List<Long> contentIds = appMemberBehaviorService.loadContentIdsByUserAndBevType(appBehaviorDto.getMemberId(), appBehaviorDto.getBevType(),appBehaviorDto.getPlateType());
-	  if(contentIds==null){
-		  return new ArrayList<Long>();
-	  }
-	  return contentIds;
+		if (behaviorDto.getMemberId() == null || behaviorDto.getContentId() == null
+				|| behaviorDto.getBevType() == null) {
+			return "n";
+		}
+		boolean flag = appMemberBehaviorService.getUserBehaviorExist(behaviorDto.getMemberId(),
+				behaviorDto.getContentId(), behaviorDto.getBevType(), BehaviorValue.bev1, behaviorDto.getPlateType());
+
+		return flag ? "y" : "n";
+	}
+
+	@RequestMapping(value = "/loadcontentids.do", method = RequestMethod.POST)
+	// @ResponseBody
+	public List<Long> loadBehaviorContentIds(@RequestBody AppBehaviorDto appBehaviorDto) {
+		if (appBehaviorDto.getMemberId() == null || appBehaviorDto.getBevType() == null) {
+			return Lists.newArrayList();
+		}
+
+		List<Long> contentIds = appMemberBehaviorService.loadContentIdsByUserAndBevType(appBehaviorDto.getMemberId(),
+				appBehaviorDto.getBevType(), appBehaviorDto.getPlateType());
+		if (contentIds == null) {
+			return new ArrayList<Long>();
+		}
+		return contentIds;
 	}
 }
-
-
-
-

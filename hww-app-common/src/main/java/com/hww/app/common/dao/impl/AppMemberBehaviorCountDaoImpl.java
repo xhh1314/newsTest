@@ -59,6 +59,21 @@ public class AppMemberBehaviorCountDaoImpl extends LocalEntityDaoImpl<Long, AppM
 			return null;
 		return appMemberBehaviorCounts.get(0).getBevCount();
 	}
+
+	@Override
+	public AppMemberBehaviorCount getAppMemeberBehaviorCount(Long contentId, Integer behaviorType, Integer plateType) {
+		Finder f = Finder.create("from AppMemberBehaviorCount ");
+		f.append(" where  contentId=:contentId");
+		f.append(" and plateType =:plateType ");
+		f.append(" and bevType=:bevType");
+		f.setParam("plateType", plateType);
+		f.setParam("contentId", contentId);
+		f.setParam("bevType", behaviorType);
+		List<AppMemberBehaviorCount> appMemberBehaviorCounts = (List<AppMemberBehaviorCount>) find(f);
+		if (appMemberBehaviorCounts == null || appMemberBehaviorCounts.isEmpty())
+			return null;
+		return appMemberBehaviorCounts.get(0);
+	}
 	// @Override
 	// public List<AppMemberBehaviorCount> loadByContentIdsAndBevType(List<Long>
 	// contentIds, Integer bevType,Integer plateType) {

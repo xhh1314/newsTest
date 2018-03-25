@@ -21,96 +21,111 @@ import java.util.stream.Collectors;
 @Transactional
 public class AppMemberBehaviorServiceImpl implements AppMemberBehaviorService {
 
-	 @Autowired
-	 private AppMemberBehaviorMng appMemberBehaviorMng;
+	@Autowired
+	private AppMemberBehaviorMng appMemberBehaviorMng;
 
-	 @Autowired
-	 private  AppMemberBehaviorCountService behaviorCountService;
-	
+	@Autowired
+	private AppMemberBehaviorCountService behaviorCountService;
+
 	@Override
 	public void createBehavior(AppBehaviorDto behaviorDto) {
-		Long memberId=behaviorDto.getMemberId();
-		Long contentId=behaviorDto.getContentId();
-		Integer bevType=behaviorDto.getBevType();
-		
-		Integer bevValue =behaviorDto.getBevValue();
-		
+		Long memberId = behaviorDto.getMemberId();
+		Long contentId = behaviorDto.getContentId();
+		Integer bevType = behaviorDto.getBevType();
+
+		Integer bevValue = behaviorDto.getBevValue();
+
 		Integer plateType = behaviorDto.getPlateType();
-		
-		
-		AppMemberBehaviorVo vo = loadUserBehaviorForContentByType( memberId,  contentId, bevType,null,plateType);
-		if(vo!=null) {
-			//已经是点赞。。。。等操作  0 详情查看， 1点赞 ，2 收藏，3评论，4爆料，5不感兴趣( 不感兴趣，6内容太水，7看过了)
-			if(HwwConsts.Behavior.b3_pl!=bevType.intValue()&&HwwConsts.Behavior.b4_bl!=bevType.intValue()) {//评论，爆料 需要继续加一
-				if(HwwConsts.BehaviorValue.bev1.equals(vo.getBevValue())&&HwwConsts.BehaviorValue.bev1.equals(bevValue)) {
+
+		AppMemberBehaviorVo vo = loadUserBehaviorForContentByType(memberId, contentId, bevType, null, plateType);
+		if (vo != null) {
+			// 已经是点赞。。。。等操作 0 详情查看， 1点赞 ，2 收藏，3评论，4爆料，5不感兴趣( 不感兴趣，6内容太水，7看过了)
+			if (HwwConsts.Behavior.b3_pl != bevType.intValue() && HwwConsts.Behavior.b4_bl != bevType.intValue()) {// 评论，爆料
+																													// 需要继续加一
+				if (HwwConsts.BehaviorValue.bev1.equals(vo.getBevValue())
+						&& HwwConsts.BehaviorValue.bev1.equals(bevValue)) {
 					return;
 				}
 			}
-			if(HwwConsts.Behavior.b3_pl!=bevType.intValue()&&HwwConsts.Behavior.b4_bl!=bevType.intValue()) {//评论，爆料 需要继续加一
-				//已经是 取消点赞。。。等操作
-				if(HwwConsts.BehaviorValue.bev0.equals(vo.getBevValue())&&HwwConsts.BehaviorValue.bev0.equals(bevValue)) {
+			if (HwwConsts.Behavior.b3_pl != bevType.intValue() && HwwConsts.Behavior.b4_bl != bevType.intValue()) {// 评论，爆料
+																													// 需要继续加一
+				// 已经是 取消点赞。。。等操作
+				if (HwwConsts.BehaviorValue.bev0.equals(vo.getBevValue())
+						&& HwwConsts.BehaviorValue.bev0.equals(bevValue)) {
 					return;
 				}
 			}
-		
-			AppMemberBehavior appMemberBehavior=new AppMemberBehavior();
+
+			AppMemberBehavior appMemberBehavior = new AppMemberBehavior();
 			BeanMapper.copy(vo, appMemberBehavior);
 			appMemberBehavior.setBevValue(bevValue);
 			appMemberBehavior.setReadedTime(TimeUtils.getDateToTimestamp());
-			appMemberBehaviorMng.updateBevValue(vo.getBehaviorId(),bevValue);
-			
-			
-			if(HwwConsts.BehaviorValue.bev0.equals(bevValue)){
-				behaviorCountService.addBehaviorCount(contentId, bevType,plateType, -1,memberId);
-			}else {
-				behaviorCountService.addBehaviorCount(contentId, bevType,plateType, 1,memberId);
+			appMemberBehaviorMng.updateBevValue(vo.getBehaviorId(), bevValue);
+
+			if (HwwConsts.BehaviorValue.bev0.equals(bevValue)) {
+				behaviorCountService.addBehaviorCount(contentId, bevType, plateType, -1, memberId);
+			} else {
+				behaviorCountService.addBehaviorCount(contentId, bevType, plateType, 1, memberId);
 			}
-			
-		}else {
-			AppMemberBehavior appMemberBehavior=new AppMemberBehavior();
+
+		} else {
+			AppMemberBehavior appMemberBehavior = new AppMemberBehavior();
 			BeanMapper.copy(behaviorDto, appMemberBehavior);
 			appMemberBehavior.setBevValue(bevValue);
 			appMemberBehavior.setCreateTime(TimeUtils.getDateToTimestamp());
 			appMemberBehavior.setReadedTime(TimeUtils.getDateToTimestamp());
 			appMemberBehaviorMng.save(appMemberBehavior);
-			
-			if(HwwConsts.BehaviorValue.bev0.equals(bevValue)){
-				//第一次点击肯定不会出现直接取消点赞的情况
-				//behaviorCountService.addBehaviorCount(contentId, bevType,plateType, -1);
-			}else {
-				behaviorCountService.addBehaviorCount(contentId, bevType,plateType, 1,memberId);
+
+			if (HwwConsts.BehaviorValue.bev0.equals(bevValue)) {
+				// 第一次点击肯定不会出现直接取消点赞的情况
+				// behaviorCountService.addBehaviorCount(contentId, bevType,plateType, -1);
+			} else {
+				behaviorCountService.addBehaviorCount(contentId, bevType, plateType, 1, memberId);
 			}
 		}
-		
+
 	}
 
 	@Override
-	public AppMemberBehaviorVo loadUserBehaviorForContentByType(Long memberId, Long contentId, Integer bevType,Integer bevValue,Integer plateType) {
-		AppMemberBehaviorVo appMemberBehaviorVo = appMemberBehaviorMng.loadUserBehaviorForContentByType(memberId,  contentId, bevType,bevValue,plateType);
+	public AppMemberBehaviorVo loadUserBehaviorForContentByType(Long memberId, Long contentId, Integer bevType,
+			Integer bevValue, Integer plateType) {
+		AppMemberBehaviorVo appMemberBehaviorVo = appMemberBehaviorMng.loadUserBehaviorForContentByType(memberId,
+				contentId, bevType, bevValue, plateType);
 		return appMemberBehaviorVo;
 	}
 
-
 	@Override
-	public List<Long> loadContentIdsByUserAndBevType(Long memberId, Integer bevType,Integer plateType) {
+	public List<Long> loadContentIdsByUserAndBevType(Long memberId, Integer bevType, Integer plateType) {
 		List<Long> contentIds = new ArrayList<Long>();
-		if(memberId==null||bevType==null) {
+		if (memberId == null || bevType == null) {
 			return contentIds;
 		}
-		List<AppMemberBehaviorVo> vo_list= appMemberBehaviorMng.loadContentIdsByUserAndBevType(memberId,bevType,plateType);
-		
-		//过滤
-//		vo_list=vo_list.stream().filter(val->HwwConsts.BehaviorValue.bev1.equals(val.getBevValue())).collect(Collectors.toList());
-		
-		if(vo_list!=null){
-			contentIds =vo_list.stream().map(val->val.getContentId()).collect(Collectors.toList());
+		List<AppMemberBehaviorVo> vo_list = appMemberBehaviorMng.loadContentIdsByUserAndBevType(memberId, bevType,
+				plateType);
+
+		// 过滤
+		// vo_list=vo_list.stream().filter(val->HwwConsts.BehaviorValue.bev1.equals(val.getBevValue())).collect(Collectors.toList());
+
+		if (vo_list != null) {
+			contentIds = vo_list.stream().map(val -> val.getContentId()).collect(Collectors.toList());
 		}
 		return contentIds;
 	}
 
-
-
-
-
-
+	@Override
+	public boolean getUserBehaviorExist(Long memberId, Long contentId, Integer bevType, Integer bevValue,
+			Integer plateType) {
+		// 点赞的情况优先从缓存中取
+		if (bevType.equals(HwwConsts.Behavior.b1_dz)) {
+			return appMemberBehaviorMng.getIsUserInLikedCollection(contentId, plateType, memberId);
+		}
+		// 不是点赞的情况，从数据库查
+		AppMemberBehaviorVo appMemberBehavior = appMemberBehaviorMng.loadUserBehaviorForContentByType(memberId,
+				contentId, bevType, bevValue, plateType);
+		if (appMemberBehavior == null)
+			return false;
+		if (appMemberBehavior.getBevValue().equals(bevValue))
+			return true;
+		return false;
+	}
 }

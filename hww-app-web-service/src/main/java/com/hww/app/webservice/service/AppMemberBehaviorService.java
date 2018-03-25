@@ -14,4 +14,15 @@ public interface AppMemberBehaviorService {
 	
 
     void createBehavior(AppBehaviorDto behaviorDto);
+
+    /**
+     * 查询用户的行为是否存在
+     * @param memberId
+     * @param contentId
+     * @param bevType
+     * @param bev1
+     * @param plateType
+     * @return
+     */
+    boolean getUserBehaviorExist(Long memberId, Long contentId, Integer bevType, Integer behaviorValue, Integer plateType);
 }

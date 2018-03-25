@@ -211,7 +211,7 @@ public class AppMemberBehaviorCountMngImpl0323
 			{
 				synchronized (contentIdStr) {
 					if (!conn.exists(likeCollectionKey)) {
-						List<Long> memberIds = appMemberBehaviorDao.listMemberIdsByContentIdAndBehaviorType(contentId,
+						List<Long> memberIds = appMemberBehaviorDao.listMemberIds 1ByContentIdAndBehaviorType(contentId,
 								bevType);
 						if (memberIds != null && memberIds.size() > 0) {
 							List<String> memberString = memberIds.stream().map(val -> val.toString())

@@ -16,4 +16,6 @@ public interface AppMemberBehaviorMng extends IBaseEntityMng<Long, AppMemberBeha
 
 
 	void updateBevValue(Long behaviorId, Integer bevValue);
+
+    boolean getIsUserInLikedCollection(Long contentId, Integer plateType,Long memberId);
 }

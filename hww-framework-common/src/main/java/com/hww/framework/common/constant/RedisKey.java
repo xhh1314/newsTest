@@ -3,7 +3,7 @@ package com.hww.framework.common.constant;
 public enum RedisKey {
 
 	/**
-	 * 新鲜事的key前缀+topicId
+	 * 新鲜事的key  sns:topic:topicId
 	 */
 	SnsTopic("sns:topic:"),
 
@@ -35,7 +35,7 @@ public enum RedisKey {
 	ContentLikedCollection("clc:"),
 
 	/**
-	 * 用户行为对象，存储用户的点赞 评论 收藏 等行为
+	 * 用户行为对象，存储用户的点赞 评论 收藏 等行为,用set存储，方便移除数据
 	 */
 	UserBehavior("user:behavior"),
 	/**

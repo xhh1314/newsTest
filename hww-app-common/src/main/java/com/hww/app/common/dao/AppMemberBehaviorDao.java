@@ -8,5 +8,7 @@ import java.util.List;
 public interface AppMemberBehaviorDao extends IBaseEntityDao<Long, AppMemberBehavior> {
 
 
-    List<Long> listMemberIdsByContentIdAndBehaviorType(Long ContentId,Integer behaviorType);
+    List<Long> listMemberIdsOfContentLiked(Long ContentId,Integer plateType, Integer behaviorType);
+
+    Integer getUserBehaviorCountValue(Long contentId, Integer behaviorType, Integer plateType, Long memberId);
 }

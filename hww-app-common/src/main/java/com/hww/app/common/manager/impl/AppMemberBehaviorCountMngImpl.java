@@ -6,7 +6,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
-import com.hww.base.common.util.Finder;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -27,10 +27,6 @@ import com.hww.framework.common.constant.HwwConsts;
 import com.hww.framework.common.constant.RedisKey;
 import com.hww.framework.common.tool.JedisPoolUtil;
 import com.hww.sns.api.SnsFeignClient;
-import com.hww.sns.common.dto.SnsPostDto;
-import com.hww.sns.common.entity.SnsTopic;
-import com.hww.sns.common.vo.SnsPostVo;
-import com.hww.sns.common.vo.SnsTopicVo;
 
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
@@ -68,12 +64,84 @@ public class AppMemberBehaviorCountMngImpl
 		if (contentId == null) {
 			return appMemberBehaviorCountDtoList;
 		}
-		List<AppMemberBehaviorCount> appMemberBehaviorCountList = appMemberBehaviorCountDao.loadByContentId(contentId,
-				plateType);
-		if (appMemberBehaviorCountList != null && appMemberBehaviorCountList.size() > 0) {
-			appMemberBehaviorCountDtoList = BeanMapper.mapList(appMemberBehaviorCountList, AppBehaviorCountDto.class);
+		// 查看新闻的用户行为的情况（新闻主要是看有没有收藏,是否感兴趣等,这块先直接从数据库查询）
+		if (plateType.equals(HwwConsts.PlateType.news)) {
+			List<AppMemberBehaviorCount> appMemberBehaviorCountList = appMemberBehaviorCountDao
+					.loadByContentId(contentId, plateType);
+			if (appMemberBehaviorCountList != null && appMemberBehaviorCountList.size() > 0) {
+				appMemberBehaviorCountDtoList = BeanMapper.mapList(appMemberBehaviorCountList,
+						AppBehaviorCountDto.class);
+			}
+			return appMemberBehaviorCountDtoList;
 		}
-		return appMemberBehaviorCountDtoList;
+		// 查看新鲜事或者评论的用户行为情况
+		AppMemberBehaviorCount commentBehaviorCount = null;
+		AppMemberBehaviorCount likesBehaviorCount = null;
+
+		Jedis conn = null;
+		try {
+			conn = JedisPoolUtil.getConnection();
+
+			// ---------处理评论数---------
+			Double commentNumber = conn.zscore(RedisKey.CommentedHistoryCollection.getValue(),
+					contentId + ":" + plateType);
+			if (commentNumber == null) {
+				commentBehaviorCount = appMemberBehaviorCountDao.getAppMemeberBehaviorCount(contentId,
+						HwwConsts.Behavior.b3_pl, plateType);
+				if (commentBehaviorCount == null) {
+					conn.zadd(RedisKey.CommentedHistoryCollection.getValue(), 0, contentId + ":" + plateType);
+					commentNumber = new Double(0);
+				} else {
+					conn.zadd(RedisKey.CommentedHistoryCollection.getValue(), commentBehaviorCount.getBevCount(),
+							contentId + ":" + plateType);
+					commentNumber = new Double(commentBehaviorCount.getBevCount());
+				}
+			}
+			// 不是从数据库查询的情况，需要new个对象
+			if (commentBehaviorCount == null)
+				commentBehaviorCount = new AppMemberBehaviorCount();
+			commentBehaviorCount.setContentId(contentId);
+			commentBehaviorCount.setBevType(HwwConsts.Behavior.b3_pl);
+			commentBehaviorCount.setPlateType(plateType);
+			commentBehaviorCount.setBevCount(commentNumber.intValue());
+
+			// -------处理点赞数--------
+			Double likedNumber = conn.zscore(RedisKey.LikedHistoryCollection.getValue(), contentId + ":" + plateType);
+			if (likedNumber == null) {
+				likesBehaviorCount = appMemberBehaviorCountDao.getAppMemeberBehaviorCount(contentId,
+						HwwConsts.Behavior.b1_dz, plateType);
+				if (likesBehaviorCount == null) {
+					conn.zadd(RedisKey.LikedHistoryCollection.getValue(), 0, contentId + ":" + plateType);
+					likedNumber = new Double(0);
+				} else {
+					conn.zadd(RedisKey.LikedHistoryCollection.getValue(), likesBehaviorCount.getBevCount(),
+							contentId + ":" + plateType);
+					likedNumber = new Double(likesBehaviorCount.getBevCount());
+				}
+			}
+			// 不是从数据库查询的情况，需要new个对象
+			if (likesBehaviorCount == null)
+				likesBehaviorCount = new AppMemberBehaviorCount();
+			likesBehaviorCount.setContentId(contentId);
+			likesBehaviorCount.setBevType(HwwConsts.Behavior.b1_dz);
+			likesBehaviorCount.setPlateType(plateType);
+			likesBehaviorCount.setBevCount(likedNumber.intValue());
+
+			// ------转换成dto------
+			AppBehaviorCountDto commentAppBehaviorCountDto = new AppBehaviorCountDto();
+			AppBehaviorCountDto likedAppBehaviorCountDto = new AppBehaviorCountDto();
+			BeanUtils.copyProperties(commentBehaviorCount, commentAppBehaviorCountDto);
+			BeanUtils.copyProperties(likesBehaviorCount, likedAppBehaviorCountDto);
+			appMemberBehaviorCountDtoList.add(commentAppBehaviorCountDto);
+			appMemberBehaviorCountDtoList.add(likedAppBehaviorCountDto);
+			return appMemberBehaviorCountDtoList;
+		} catch (BeansException e) {
+			log.error("查询用户行为发生异常!{}", e);
+			return Lists.newArrayList();
+		} finally {
+			if (conn != null)
+				conn.close();
+		}
 	}
 
 	@Override
@@ -123,7 +191,7 @@ public class AppMemberBehaviorCountMngImpl
 	private void addLikeCount(Long contentId, Integer bevType, Integer plateType, Integer count, Long memberId) {
 		Jedis conn = null;
 		try {
-			conn=JedisPoolUtil.getConnection();
+			conn = JedisPoolUtil.getConnection();
 			String likedHistoryCollectionKey = RedisKey.LikedHistoryCollection.getValue();
 			String memberKey = contentId + ":" + plateType;
 			Double number = conn.zscore(likedHistoryCollectionKey, memberKey);
@@ -142,12 +210,34 @@ public class AppMemberBehaviorCountMngImpl
 			if (number == 0 && count == -1) {
 				return;
 			}
+			// ----------点赞历史记录存储到缓存-----------
 			conn.zincrby(likedHistoryCollectionKey, number.intValue() + count, memberKey);
+
+			// -------------用户行为存储-------------
 			writeMemberBehaviorToCache(conn, contentId, bevType, plateType, count, memberId);
-			if (count == 1)
-				conn.sadd(RedisKey.ContentLikedCollection.getValue() + memberKey, memberId.toString());
-			if (count == -1)
-				conn.srem(RedisKey.ContentLikedCollection.getValue() + memberKey, memberId.toString());
+
+			// ---------------内容的点赞用户集合存储----------------
+			String contentLikedCollectionKey = RedisKey.ContentLikedCollection.getValue() + memberKey;
+			Boolean likedCollectionExist = conn.exists(contentLikedCollectionKey);
+			// 缓存中不存在,则从数据库刷出文章被点赞的memberId,以保证数据一致性
+			if (!likedCollectionExist) {
+				List<Long> memberIds = appMemberBehaviorDao.listMemberIdsOfContentLiked(contentId, plateType,
+						HwwConsts.Behavior.b1_dz);
+				if (memberIds == null || memberIds.isEmpty()) {
+					conn.sadd(contentLikedCollectionKey, "-1");
+				} else {
+					List<String> stringList = memberIds.parallelStream().map(val -> val.toString())
+							.collect(Collectors.toList());
+					conn.sadd(contentLikedCollectionKey, (String[]) stringList.toArray());
+
+				}
+			}
+			if (count == -1) {
+				conn.srem(contentLikedCollectionKey, memberId.toString());
+			} else if (count == 1) {
+				conn.sadd(contentLikedCollectionKey, memberId.toString());
+			}
+
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		} finally {
@@ -168,30 +258,30 @@ public class AppMemberBehaviorCountMngImpl
 	private void addCommentCount(Long contentId, Integer bevType, Integer plateType, int count, Long memberId) {
 		Jedis conn = null;
 		try {
-			conn=JedisPoolUtil.getConnection();
+			conn = JedisPoolUtil.getConnection();
 			String commentHistoryCollectionKey = RedisKey.CommentedHistoryCollection.getValue();
 			String memberKey = contentId + ":" + plateType;
 			Double number = conn.zscore(commentHistoryCollectionKey, memberKey);
 			if (number == null) {
-                synchronized (memberKey) {
-                    if (number == null) {
-                        Integer numberFromDataBase = appMemberBehaviorCountDao.getCountByBehaviorAndPlate(contentId,
-                                bevType, plateType);
-                        if (numberFromDataBase == null)
-                            conn.zadd(commentHistoryCollectionKey, 0, memberKey);
-                        else
-                            number = numberFromDataBase.doubleValue();
-                    }
-                }
-            }
+				synchronized (memberKey) {
+					if (number == null) {
+						Integer numberFromDataBase = appMemberBehaviorCountDao.getCountByBehaviorAndPlate(contentId,
+								bevType, plateType);
+						if (numberFromDataBase == null)
+							conn.zadd(commentHistoryCollectionKey, 0, memberKey);
+						else
+							number = numberFromDataBase.doubleValue();
+					}
+				}
+			}
 			if (count != 1)
-                throw new RuntimeException("评论数量不能为非1的值！");
+				throw new RuntimeException("评论数量不能为非1的值！");
 			conn.zincrby(commentHistoryCollectionKey, number.intValue() + count, memberKey);
 			writeMemberBehaviorToCache(conn, contentId, bevType, plateType, count, memberId);
 		} catch (RuntimeException e) {
 			throw new RuntimeException("增加评论数发生异常！");
 		} finally {
-			if (conn!=null)
+			if (conn != null)
 				conn.close();
 		}
 
@@ -207,6 +297,7 @@ public class AppMemberBehaviorCountMngImpl
 		memberBehavior.setMemberId(memberId);
 		memberBehavior.setCreateTime(TimeUtils.getDateToTimestamp());
 		conn.lpush(RedisKey.UserBehavior.getValue(), JSON.toJSONString(memberBehavior));
+
 	}
 
 	// @Override

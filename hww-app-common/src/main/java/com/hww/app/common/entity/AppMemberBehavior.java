@@ -170,4 +170,19 @@ public class AppMemberBehavior implements IBaseEntity<Long> {
 		return behaviorId;
 	}
 
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder("AppMemberBehavior{");
+		sb.append("memberId=").append(memberId);
+		sb.append(", contentId=").append(contentId);
+		sb.append(", categoryId=").append(categoryId);
+		sb.append(", createTime=").append(createTime);
+		sb.append(", readedTime=").append(readedTime);
+		sb.append(", bevType=").append(bevType);
+		sb.append(", keywords='").append(keywords).append('\'');
+		sb.append(", bevValue=").append(bevValue);
+		sb.append(", plateType=").append(plateType);
+		sb.append('}');
+		return sb.toString();
+	}
 }

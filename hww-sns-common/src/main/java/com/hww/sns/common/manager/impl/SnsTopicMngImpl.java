@@ -174,7 +174,7 @@ public class SnsTopicMngImpl extends BaseEntityMngImpl<Long, SnsTopic, SnsTopicD
 				if (topicIds == null)
 					snsTopicIdMiss.add(id);
 				for (String str : topicIds) {
-					String[] strArray = str.split(";");
+					String[] strArray = str.split(":");
 					SnsTopic topic = new SnsTopic();
 					topic.setTopicId(Long.parseLong(strArray[0]));
 					topic.setCreateTime(new Timestamp(Long.parseLong(strArray[1])));

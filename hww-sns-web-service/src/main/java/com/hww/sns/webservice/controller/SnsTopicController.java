@@ -142,6 +142,11 @@ public class SnsTopicController {
 		}
 	}
 
+	/**
+	 * 关注的人的新鲜事
+	 * @param snsQueryDto
+	 * @return
+	 */
 	@RequestMapping(value = "loadConcernTopics.do", method = RequestMethod.POST)
 	@ResponseBody
 	public R loadConcernTopics(HBaseSnsQueryDto snsQueryDto) {
