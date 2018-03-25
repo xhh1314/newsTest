@@ -48,9 +48,9 @@ public class AppMemberBehaviorCountMngImpl
 	private Lock lockOfComment = new ReentrantLock();
 
 	/**
-	 * 过期时间
+	 * 过期时间 7天
 	 */
-	private final int expireTime = 2 * 24 * 60 * 60;
+	private final int expireTime = 7 * 24 * 60;
 
 	@Autowired
 	public void setAppMemberBehaviorCountDao(AppMemberBehaviorCountDao appMemberBehaviorCountDao) {
@@ -231,6 +231,7 @@ public class AppMemberBehaviorCountMngImpl
 					conn.sadd(contentLikedCollectionKey, (String[]) stringList.toArray());
 
 				}
+				conn.expire(contentLikedCollectionKey, expireTime);
 			}
 			if (count == -1) {
 				conn.srem(contentLikedCollectionKey, memberId.toString());

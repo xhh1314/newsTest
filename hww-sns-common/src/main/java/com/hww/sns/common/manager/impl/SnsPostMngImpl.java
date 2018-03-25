@@ -48,6 +48,11 @@ public class SnsPostMngImpl extends BaseEntityMngImpl<Long, SnsPost, SnsPostDao>
 	// return snsPostDao.smallPostList(vo);
 	// }
 
+
+	/**
+	 * 过期时间 7天
+	 */
+	private final int expireTime=7*24*60;
 	@Override
 	public SnsPostDto saveSnsPost(SnsPost post) {
 		SnsPost newPost = snsPostDao.save(post);
@@ -57,6 +62,7 @@ public class SnsPostMngImpl extends BaseEntityMngImpl<Long, SnsPost, SnsPostDao>
 		try {
 			conn = JedisPoolUtil.getConnection();
 			conn.hmset(RedisKey.SnsTopic.getValue() + post.getPostId(), BeanMapper.mapBeanToStringMap(postDto));
+			conn.expire(RedisKey.SnsTopic.getValue() + post.getPostId(),expireTime);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

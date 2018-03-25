@@ -35,6 +35,7 @@ public class SnsTopicMngImpl extends BaseEntityMngImpl<Long, SnsTopic, SnsTopicD
 		super.setEntityDao(snsTopicDao);
 		this.snsTopicDao = snsTopicDao;
 	}
+	private final int expireTimeSeven =7*24*60;
 
 	@Override
 	public SnsTopicDto saveTopic(SnsTopicDto dto) {
@@ -46,6 +47,7 @@ public class SnsTopicMngImpl extends BaseEntityMngImpl<Long, SnsTopic, SnsTopicD
 		Jedis conn = JedisPoolUtil.getConnection();
 		try {
 			conn.hmset(RedisKey.SnsTopic.getValue() + dto.getTopicId(), map);
+			conn.expire(RedisKey.SnsTopic.getValue() + dto.getTopicId(), expireTimeSeven);
 			conn.zadd(RedisKey.UserTopic.getValue() + dto.getMemberId(), dto.getCreateTime().getTime(),
 					dto.getTopicId().toString() + ":" + dto.getCreateTime().getTime());
 		} catch (Exception e) {
